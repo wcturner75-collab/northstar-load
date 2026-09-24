@@ -121,5 +121,37 @@ NSBuilder.Inspector = (function () {
     parent.appendChild(lab);
   }
 
+  function addColor(parent, label, value, cb) {
+    const lab = document.createElement('label');
+    lab.textContent = label;
+    const row = document.createElement('div');
+    row.className = 'color-field-row';
+    const picker = document.createElement('input');
+    picker.type = 'color';
+    let hex = String(value || '#FFFFFF');
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) hex = '#FFFFFF';
+    picker.value = hex;
+    const hexInput = document.createElement('input');
+    hexInput.type = 'text';
+    hexInput.value = hex.toUpperCase();
+    hexInput.maxLength = 7;
+    hexInput.className = 'color-hex';
+    picker.addEventListener('input', () => {
+      hexInput.value = picker.value.toUpperCase();
+      cb(picker.value.toUpperCase());
+    });
+    hexInput.addEventListener('input', () => {
+      const v = hexInput.value.trim();
+      if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+        picker.value = v;
+        cb(v.toUpperCase());
+      }
+    });
+    row.appendChild(picker);
+    row.appendChild(hexInput);
+    lab.appendChild(row);
+    parent.appendChild(lab);
+  }
+
   return { init, setDoc, render };
 })();
