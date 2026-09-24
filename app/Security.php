@@ -12,8 +12,21 @@ final class Security
             return;
         }
         header('X-Content-Type-Options: nosniff');
-        header('X-Frame-Options: SAMEORIGIN');
         header('Referrer-Policy: strict-origin-when-cross-origin');
+
+        $path = (string) (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');
+        $hosted = $path === '/load' || $path === '/load.php'
+            || str_starts_with($path, '/api/load/')
+            || str_starts_with($path, '/hosted/');
+
+        if ($hosted) {
+            // Public FiveM loadscreen + YouTube music embed
+            header('Referrer-Policy: no-referrer');
+            header("Content-Security-Policy: default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://www.youtube.com https://www.youtube-nocookie.com https://www.google.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; media-src 'self' https: blob: data:; img-src 'self' https: data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https:");
+            return;
+        }
+
+        header('X-Frame-Options: SAMEORIGIN');
         header("Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self'; connect-src 'self'; frame-ancestors 'self'");
     }
 

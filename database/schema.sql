@@ -82,7 +82,9 @@ CREATE TABLE IF NOT EXISTS projects (
   config_json     JSON NOT NULL,
   config_version  INT UNSIGNED NOT NULL DEFAULT 1,
   runtime_version VARCHAR(32) NOT NULL DEFAULT '1.0.0',
+  publish_token   CHAR(48) NULL,
   status          ENUM('draft','ready','archived') NOT NULL DEFAULT 'draft',
+  UNIQUE KEY uq_projects_publish_token (publish_token),
   last_saved_at   DATETIME(3) NULL,
   created_at      DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   updated_at      DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)

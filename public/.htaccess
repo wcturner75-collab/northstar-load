@@ -1,7 +1,11 @@
-# Apache: keep front controller behaviour if using multi-views
+# Apache: public front
 Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+  # Hosted FiveM loadscreen: /load?t=TOKEN
+  RewriteRule ^load/?$ load.php [L,QSA]
+
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^ index.php [L]

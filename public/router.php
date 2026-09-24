@@ -14,6 +14,12 @@ if ($path !== '/' && is_file($file)) {
     return false;
 }
 
+// Pretty hosted load URL: /load?t=TOKEN
+if ($path === '/load' || $path === '/load/') {
+    require __DIR__ . '/load.php';
+    return true;
+}
+
 if (str_ends_with($path, '.php') && is_file($file)) {
     require $file;
     return true;

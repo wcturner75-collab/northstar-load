@@ -49,7 +49,12 @@ return [
 
     'builds' => [
         'expire_days' => 30,
-        'runtime_version' => '1.1.0',
+        'runtime_version' => '1.2.0',
+    ],
+
+    // Hosted FiveM loadscreens (players load from this origin)
+    'hosting' => [
+        'load_base_url' => 'https://load.northstarscripts.us',
     ],
 
     'entitlements' => [

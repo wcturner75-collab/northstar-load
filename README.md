@@ -56,11 +56,14 @@ location ~ \.php$ {
 Website → Auth/Session → Builder (JSON state)
        → Autosave API → MySQL projects.config_json
        → Generate API → ResourceGenerator
-            → master templates/fivem-loadscreen
-            → customer media
-            → ZipArchive → storage/builds/{token}.zip
+            → publish_token on project
+            → thin ZIP (fxmanifest → hosted URL + client.lua)
        → download.php?build=TOKEN (auth + ownership)
+Players → https://load.northstarscripts.us/load?t=TOKEN
+       → /api/load/config.php + /api/load/media.php
 ```
+
+Set `hosting.load_base_url` in `config/config.php` (production: `https://load.northstarscripts.us`).
 
 ## Cron
 

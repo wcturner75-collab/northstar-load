@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * End-to-end smoke test for Northstar Load core pipeline.
+ * End-to-end smoke test for Northstar Load core pipeline (hosted ZIP).
  */
 
 $config = require __DIR__ . '/../app/bootstrap.php';
@@ -32,6 +32,12 @@ echo "Generate resource...\n";
 $result = \Northstar\ResourceGenerator::generate($pid, $userId, $config);
 echo "token={$result['buildToken']}\n";
 echo "zip={$result['downloadUrl']}\n";
+echo "loadUrl={$result['loadUrl']}\n";
+
+if (empty($result['loadUrl']) || !str_contains((string) $result['loadUrl'], '/load?t=')) {
+    fwrite(STDERR, "Missing hosted loadUrl\n");
+    exit(1);
+}
 
 $zipPath = $config['paths']['builds'] . '/' . $result['buildToken'] . '.zip';
 if (!is_file($zipPath)) {
@@ -45,14 +51,13 @@ $names = [];
 for ($i = 0; $i < $zip->numFiles; $i++) {
     $names[] = $zip->getNameIndex($i);
 }
+$manifest = $zip->getFromName('sirp_loading/fxmanifest.lua');
 $zip->close();
 
 $need = [
     'sirp_loading/fxmanifest.lua',
-    'sirp_loading/config.json',
-    'sirp_loading/web/index.html',
-    'sirp_loading/web/js/runtime.js',
-    'sirp_loading/web/js/fivem.js',
+    'sirp_loading/client.lua',
+    'sirp_loading/README.txt',
 ];
 foreach ($need as $n) {
     if (!in_array($n, $names, true)) {
@@ -61,17 +66,17 @@ foreach ($need as $n) {
     }
 }
 
-// Ensure ZIP has resource folder root (not flat)
-$hasRoot = false;
-foreach ($names as $n) {
-    if (str_starts_with($n, 'sirp_loading/')) {
-        $hasRoot = true;
-        break;
-    }
-}
-if (!$hasRoot) {
-    fwrite(STDERR, "ZIP missing resource root folder\n");
+if (!is_string($manifest) || !str_contains($manifest, (string) $result['loadUrl'])) {
+    fwrite(STDERR, "fxmanifest missing load URL\n");
     exit(1);
+}
+
+// Bundled web assets must NOT be in hosted ZIP
+foreach ($names as $n) {
+    if (str_contains($n, '/web/') || str_ends_with($n, 'config.json')) {
+        fwrite(STDERR, "Hosted ZIP should not include: {$n}\n");
+        exit(1);
+    }
 }
 
 echo "ZIP entries: " . count($names) . "\n";

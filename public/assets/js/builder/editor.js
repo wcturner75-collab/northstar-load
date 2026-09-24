@@ -518,16 +518,30 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ project_id: projectId }),
       });
-      document.getElementById('generate-msg').textContent = 'Resource ready.';
+      document.getElementById('generate-msg').textContent = 'Resource ready (hosted).';
       const result = document.getElementById('generate-result');
       result.classList.remove('hidden');
       result.innerHTML = '';
+      if (data.loadUrl) {
+        const p = document.createElement('p');
+        p.className = 'muted';
+        p.textContent = 'Players load from:';
+        result.appendChild(p);
+        const link = document.createElement('a');
+        link.href = data.loadUrl;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = data.loadUrl;
+        result.appendChild(link);
+      }
       const a = document.createElement('a');
       a.className = 'btn btn-primary';
       a.href = data.downloadUrl;
+      a.style.marginTop = '0.75rem';
+      a.style.display = 'inline-flex';
       a.textContent = 'Download ' + data.resourceName + '.zip';
       result.appendChild(a);
-      toast('Resource generated', 'success');
+      toast('Hosted resource generated', 'success');
     } catch (err) {
       document.getElementById('generate-msg').textContent = err.message || 'Generate failed';
       toast(err.message || 'Generate failed', 'error');

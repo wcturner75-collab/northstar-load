@@ -122,7 +122,7 @@ $mode = (($editorMode ?? 'simple') === 'advanced') ? 'advanced' : 'simple';
 <div class="modal hidden" id="generate-modal">
   <div class="modal-card">
     <h3>Generate resource</h3>
-    <p id="generate-msg">Packaging FiveM resource…</p>
+    <p id="generate-msg">Packaging hosted FiveM resource…</p>
     <div id="generate-result" class="hidden"></div>
     <button type="button" class="btn btn-ghost" id="generate-close">Close</button>
   </div>

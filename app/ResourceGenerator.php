@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Northstar;
 
+/**
+ * Packages a thin FiveM resource that points loadscreen at the hosted URL.
+ * Media + runtime stay on Northstar (load.northstarscripts.us).
+ */
 final class ResourceGenerator
 {
     /**
@@ -24,43 +28,41 @@ final class ResourceGenerator
         $validated = BuilderConfigValidator::validate($rawConfig, $userId, true);
         Entitlement::assertConfigAllowed($validated, $userId, $configApp);
 
+        $publishToken = HostedLoad::ensurePublishToken($projectId, $userId);
+        $loadUrl = HostedLoad::publicUrl($publishToken, $configApp);
+
         $buildToken = bin2hex(random_bytes(32));
         $tempId = bin2hex(random_bytes(16));
         $tempRoot = Path::join($configApp['paths']['build_temp'], $tempId);
         $resourceRoot = Path::join($tempRoot, $resourceName);
-        $templateSrc = $configApp['paths']['fivem_template'];
-
-        if (!is_dir($templateSrc)) {
-            throw new \RuntimeException('Master template missing.');
-        }
+        $runtime = (string) ($configApp['builds']['runtime_version'] ?? '1.2.0');
 
         try {
             self::mkdirp($tempRoot);
             self::mkdirp($resourceRoot);
-            self::copyTree($templateSrc, $resourceRoot);
 
-            $mediaMap = self::copyMedia($validated, $userId, $resourceRoot, $configApp);
-            $runtimeConfig = self::rewriteConfigMedia($validated, $mediaMap);
-            $configJson = json_encode($runtimeConfig, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-            if ($configJson === false) {
-                throw new \RuntimeException('Could not encode config.');
-            }
-            file_put_contents(Path::join($resourceRoot, 'config.json'), $configJson);
-
-            $manifest = self::fxmanifest($resourceName, $configApp['builds']['runtime_version'] ?? '1.0.0');
-            file_put_contents(Path::join($resourceRoot, 'fxmanifest.lua'), $manifest);
+            file_put_contents(
+                Path::join($resourceRoot, 'fxmanifest.lua'),
+                self::fxmanifest($resourceName, $runtime, $loadUrl)
+            );
+            file_put_contents(
+                Path::join($resourceRoot, 'client.lua'),
+                self::clientLua()
+            );
+            file_put_contents(
+                Path::join($resourceRoot, 'README.txt'),
+                self::readme($resourceName, $loadUrl)
+            );
 
             self::assertResourceValid($resourceRoot);
 
             $zipName = $buildToken . '.zip';
-            $zipRel = $zipName;
             $zipAbs = Path::join($configApp['paths']['builds'], $zipName);
             self::mkdirp($configApp['paths']['builds']);
             self::zipResource($tempRoot, $resourceName, $zipAbs);
 
             $size = filesize($zipAbs) ?: 0;
             $expireDays = (int) ($configApp['builds']['expire_days'] ?? 30);
-            $runtime = (string) ($configApp['builds']['runtime_version'] ?? '1.0.0');
 
             $stmt = Database::pdo()->prepare(
                 'INSERT INTO builds
@@ -72,7 +74,7 @@ final class ResourceGenerator
                 $projectId,
                 $buildToken,
                 $resourceName,
-                $zipRel,
+                $zipName,
                 $size,
                 $runtime,
                 $expireDays,
@@ -83,143 +85,81 @@ final class ResourceGenerator
                 'resourceName' => $resourceName,
                 'fileSize' => $size,
                 'downloadUrl' => '/download.php?build=' . $buildToken,
+                'loadUrl' => $loadUrl,
+                'publishToken' => $publishToken,
+                'hosted' => true,
             ];
         } finally {
             self::rrmdir($tempRoot);
         }
     }
 
-    /** @return array<int,string> mediaId => relative path inside resource */
-    private static function copyMedia(array $config, int $userId, string $resourceRoot, array $configApp): array
-    {
-        $ids = [];
-        foreach ($config['background']['mediaIds'] ?? [] as $id) {
-            $ids[(int) $id] = 'backgrounds';
-        }
-        if (!empty($config['music']['mediaId'])) {
-            $ids[(int) $config['music']['mediaId']] = 'music';
-        }
-        // YouTube music copies no files — youtubeId stays in config.json
-        if (($config['music']['source'] ?? '') === 'file' && !empty($config['music']['mediaId'])) {
-            // already handled
-        }
-        foreach ($config['components'] ?? [] as $comp) {
-            if (!empty($comp['props']['mediaId'])) {
-                $ids[(int) $comp['props']['mediaId']] = 'images';
-            }
-        }
-        foreach ($config['content']['staff'] ?? [] as $staff) {
-            if (!empty($staff['mediaId'])) {
-                $ids[(int) $staff['mediaId']] = 'images';
-            }
-        }
-
-        $map = [];
-        foreach ($ids as $mediaId => $folder) {
-            $media = MediaManager::findOwned($mediaId, $userId);
-            if (!$media) {
-                throw new \InvalidArgumentException('Missing media id ' . $mediaId);
-            }
-            $src = MediaManager::absolutePath($media, $configApp);
-            if (!is_file($src)) {
-                throw new \RuntimeException('Media file missing on disk.');
-            }
-            $destDir = Path::join($resourceRoot, 'web', 'assets', $folder);
-            self::mkdirp($destDir);
-            $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', (string) $media['storage_name']) ?? 'asset.bin';
-            $dest = Path::join($destDir, $safeName);
-            if (!copy($src, $dest)) {
-                throw new \RuntimeException('Failed to copy media.');
-            }
-            $map[$mediaId] = 'assets/' . $folder . '/' . $safeName;
-        }
-        return $map;
-    }
-
-    /** @param array<int,string> $mediaMap @return array<string,mixed> */
-    private static function rewriteConfigMedia(array $config, array $mediaMap): array
-    {
-        $config['background']['assets'] = [];
-        foreach ($config['background']['mediaIds'] ?? [] as $id) {
-            if (isset($mediaMap[(int) $id])) {
-                $config['background']['assets'][] = $mediaMap[(int) $id];
-            }
-        }
-        unset($config['background']['mediaIds']);
-
-        if (($config['music']['source'] ?? 'file') === 'youtube') {
-            $config['music']['asset'] = null;
-            // Keep youtubeId for the runtime hidden embed
-            unset($config['music']['mediaId']);
-        } elseif (!empty($config['music']['mediaId']) && isset($mediaMap[(int) $config['music']['mediaId']])) {
-            $config['music']['asset'] = $mediaMap[(int) $config['music']['mediaId']];
-            unset($config['music']['mediaId']);
-        } else {
-            $config['music']['asset'] = null;
-            unset($config['music']['mediaId']);
-        }
-
-        foreach ($config['components'] as &$comp) {
-            if (!empty($comp['props']['mediaId']) && isset($mediaMap[(int) $comp['props']['mediaId']])) {
-                $comp['props']['asset'] = $mediaMap[(int) $comp['props']['mediaId']];
-            }
-            unset($comp['props']['mediaId']);
-        }
-        unset($comp);
-
-        foreach ($config['content']['staff'] as &$staff) {
-            if (!empty($staff['mediaId']) && isset($mediaMap[(int) $staff['mediaId']])) {
-                $staff['asset'] = $mediaMap[(int) $staff['mediaId']];
-            }
-            unset($staff['mediaId']);
-        }
-        unset($staff);
-
-        return $config;
-    }
-
-    private static function fxmanifest(string $resourceName, string $version): string
+    private static function fxmanifest(string $resourceName, string $version, string $loadUrl): string
     {
         $name = addslashes($resourceName);
         $ver = addslashes($version);
+        // Escape for Lua single-quoted string
+        $url = str_replace(["\\", "'"], ["\\\\", "\\'"], $loadUrl);
+
         return <<<LUA
 fx_version 'cerulean'
 game 'gta5'
 
 name '{$name}'
-author 'Northstar Load'
-description 'Generated loading screen'
+author 'Northstar Scripts'
+description 'Hosted loading screen — Northstar Load'
 version '{$ver}'
 
-loadscreen 'web/index.html'
+-- Lives on Northstar hosting (edit in the web builder; no local HTML needed)
+loadscreen '{$url}'
 loadscreen_cursor 'yes'
+loadscreen_manual_shutdown 'yes'
 
-files {
-    'web/index.html',
-    'web/css/loadscreen.css',
-    'web/js/runtime.js',
-    'web/js/fivem.js',
-    'config.json',
-    'web/assets/**'
-}
+client_script 'client.lua'
 
 LUA;
     }
 
+    private static function clientLua(): string
+    {
+        return <<<'LUA'
+-- Northstar Load — shut down hosted loadscreen when the session is ready
+CreateThread(function()
+    while not NetworkIsSessionStarted() do
+        Wait(100)
+    end
+    ShutdownLoadingScreen()
+    ShutdownLoadingScreenNui()
+end)
+
+LUA;
+    }
+
+    private static function readme(string $resourceName, string $loadUrl): string
+    {
+        return "NORTHSTAR LOAD — HOSTED RESOURCE\r\n"
+            . "================================\r\n\r\n"
+            . "Resource: {$resourceName}\r\n"
+            . "Load URL: {$loadUrl}\r\n\r\n"
+            . "1. Drop this folder into your server resources/\r\n"
+            . "2. Add: ensure {$resourceName}\r\n"
+            . "3. Restart the server (or start the resource)\r\n\r\n"
+            . "The loading screen is hosted by Northstar Scripts.\r\n"
+            . "Edit it anytime in the web builder — players see updates\r\n"
+            . "without regenerating this ZIP (same publish link).\r\n\r\n"
+            . "Do not change the loadscreen URL in fxmanifest.lua.\r\n";
+    }
+
     private static function assertResourceValid(string $root): void
     {
-        $required = [
-            'fxmanifest.lua',
-            'config.json',
-            'web/index.html',
-            'web/css/loadscreen.css',
-            'web/js/runtime.js',
-            'web/js/fivem.js',
-        ];
-        foreach ($required as $rel) {
+        foreach (['fxmanifest.lua', 'client.lua', 'README.txt'] as $rel) {
             if (!is_file(Path::join($root, $rel))) {
                 throw new \RuntimeException('Generated resource missing: ' . $rel);
             }
+        }
+        $manifest = (string) file_get_contents(Path::join($root, 'fxmanifest.lua'));
+        if (!str_contains($manifest, 'loadscreen ') || (!str_contains($manifest, 'https://') && !str_contains($manifest, 'http://'))) {
+            throw new \RuntimeException('Hosted loadscreen URL missing from manifest.');
         }
     }
 
@@ -257,31 +197,6 @@ LUA;
             $zip->addFile($full, $entry);
         }
         $zip->close();
-    }
-
-    private static function copyTree(string $src, string $dst): void
-    {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($src, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
-        foreach ($iterator as $item) {
-            /** @var \SplFileInfo $item */
-            $rel = substr($item->getPathname(), strlen($src) + 1);
-            $rel = str_replace('\\', '/', (string) $rel);
-            if (Path::containsTraversal($rel)) {
-                throw new \RuntimeException('Invalid template path.');
-            }
-            $target = Path::join($dst, $rel);
-            if ($item->isDir()) {
-                self::mkdirp($target);
-            } else {
-                self::mkdirp(dirname($target));
-                if (!copy($item->getPathname(), $target)) {
-                    throw new \RuntimeException('Template copy failed.');
-                }
-            }
-        }
     }
 
     private static function mkdirp(string $dir): void
