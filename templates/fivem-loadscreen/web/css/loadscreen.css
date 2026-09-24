@@ -237,10 +237,33 @@ body[data-layout="stadium"] .ns-bar {
   font-weight: 700;
 }
 .dual-panel-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7vw;
   margin-bottom: 0.9vh;
   font-size: clamp(14px, 1.15vw, 20px);
   line-height: 1.35;
 }
+.dual-panel-icon {
+  width: 1.5vw;
+  height: 1.5vw;
+  min-width: 18px;
+  min-height: 18px;
+  flex: 0 0 auto;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.18);
+  position: relative;
+}
+.dual-panel-icon::after {
+  content: "";
+  position: absolute;
+  inset: 25%;
+  background: rgba(255,255,255,0.85);
+  border-radius: 2px;
+}
+.dual-panel-icon-map::after { clip-path: polygon(0 20%, 100% 0, 100% 80%, 0 100%); }
+.dual-panel-icon-slots::after { border-radius: 50%; }
+.dual-panel-icon-mode::after { border-radius: 50% 50% 40% 40%; }
 .dual-panel-divider {
   height: 1px;
   background: rgba(255,255,255,0.22);

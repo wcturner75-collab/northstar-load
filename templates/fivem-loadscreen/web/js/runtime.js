@@ -290,17 +290,17 @@
     const left = document.createElement('div');
     left.className = 'dual-panel-card';
     left.appendChild(dpHead('Server Info'));
-    left.appendChild(dpRow('Name', server.name || '—'));
-    left.appendChild(dpRow('Map', server.map || '—'));
-    left.appendChild(dpRow('Slots', String(server.slots != null ? server.slots : '—')));
-    left.appendChild(dpRow('Mode', server.mode || '—'));
+    left.appendChild(dpRow('Name', server.name || '—', 'name'));
+    left.appendChild(dpRow('Map', server.map || '—', 'map'));
+    left.appendChild(dpRow('Slots', String(server.slots != null ? server.slots : '—'), 'slots'));
+    left.appendChild(dpRow('Mode', server.mode || '—', 'mode'));
     const divider = document.createElement('div');
     divider.className = 'dual-panel-divider';
     left.appendChild(divider);
     left.appendChild(dpHead('Player Info'));
-    left.appendChild(dpRow('Name', player.name || 'Connecting…'));
-    left.appendChild(dpRow('SteamID', player.steamId || '—'));
-    left.appendChild(dpRow('Last Seen', player.lastSeen || '—'));
+    left.appendChild(dpRow('Name', player.name || state.playerName || 'Connecting…', 'player'));
+    left.appendChild(dpRow('SteamID', player.steamId || '—', 'steamid'));
+    left.appendChild(dpRow('Last Seen', player.lastSeen || '—', 'seen'));
 
     const mark = document.createElement('div');
     mark.className = 'dual-panel-watermark';
@@ -361,13 +361,20 @@
       h.textContent = label;
       return h;
     }
-    function dpRow(label, value) {
+    function dpRow(label, value, kind) {
       const row = document.createElement('div');
       row.className = 'dual-panel-row';
+      const icon = document.createElement('span');
+      icon.className = 'dual-panel-icon dual-panel-icon-' + (kind || 'name');
+      icon.setAttribute('aria-hidden', 'true');
+      const text = document.createElement('div');
+      text.className = 'dual-panel-row-text';
       const strong = document.createElement('strong');
       strong.textContent = label + ':';
-      row.appendChild(strong);
-      row.appendChild(document.createTextNode(' ' + value));
+      text.appendChild(strong);
+      text.appendChild(document.createTextNode(' ' + value));
+      row.appendChild(icon);
+      row.appendChild(text);
       return row;
     }
   }

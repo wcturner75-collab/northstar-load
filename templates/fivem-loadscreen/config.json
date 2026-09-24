@@ -3,10 +3,15 @@
   "server": {
     "name": "Northstar Server",
     "tagline": "Your Story Starts Here",
+    "creator": "Northstar Server",
+    "map": "",
+    "slots": null,
+    "mode": "",
     "locale": "en"
   },
   "theme": {
     "preset": "cinematic",
+    "layout": "freeform",
     "accent": "#C4A35A",
     "fonts": {
       "display": "Orbitron",
