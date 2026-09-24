@@ -3,7 +3,7 @@
   <div class="shell hero-content">
     <p class="eyebrow">Northstar Scripts</p>
     <h1 class="hero-brand">NORTHSTAR<br>LOAD</h1>
-    <p class="hero-lead">Design a FiveM loading screen visually. Preview in your browser. Generate a ready-to-ensure resource ZIP — no HTML, CSS, or Lua edits required.</p>
+    <p class="hero-lead">Design a FiveM loading screen visually — guided Simple mode for new operators, or Advanced canvas control. Preview in your browser. Generate a ready-to-ensure resource ZIP.</p>
     <div class="hero-actions">
       <a class="btn btn-primary btn-lg" href="/register.php">Start Building</a>
       <a class="btn btn-ghost btn-lg" href="/docs.php">Read the Docs</a>
