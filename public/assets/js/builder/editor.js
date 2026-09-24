@@ -64,8 +64,7 @@
 
   /**
    * Form DOM rebuild steals focus. Only rebuild when explicitly requested
-   * (rebuildUi / structural action) and never while typing in a text field
-   * unless forceUi is set.
+   * (rebuildUi / structural action). Default is NEVER rebuild — canvas only.
    */
   function shouldRebuildUi(meta) {
     meta = meta || {};
@@ -75,8 +74,7 @@
       if (meta.forceUi) return true;
       return !isTextEditing();
     }
-    // Default: never rebuild while typing; otherwise allow one-shot rebuilds
-    return !isTextEditing();
+    return false;
   }
 
   NSBuilder.History.push(doc);
@@ -115,8 +113,9 @@
       document.getElementById('project-title').textContent = doc.server.name;
     }
 
-    // Always refresh the live canvas + keep inspector doc pointer in sync
-    NSBuilder.Canvas.setDoc(doc);
+    // Live preview: debounce while typing so focus stays in form fields
+    const typing = isTextEditing() || !!meta.skipUi;
+    NSBuilder.Canvas.setDoc(doc, typing ? { debounce: true } : {});
     NSBuilder.Inspector.setDoc(doc);
 
     const rebuild = shouldRebuildUi(meta);
@@ -253,14 +252,8 @@
     });
   }
 
-  function field(label, value, onInput) {
-    const lab = document.createElement('label');
-    lab.textContent = label;
-    const input = document.createElement('input');
-    input.value = value ?? '';
-    input.addEventListener('input', () => onInput(input.value));
-    lab.appendChild(input);
-    return lab;
+  function preview() {
+    commit(doc, false, { skipUi: true });
   }
 
   function renderThemePicker(parent) {
@@ -301,6 +294,8 @@
     const bg = document.getElementById('bg-form');
     const music = document.getElementById('music-form');
     const content = document.getElementById('content-form');
+    const F = NSBuilder.Fields;
+    if (!bg || !F) return;
     bg.innerHTML = '';
     music.innerHTML = '';
     content.innerHTML = '';
@@ -310,10 +305,17 @@
     doc.server = doc.server || {};
     doc.theme = doc.theme || {};
     doc.content = doc.content || { rules: [], announcements: [], staff: [], socials: [] };
+    doc.watermark = doc.watermark || {};
 
     renderThemePicker(bg);
 
-    bg.appendChild(field('Type (color|image|slideshow|video)', doc.background.type || 'color', (v) => {
+    const bgOpts = [
+      { value: 'color', label: 'Solid color' },
+      { value: 'image', label: 'Image' },
+      { value: 'slideshow', label: canFeature('slideshow_background') ? 'Slideshow' : 'Slideshow (locked)', disabled: !canFeature('slideshow_background') },
+      { value: 'video', label: canFeature('video_background') ? 'Video' : 'Video (Pro)', disabled: !canFeature('video_background') },
+    ];
+    F.select(bg, 'Background type', doc.background.type || 'color', bgOpts, (v) => {
       if (v === 'slideshow' && !canFeature('slideshow_background')) {
         toast(featureLockReason('slideshow_background'), 'error');
         return;
@@ -322,34 +324,35 @@
         toast(featureLockReason('video_background'), 'error');
         return;
       }
-      doc.background.type = v; commit(doc, false, { skipUi: true });
-    }));
-    bg.appendChild(field('Color', doc.background.color || '#0B0C10', (v) => {
-      doc.background.color = v; commit(doc, false, { skipUi: true });
-    }));
-    bg.appendChild(field('Media IDs (comma)', (doc.background.mediaIds || []).join(','), (v) => {
+      doc.background.type = v;
+      preview();
+    });
+    F.color(bg, 'Background color', doc.background.color || '#0B0C10', (v) => {
+      doc.background.color = v;
+      preview();
+    });
+    F.text(bg, 'Media IDs', (doc.background.mediaIds || []).join(','), (v) => {
       doc.background.mediaIds = v.split(',').map((s) => parseInt(s.trim(), 10)).filter(Boolean);
-      commit(doc, false, { skipUi: true });
-    }));
+      preview();
+    }, { placeholder: 'e.g. 12, 15' });
     if (canFeature('ken_burns')) {
-      bg.appendChild(field('Ken Burns (true/false)', String(!!doc.background.kenBurns), (v) => {
-        doc.background.kenBurns = v === 'true'; commit(doc, false, { skipUi: true });
-      }));
+      F.bool(bg, 'Ken Burns', !!doc.background.kenBurns, (v) => {
+        doc.background.kenBurns = v;
+        preview();
+      });
     } else {
-      const hint = document.createElement('p');
-      hint.className = 'plan-hint';
-      hint.textContent = 'Ken Burns effect: Standard+ plan';
-      bg.appendChild(hint);
+      F.hint(bg, 'Ken Burns effect: Standard+ plan');
     }
 
-    music.appendChild(field('Enabled (true/false)', String(!!doc.music.enabled), (v) => {
-      doc.music.enabled = v === 'true'; commit(doc, false, { skipUi: true });
-    }));
-
-    const sourceOptions = ['file'];
-    if (canFeature('youtube_music')) sourceOptions.push('youtube');
-    const sourceVal = doc.music.source || 'file';
-    music.appendChild(field('Source (' + sourceOptions.join('|') + ')', sourceVal, (v) => {
+    F.bool(music, 'Enable music', !!doc.music.enabled, (v) => {
+      doc.music.enabled = v;
+      preview();
+    });
+    const sourceOpts = [
+      { value: 'file', label: 'Uploaded file' },
+      { value: 'youtube', label: canFeature('youtube_music') ? 'YouTube (hidden)' : 'YouTube (locked)', disabled: !canFeature('youtube_music') },
+    ];
+    F.select(music, 'Music source', doc.music.source || 'file', sourceOpts, (v) => {
       if (v === 'youtube' && !canFeature('youtube_music')) {
         toast(featureLockReason('youtube_music'), 'error');
         return;
@@ -360,79 +363,76 @@
         doc.music.youtubeUrl = '';
         doc.music.youtubeId = null;
       }
-      // Rebuild music fields when source changes shape
       commit(doc, false, { rebuildUi: true, forceUi: true });
-    }));
+    });
 
     if ((doc.music.source || 'file') === 'youtube') {
       if (canFeature('youtube_music')) {
-        const ytHint = document.createElement('p');
-        ytHint.className = 'plan-hint';
-        ytHint.textContent = 'YouTube plays as a hidden embed (no visible player) in the loading screen.';
-        music.appendChild(ytHint);
-        music.appendChild(field('YouTube URL', doc.music.youtubeUrl || '', (v) => {
+        F.hint(music, 'Hidden embed in the loading screen — no visible player.');
+        F.text(music, 'YouTube URL', doc.music.youtubeUrl || '', (v) => {
           doc.music.youtubeUrl = v;
           doc.music.source = 'youtube';
-          commit(doc, false, { skipUi: true });
-        }));
+          preview();
+        }, { placeholder: 'https://www.youtube.com/watch?v=…' });
       }
     } else {
-      music.appendChild(field('Media ID (uploaded audio)', doc.music.mediaId || '', (v) => {
-        doc.music.mediaId = parseInt(v, 10) || null;
+      F.number(music, 'Audio media ID', doc.music.mediaId || '', (v) => {
+        doc.music.mediaId = v ? Math.round(v) : null;
         doc.music.source = 'file';
-        commit(doc, false, { skipUi: true });
-      }));
+        preview();
+      }, { min: 1, step: 1 });
     }
-
     if (!canFeature('youtube_music')) {
-      const lock = document.createElement('p');
-      lock.className = 'plan-hint';
-      lock.textContent = 'YouTube music embed: not on your plan';
-      music.appendChild(lock);
+      F.hint(music, 'YouTube music embed: not on your plan');
     }
+    F.number(music, 'Volume', doc.music.volume ?? 0.15, (v) => {
+      doc.music.volume = Math.max(0, Math.min(1, v));
+      preview();
+    }, { min: 0, max: 1, step: 0.05 });
 
-    music.appendChild(field('Volume 0-1', doc.music.volume ?? 0.15, (v) => {
-      doc.music.volume = Math.max(0, Math.min(1, parseFloat(v) || 0)); commit(doc, false, { skipUi: true });
-    }));
-
-    content.appendChild(field('Server name', doc.server.name || '', (v) => {
-      doc.server.name = v; commit(doc, false, { skipUi: true });
-    }));
-    content.appendChild(field('Tagline', doc.server.tagline || '', (v) => {
-      doc.server.tagline = v; commit(doc, false, { skipUi: true });
-    }));
-    content.appendChild(field('Made By (creator watermark)', doc.server.creator || (doc.watermark && doc.watermark.madeBy) || '', (v) => {
+    F.text(content, 'Server name', doc.server.name || '', (v) => {
+      doc.server.name = v;
+      preview();
+    });
+    F.text(content, 'Tagline', doc.server.tagline || '', (v) => {
+      doc.server.tagline = v;
+      preview();
+    });
+    F.text(content, 'Made By (watermark)', doc.server.creator || doc.watermark.madeBy || '', (v) => {
       doc.server.creator = v;
-      doc.watermark = doc.watermark || {};
       doc.watermark.madeBy = v;
-      commit(doc, false, { skipUi: true });
-    }));
-    content.appendChild(field('Accent', doc.theme.accent || '#C4A35A', (v) => {
-      doc.theme.accent = v; commit(doc, false, { skipUi: true });
-    }));
+      preview();
+    });
+    F.color(content, 'Accent', doc.theme.accent || '#C4A35A', (v) => {
+      doc.theme.accent = v;
+      preview();
+    });
     if (NSBuilder.isDualPanelLayout && NSBuilder.isDualPanelLayout(doc)) {
-      content.appendChild(field('Map', doc.server.map || '', (v) => {
-        doc.server.map = v; commit(doc, false, { skipUi: true });
-      }));
-      content.appendChild(field('Slots', doc.server.slots ?? 64, (v) => {
-        doc.server.slots = parseInt(v, 10) || 0; commit(doc, false, { skipUi: true });
-      }));
-      content.appendChild(field('Mode', doc.server.mode || '', (v) => {
-        doc.server.mode = v; commit(doc, false, { skipUi: true });
-      }));
+      F.text(content, 'Map', doc.server.map || '', (v) => {
+        doc.server.map = v;
+        preview();
+      });
+      F.number(content, 'Slots', doc.server.slots ?? 64, (v) => {
+        doc.server.slots = Math.max(0, Math.round(v));
+        preview();
+      }, { min: 0, step: 1 });
+      F.text(content, 'Mode', doc.server.mode || '', (v) => {
+        doc.server.mode = v;
+        preview();
+      });
     }
-    content.appendChild(field('Rules JSON', JSON.stringify(doc.content.rules || []), (v) => {
-      try { doc.content.rules = JSON.parse(v); commit(doc, false, { skipUi: true }); } catch (_) {}
-    }));
-    content.appendChild(field('Announcements JSON', JSON.stringify(doc.content.announcements || []), (v) => {
-      try { doc.content.announcements = JSON.parse(v); commit(doc, false, { skipUi: true }); } catch (_) {}
-    }));
-    content.appendChild(field('Staff JSON', JSON.stringify(doc.content.staff || []), (v) => {
-      try { doc.content.staff = JSON.parse(v); commit(doc, false, { skipUi: true }); } catch (_) {}
-    }));
-    content.appendChild(field('Socials JSON', JSON.stringify(doc.content.socials || []), (v) => {
-      try { doc.content.socials = JSON.parse(v); commit(doc, false, { skipUi: true }); } catch (_) {}
-    }));
+    F.text(content, 'Rules JSON', JSON.stringify(doc.content.rules || []), (v) => {
+      try { doc.content.rules = JSON.parse(v); preview(); } catch (_) {}
+    }, { multiline: true, rows: 3 });
+    F.text(content, 'Announcements JSON', JSON.stringify(doc.content.announcements || []), (v) => {
+      try { doc.content.announcements = JSON.parse(v); preview(); } catch (_) {}
+    }, { multiline: true, rows: 3 });
+    F.text(content, 'Staff JSON', JSON.stringify(doc.content.staff || []), (v) => {
+      try { doc.content.staff = JSON.parse(v); preview(); } catch (_) {}
+    }, { multiline: true, rows: 3 });
+    F.text(content, 'Socials JSON', JSON.stringify(doc.content.socials || []), (v) => {
+      try { doc.content.socials = JSON.parse(v); preview(); } catch (_) {}
+    }, { multiline: true, rows: 3 });
   }
 
   renderLayers();

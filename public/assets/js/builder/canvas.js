@@ -21,9 +21,23 @@ NSBuilder.Canvas = (function () {
     render();
   }
 
-  function setDoc(next) {
+  function setDoc(next, opts) {
     doc = next;
+    opts = opts || {};
+    if (opts.debounce) {
+      scheduleRender();
+      return;
+    }
     render();
+  }
+
+  let renderTimer = null;
+  function scheduleRender() {
+    if (renderTimer) cancelAnimationFrame(renderTimer);
+    renderTimer = requestAnimationFrame(() => {
+      renderTimer = null;
+      render();
+    });
   }
 
   function setSnap(v) { snap = !!v; }

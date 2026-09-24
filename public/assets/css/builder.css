@@ -125,11 +125,39 @@ body.mode-simple .builder-center {
   cursor: not-allowed !important;
   position: relative;
 }
-.plan-hint {
-  font-size: 0.75rem;
-  color: #c4a35a;
-  margin: 0.35rem 0 0.5rem;
-  line-height: 1.35;
+.field-label {
+  display: grid;
+  gap: 0.35rem;
+}
+.field-caption {
+  color: #9a9aa2;
+  font-size: 0.8rem;
+}
+.color-field-row {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+.color-field-row input[type="color"] {
+  width: 42px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #2a2e38;
+  background: #0b0c10;
+  cursor: pointer;
+}
+.color-field-row .color-hex {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-transform: uppercase;
+}
+.stack-form select {
+  width: 100%;
+  background: #0b0c10;
+  border: 1px solid #2a2e38;
+  color: #e8e6e1;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
 }
 .builder-actions { display: flex; gap: 0.45rem; }
 

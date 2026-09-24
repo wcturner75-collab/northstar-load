@@ -38,7 +38,7 @@ NSBuilder.Inspector = (function () {
       addNumber(host, 'Size', p.fontSize || 20, (v) => { p.fontSize = v; touch(false); });
       addNumber(host, 'Weight', p.fontWeight || 400, (v) => { p.fontWeight = v; touch(false); });
       addSelect(host, 'Align', p.align || 'center', ['left', 'center', 'right'], (v) => { p.align = v; touch(true); });
-      addText(host, 'Color', p.color || '#FFFFFF', (v) => { p.color = v; touch(false); });
+      addColor(host, 'Color', p.color || '#FFFFFF', (v) => { p.color = v; touch(false); });
     }
     if (comp.type === 'text') {
       addText(host, 'Text', p.text || '', (v) => { p.text = v; touch(false); });

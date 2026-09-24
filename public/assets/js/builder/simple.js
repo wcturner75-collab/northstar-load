@@ -4,6 +4,7 @@ NSBuilder.Simple = (function () {
   let doc = null;
   let onChange = () => {};
   let features = {};
+  const F = () => NSBuilder.Fields;
 
   function toast(msg, type) {
     if (window.NS && typeof NS.toast === 'function') NS.toast(msg, type);
@@ -19,7 +20,6 @@ NSBuilder.Simple = (function () {
 
   function setDoc(next, opts) {
     doc = next;
-    // soft: update pointer only — never rebuild form DOM (preserves focus)
     if (opts && opts.soft) return;
     render();
   }
@@ -36,24 +36,14 @@ NSBuilder.Simple = (function () {
     });
   }
 
-  function touch(rebuild) {
-    // skipUi keeps focus; rebuildUi when the form layout must change
-    onChange(doc, false, rebuild ? { rebuildUi: true, forceUi: true } : { skipUi: true });
+  /** Preview-only update — never rebuild this form (keeps focus). */
+  function preview() {
+    onChange(doc, false, { skipUi: true });
   }
 
-  function field(parent, label, value, onInput, type) {
-    const lab = document.createElement('label');
-    lab.textContent = label;
-    const input = document.createElement(type === 'textarea' ? 'textarea' : 'input');
-    if (type === 'textarea') {
-      input.rows = 4;
-    } else {
-      input.type = type || 'text';
-    }
-    input.value = value ?? '';
-    input.addEventListener('input', () => onInput(input.value));
-    lab.appendChild(input);
-    parent.appendChild(lab);
+  /** Structural change — rebuild form after select changes field set. */
+  function rebuild() {
+    onChange(doc, false, { rebuildUi: true, forceUi: true });
   }
 
   function renderThemePicker(parent) {
@@ -63,10 +53,7 @@ NSBuilder.Simple = (function () {
     title.className = 'pane-label';
     title.textContent = 'Layout theme';
     wrap.appendChild(title);
-    const tip = document.createElement('p');
-    tip.className = 'plan-hint';
-    tip.textContent = 'Pick a Northstar layout look. This updates colors and repositions standard elements.';
-    wrap.appendChild(tip);
+    F().hint(wrap, 'Pick a layout look. Updates colors and arrangement.');
     const current = (doc.theme && doc.theme.preset) || 'cinematic';
     (NSBuilder.LAYOUT_THEMES || []).forEach((theme) => {
       const btn = document.createElement('button');
@@ -98,9 +85,8 @@ NSBuilder.Simple = (function () {
     const look = document.getElementById('simple-look');
     const music = document.getElementById('simple-music');
     const extras = document.getElementById('simple-extras');
-    if (!brand) return;
+    if (!brand || !F()) return;
 
-    // Preserve which guided step is active
     const activeStep = document.querySelector('[data-simple-step].active')?.dataset.simpleStep || 'brand';
 
     brand.innerHTML = '';
@@ -113,123 +99,135 @@ NSBuilder.Simple = (function () {
     doc.background = doc.background || {};
     doc.music = doc.music || {};
     doc.content = doc.content || { rules: [], announcements: [], staff: [], socials: [] };
+    doc.watermark = doc.watermark || {};
 
-    field(brand, 'Server name', doc.server.name || '', (v) => {
+    F().text(brand, 'Server name', doc.server.name || '', (v) => {
       doc.server.name = v;
-      touch(false);
+      preview();
     });
-    field(brand, 'Tagline', doc.server.tagline || '', (v) => {
+    F().text(brand, 'Tagline', doc.server.tagline || '', (v) => {
       doc.server.tagline = v;
-      touch(false);
+      preview();
     });
-    field(brand, 'Made By (creator watermark)', doc.server.creator || (doc.watermark && doc.watermark.madeBy) || doc.server.name || '', (v) => {
+    F().text(brand, 'Made By (watermark)', doc.server.creator || doc.watermark.madeBy || doc.server.name || '', (v) => {
       doc.server.creator = v;
-      doc.watermark = doc.watermark || {};
       doc.watermark.madeBy = v;
-      touch(false);
-    });
-    field(brand, 'Accent color', doc.theme.accent || '#C4A35A', (v) => {
+      preview();
+    }, { placeholder: 'Your studio or server name' });
+    F().color(brand, 'Accent color', doc.theme.accent || '#C4A35A', (v) => {
       doc.theme.accent = v;
-      touch(false);
-    }, 'color');
+      preview();
+    });
 
     renderThemePicker(look);
 
-    const bgType = doc.background.type || 'color';
-    field(look, 'Background type (color / image / slideshow)', bgType, (v) => {
-      const allowed = ['color', 'image'];
-      if (features.slideshow_background) allowed.push('slideshow');
-      if (features.video_background) allowed.push('video');
-      if (!allowed.includes(v)) {
-        toast('That background type needs a higher plan or is invalid.', 'error');
+    const bgOpts = [
+      { value: 'color', label: 'Solid color' },
+      { value: 'image', label: 'Image' },
+    ];
+    if (features.slideshow_background) bgOpts.push({ value: 'slideshow', label: 'Slideshow' });
+    if (features.video_background) bgOpts.push({ value: 'video', label: 'Video' });
+    else bgOpts.push({ value: 'video', label: 'Video (Pro)', disabled: true });
+
+    F().select(look, 'Background type', doc.background.type || 'color', bgOpts, (v) => {
+      if (v === 'slideshow' && !features.slideshow_background) {
+        toast('Slideshow needs Standard+ or is locked on your plan.', 'error');
+        return;
+      }
+      if (v === 'video' && !features.video_background) {
+        toast('Video backgrounds need Pro.', 'error');
         return;
       }
       doc.background.type = v;
-      touch(false);
+      preview();
     });
-    field(look, 'Background color', doc.background.color || '#0B0C10', (v) => {
+    F().color(look, 'Background color', doc.background.color || '#0B0C10', (v) => {
       doc.background.color = v;
-      touch(false);
-    }, 'color');
-    field(look, 'Background media IDs (from Media library)', (doc.background.mediaIds || []).join(', '), (v) => {
+      preview();
+    });
+    F().text(look, 'Background media IDs', (doc.background.mediaIds || []).join(', '), (v) => {
       doc.background.mediaIds = v.split(',').map((s) => parseInt(s.trim(), 10)).filter(Boolean);
       if (doc.background.mediaIds.length && doc.background.type === 'color') {
         doc.background.type = 'image';
       }
-      touch(false);
-    });
+      preview();
+    }, { placeholder: 'e.g. 12, 15' });
 
     if (NSBuilder.isDualPanelLayout && NSBuilder.isDualPanelLayout(doc)) {
-      field(look, 'Map', doc.server.map || '', (v) => {
+      F().text(look, 'Map', doc.server.map || '', (v) => {
         doc.server.map = v;
-        touch(false);
-      });
-      field(look, 'Slots', doc.server.slots ?? 64, (v) => {
-        doc.server.slots = parseInt(v, 10) || 0;
-        touch(false);
-      });
-      field(look, 'Game mode', doc.server.mode || '', (v) => {
+        preview();
+      }, { placeholder: 'e.g. RP_xxx' });
+      F().number(look, 'Slots', doc.server.slots ?? 64, (v) => {
+        doc.server.slots = Math.max(0, Math.round(v));
+        preview();
+      }, { min: 0, step: 1 });
+      F().text(look, 'Game mode', doc.server.mode || '', (v) => {
         doc.server.mode = v;
-        touch(false);
-      });
+        preview();
+      }, { placeholder: 'e.g. DarkRP / Roleplay' });
     }
 
-    field(music, 'Enable music (true/false)', String(!!doc.music.enabled), (v) => {
-      doc.music.enabled = v === 'true';
-      touch(false);
+    F().bool(music, 'Enable music', !!doc.music.enabled, (v) => {
+      doc.music.enabled = v;
+      preview();
     });
-    field(music, 'Source (file / youtube)', doc.music.source || 'file', (v) => {
+
+    const sourceOpts = [{ value: 'file', label: 'Uploaded file (Media ID)' }];
+    if (features.youtube_music) {
+      sourceOpts.push({ value: 'youtube', label: 'YouTube (hidden embed)' });
+    } else {
+      sourceOpts.push({ value: 'youtube', label: 'YouTube (locked)', disabled: true });
+    }
+    F().select(music, 'Music source', doc.music.source || 'file', sourceOpts, (v) => {
       if (v === 'youtube' && !features.youtube_music) {
         toast('YouTube music is not on your plan.', 'error');
         return;
       }
       doc.music.source = v;
-      touch(true); // rebuild fields for youtube vs file
+      rebuild();
     });
+
     if ((doc.music.source || 'file') === 'youtube') {
-      const tip = document.createElement('p');
-      tip.className = 'plan-hint';
-      tip.textContent = 'Plays as a hidden embed in-game (no visible YouTube player).';
-      music.appendChild(tip);
-      field(music, 'YouTube URL', doc.music.youtubeUrl || '', (v) => {
+      F().hint(music, 'Plays as a hidden embed in-game (no visible YouTube player).');
+      F().text(music, 'YouTube URL', doc.music.youtubeUrl || '', (v) => {
         doc.music.youtubeUrl = v;
         doc.music.source = 'youtube';
         doc.music.enabled = true;
-        touch(false);
-      });
+        preview();
+      }, { placeholder: 'https://www.youtube.com/watch?v=…' });
     } else {
-      field(music, 'Audio media ID', doc.music.mediaId || '', (v) => {
-        doc.music.mediaId = parseInt(v, 10) || null;
+      F().number(music, 'Audio media ID', doc.music.mediaId || '', (v) => {
+        doc.music.mediaId = v ? Math.round(v) : null;
         doc.music.source = 'file';
         if (doc.music.mediaId) doc.music.enabled = true;
-        touch(false);
-      });
+        preview();
+      }, { min: 1, step: 1, placeholder: 'From Media library' });
     }
-    field(music, 'Volume (0–1)', doc.music.volume ?? 0.15, (v) => {
-      doc.music.volume = Math.max(0, Math.min(1, parseFloat(v) || 0));
-      touch(false);
-    });
+    F().number(music, 'Volume', doc.music.volume ?? 0.15, (v) => {
+      doc.music.volume = Math.max(0, Math.min(1, v));
+      preview();
+    }, { min: 0, max: 1, step: 0.05 });
 
-    field(extras, 'Rules (one per line: Title | Body)', rulesToText(doc.content.rules), (v) => {
+    F().text(extras, 'Rules (one per line: Title | Body)', rulesToText(doc.content.rules), (v) => {
       doc.content.rules = textToRules(v);
-      touch(false);
-    }, 'textarea');
-    field(extras, 'Discord URL', (doc.content.socials || []).find((s) => s.type === 'discord')?.url || '', (v) => {
+      preview();
+    }, { multiline: true, rows: 5 });
+    F().text(extras, 'Discord URL', (doc.content.socials || []).find((s) => s.type === 'discord')?.url || '', (v) => {
       upsertSocial('discord', 'Discord', v);
-      touch(false);
-    });
-    field(extras, 'Website URL', (doc.content.socials || []).find((s) => s.type === 'website')?.url || '', (v) => {
+      preview();
+    }, { placeholder: 'https://discord.gg/…' });
+    F().text(extras, 'Website URL', (doc.content.socials || []).find((s) => s.type === 'website')?.url || '', (v) => {
       upsertSocial('website', 'Website', v);
-      touch(false);
-    });
+      preview();
+    }, { placeholder: 'https://…' });
     if (features.announcements) {
-      field(extras, 'Announcements (Title | Body per line)', rulesToText(doc.content.announcements), (v) => {
+      F().text(extras, 'Announcements (Title | Body per line)', rulesToText(doc.content.announcements), (v) => {
         doc.content.announcements = textToRules(v);
-        touch(false);
-      }, 'textarea');
+        preview();
+      }, { multiline: true, rows: 4 });
     }
 
-    // Restore active step after rebuild
     document.querySelectorAll('[data-simple-step]').forEach((b) => {
       b.classList.toggle('active', b.dataset.simpleStep === activeStep);
     });
