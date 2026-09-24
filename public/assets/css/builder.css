@@ -14,6 +14,87 @@
   height: 100vh;
 }
 
+body.mode-simple .builder-app {
+  grid-template-columns: 320px 1fr;
+}
+
+body.mode-simple .builder-left,
+body.mode-simple .builder-right,
+body.mode-simple .builder-bottom .history-controls,
+body.mode-simple .builder-bottom .check {
+  display: none !important;
+}
+
+body.mode-advanced .builder-simple {
+  display: none !important;
+}
+
+.builder-simple {
+  background: #12141a;
+  border-right: 1px solid #2a2e38;
+  overflow: auto;
+  padding: 0.85rem;
+  grid-row: 2;
+}
+
+.simple-head h2 {
+  margin: 0 0 0.35rem;
+  font-family: Orbitron, sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+}
+.simple-head p {
+  margin: 0 0 1rem;
+  color: #9a9aa2;
+  font-size: 0.85rem;
+}
+
+.simple-steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+  margin-bottom: 0.85rem;
+}
+.simple-steps button {
+  background: #0b0c10;
+  border: 1px solid #2a2e38;
+  color: #9a9aa2;
+  padding: 0.45rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+}
+.simple-steps button.active {
+  color: #c4a35a;
+  border-color: #c4a35a;
+}
+
+.simple-step-pane { display: none; }
+.simple-step-pane.active { display: grid; gap: 0.65rem; }
+
+.mode-toggle {
+  display: inline-flex;
+  border: 1px solid #2a2e38;
+}
+.mode-toggle button {
+  background: #0b0c10;
+  border: 0;
+  color: #9a9aa2;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+}
+.mode-toggle button.active {
+  background: #1a1d26;
+  color: #c4a35a;
+}
+
+body.mode-simple .builder-center {
+  grid-column: 2;
+}
+
 .builder-top {
   grid-column: 1 / -1;
   display: flex;

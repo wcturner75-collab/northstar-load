@@ -12,18 +12,20 @@
   const planBadge = document.getElementById('plan-badge');
   if (planBadge) planBadge.textContent = plan;
 
+  let editorMode = document.body.dataset.editorMode === 'advanced' ? 'advanced' : 'simple';
+
   function canFeature(key) {
     return !!features[key];
   }
 
   function featureLockReason(key) {
     const labels = {
-      youtube_music: 'YouTube music (Standard+)',
-      slideshow_background: 'Slideshow backgrounds (Standard+)',
+      youtube_music: 'YouTube music',
+      slideshow_background: 'Slideshow backgrounds',
       video_background: 'Video backgrounds (Pro)',
-      staff: 'Staff blocks (Standard+)',
-      announcements: 'Announcements (Standard+)',
-      ken_burns: 'Ken Burns (Pro)',
+      staff: 'Staff blocks',
+      announcements: 'Announcements',
+      ken_burns: 'Ken Burns (Standard+)',
     };
     return labels[key] || key;
   }
@@ -73,6 +75,7 @@
     NSBuilder.Inspector.render(NSBuilder.Canvas.getSelectedId());
     renderLayers();
     renderContentForms();
+    if (window.NSBuilder.Simple) NSBuilder.Simple.setDoc(doc);
     if (snapshot) NSBuilder.History.push(doc);
     NSBuilder.Autosave.schedule(doc);
   }
@@ -95,6 +98,33 @@
     doc,
     onChange: (d, snapshot, meta) => commit(d, snapshot, meta),
   });
+
+  if (window.NSBuilder.Simple) {
+    NSBuilder.Simple.init({
+      doc,
+      features,
+      onChange: (d, snapshot) => commit(d, snapshot),
+    });
+  }
+
+  function applyEditorMode(mode) {
+    editorMode = mode === 'advanced' ? 'advanced' : 'simple';
+    document.body.classList.toggle('mode-simple', editorMode === 'simple');
+    document.body.classList.toggle('mode-advanced', editorMode === 'advanced');
+    document.body.dataset.editorMode = editorMode;
+    document.getElementById('mode-simple')?.classList.toggle('active', editorMode === 'simple');
+    document.getElementById('mode-advanced')?.classList.toggle('active', editorMode === 'advanced');
+    NSBuilder.Canvas.fit();
+    NS.api('/api/account/editor-mode.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ editor_mode: editorMode }),
+    }).catch(() => {});
+  }
+
+  document.getElementById('mode-simple')?.addEventListener('click', () => applyEditorMode('simple'));
+  document.getElementById('mode-advanced')?.addEventListener('click', () => applyEditorMode('advanced'));
+  applyEditorMode(editorMode);
 
   // Palette
   const palette = document.getElementById('component-palette');
@@ -327,6 +357,7 @@
     NSBuilder.Inspector.render(NSBuilder.Canvas.getSelectedId());
     renderLayers();
     renderContentForms();
+    if (window.NSBuilder.Simple) NSBuilder.Simple.setDoc(doc);
     NSBuilder.Autosave.schedule(doc);
   };
   document.getElementById('btn-redo').onclick = () => {
@@ -338,6 +369,7 @@
     NSBuilder.Inspector.render(NSBuilder.Canvas.getSelectedId());
     renderLayers();
     renderContentForms();
+    if (window.NSBuilder.Simple) NSBuilder.Simple.setDoc(doc);
     NSBuilder.Autosave.schedule(doc);
   };
 

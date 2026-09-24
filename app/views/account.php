@@ -2,7 +2,7 @@
   <header class="page-head">
     <div>
       <h1>Account</h1>
-      <p class="muted">Profile and plan information.</p>
+      <p class="muted">Profile, editor preference, and plan — Free can ship a complete loading screen.</p>
     </div>
   </header>
   <div class="account-grid">
@@ -12,7 +12,18 @@
         <dt>Username</dt><dd><?= \Northstar\Security::e($user['username'] ?? '') ?></dd>
         <dt>Email</dt><dd><?= \Northstar\Security::e($user['email'] ?? '') ?></dd>
         <dt>Member since</dt><dd><?= \Northstar\Security::e($user['created_at'] ?? '') ?></dd>
+        <dt>Editor mode</dt><dd><?= \Northstar\Security::e(ucfirst((string) ($user['editor_mode'] ?? 'simple'))) ?></dd>
       </dl>
+      <form class="stack-form" id="editor-mode-form" style="margin-top:1rem;max-width:320px">
+        <label>Customization style
+          <select name="editor_mode">
+            <option value="simple" <?= (($user['editor_mode'] ?? '') === 'simple') ? 'selected' : '' ?>>Simple (guided)</option>
+            <option value="advanced" <?= (($user['editor_mode'] ?? '') === 'advanced') ? 'selected' : '' ?>>Advanced (canvas)</option>
+          </select>
+        </label>
+        <button class="btn btn-primary" type="submit">Save preference</button>
+        <p class="muted" id="mode-save-status"></p>
+      </form>
     </div>
     <div>
       <h2>Entitlements</h2>
@@ -28,7 +39,8 @@
   </div>
 
   <section class="plan-matrix">
-    <h2>Feature access</h2>
+    <h2>What each plan is for</h2>
+    <p class="muted">We don’t lock the core experience behind a paywall. Paid plans buy headroom and studio extras.</p>
     <table>
       <thead>
         <tr>
@@ -42,24 +54,38 @@
       <tbody>
         <?php
         $rows = [
+            ['Complete loadscreen + ZIP generate', null, true, true, true],
             ['Uploaded music (MP3/OGG)', 'music_file'],
             ['YouTube music (hidden embed)', 'youtube_music'],
             ['Slideshow backgrounds', 'slideshow_background'],
+            ['Staff + announcements', 'staff'],
+            ['Ken Burns motion', 'ken_burns'],
             ['Video backgrounds', 'video_background'],
-            ['Staff component', 'staff'],
-            ['Announcements component', 'announcements'],
-            ['Ken Burns effect', 'ken_burns'],
         ];
         $check = static function (bool $on): string {
             return $on ? 'Yes' : '—';
         };
         $your = $limits['features'] ?? [];
         $plans = $config['entitlements'] ?? [];
-        foreach ($rows as [$label, $key]):
-            $free = !empty($plans['free']['features'][$key]);
-            $std = !empty($plans['standard']['features'][$key]);
-            $pro = !empty($plans['pro']['features'][$key]);
-            $mine = !empty($your[$key]);
+        foreach ($rows as $row):
+            $label = $row[0];
+            $key = $row[1];
+            if ($key === null) {
+                $mine = $free = $std = $pro = true;
+            } else {
+                $free = !empty($plans['free']['features'][$key]);
+                $std = !empty($plans['standard']['features'][$key]);
+                $pro = !empty($plans['pro']['features'][$key]);
+                // staff row also represents announcements
+                if ($key === 'staff') {
+                    $free = $free && !empty($plans['free']['features']['announcements']);
+                    $std = $std && !empty($plans['standard']['features']['announcements']);
+                    $pro = $pro && !empty($plans['pro']['features']['announcements']);
+                    $mine = !empty($your['staff']) && !empty($your['announcements']);
+                } else {
+                    $mine = !empty($your[$key]);
+                }
+            }
         ?>
         <tr>
           <td><?= \Northstar\Security::e($label) ?></td>
@@ -69,8 +95,33 @@
           <td><?= $check($pro) ?></td>
         </tr>
         <?php endforeach; ?>
+        <tr>
+          <td>Projects / media / daily builds</td>
+          <td><?= (int)$limits['max_projects'] ?> / <?= (int)$limits['max_media'] ?> / <?= (int)$limits['max_builds_per_day'] ?></td>
+          <td>5 / 60 / 15</td>
+          <td>25 / 250 / 50</td>
+          <td>200 / 2000 / 200</td>
+        </tr>
       </tbody>
     </table>
-    <p class="muted">Payment providers (Stripe / PayPal) can plug into the entitlements table later — not enabled in this phase. Admins can change a user’s plan in MySQL <code>entitlements</code>.</p>
+    <p class="muted">Stripe/PayPal can replace early-access plan grants later. Until then, the plan chosen at signup is what you get.</p>
   </section>
 </section>
+<script>
+document.getElementById('editor-mode-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const status = document.getElementById('mode-save-status');
+  const mode = e.target.editor_mode.value;
+  status.textContent = 'Saving…';
+  try {
+    await NS.api('/api/account/editor-mode.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ editor_mode: mode }),
+    });
+    status.textContent = 'Saved. New editor sessions use this mode.';
+  } catch (err) {
+    status.textContent = err.message;
+  }
+});
+</script>

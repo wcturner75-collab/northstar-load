@@ -20,4 +20,5 @@ if (!$project) {
     'csrf' => \Northstar\Security::csrfToken(),
     'config' => $config,
     'entitlements' => \Northstar\Entitlement::limits($userId, 'load', $config),
+    'editorMode' => (string) ((\Northstar\Auth::user()['editor_mode'] ?? 'simple')),
 ]);

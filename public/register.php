@@ -10,6 +10,8 @@ $GLOBALS['ns_config'] = $config;
 $error = null;
 $email = '';
 $username = '';
+$plan = 'free';
+$editorMode = 'simple';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!\Northstar\Security::verifyCsrf($_POST['_csrf'] ?? null)) {
@@ -18,8 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = (string) ($_POST['email'] ?? '');
         $username = (string) ($_POST['username'] ?? '');
         $password = (string) ($_POST['password'] ?? '');
+        $plan = (string) ($_POST['plan'] ?? 'free');
+        $editorMode = (string) ($_POST['editor_mode'] ?? 'simple');
         try {
-            \Northstar\Auth::register($email, $username, $password);
+            \Northstar\Auth::register($email, $username, $password, $plan, $editorMode);
             \Northstar\Response::redirect('/dashboard.php');
         } catch (\InvalidArgumentException $e) {
             $error = $e->getMessage();
@@ -32,8 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 \Northstar\View::render('register', [
     'pageTitle' => 'Register',
-    'bodyClass' => 'page-auth',
+    'bodyClass' => 'page-auth page-register',
     'error' => $error,
     'email' => $email,
     'username' => $username,
+    'plan' => $plan,
+    'editorMode' => $editorMode,
 ]);

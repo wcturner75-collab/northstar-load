@@ -3,7 +3,10 @@
 /** @var array $project */
 /** @var string $csrf */
 /** @var array $config */
+/** @var array $entitlements */
+/** @var string $editorMode */
 $cfgJson = json_encode($project['config'] ?? [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$mode = (($editorMode ?? 'simple') === 'advanced') ? 'advanced' : 'simple';
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +20,7 @@ $cfgJson = json_encode($project['config'] ?? [], JSON_UNESCAPED_SLASHES | JSON_U
   <link rel="stylesheet" href="/assets/css/app.css">
   <link rel="stylesheet" href="/assets/css/builder.css">
 </head>
-<body class="builder-body" data-project-id="<?= (int) $project['id'] ?>">
+<body class="builder-body mode-<?= \Northstar\Security::e($mode) ?>" data-project-id="<?= (int) $project['id'] ?>" data-editor-mode="<?= \Northstar\Security::e($mode) ?>">
 <script type="application/json" id="project-boot"><?= $cfgJson ?: '{}' ?></script>
 <script type="application/json" id="entitlements-boot"><?= json_encode($entitlements ?? ['plan' => 'free', 'features' => []], JSON_UNESCAPED_SLASHES) ?></script>
 
@@ -31,13 +34,33 @@ $cfgJson = json_encode($project['config'] ?? [], JSON_UNESCAPED_SLASHES | JSON_U
       <strong id="project-title"><?= \Northstar\Security::e($project['name']) ?></strong>
       <span class="mono" id="project-resource"><?= \Northstar\Security::e($project['resource_name']) ?></span>
     </div>
+    <div class="mode-toggle" role="group" aria-label="Editor mode">
+      <button type="button" id="mode-simple" class="<?= $mode === 'simple' ? 'active' : '' ?>">Simple</button>
+      <button type="button" id="mode-advanced" class="<?= $mode === 'advanced' ? 'active' : '' ?>">Advanced</button>
+    </div>
     <div class="builder-status" id="save-status">Saved</div>
     <div class="builder-plan" id="plan-badge" title="Your plan limits">FREE</div>
     <div class="builder-actions">
-      <button type="button" class="btn btn-ghost" id="btn-preview-toggle">Preview</button>
       <button type="button" class="btn btn-primary" id="btn-generate">Generate Resource</button>
     </div>
   </header>
+
+  <aside class="builder-simple" id="simple-panel">
+    <header class="simple-head">
+      <h2>Guided setup</h2>
+      <p>Change the essentials. Switch to Advanced anytime for drag-and-drop control.</p>
+    </header>
+    <nav class="simple-steps" id="simple-steps">
+      <button type="button" class="active" data-simple-step="brand">1. Brand</button>
+      <button type="button" data-simple-step="look">2. Look</button>
+      <button type="button" data-simple-step="music">3. Music</button>
+      <button type="button" data-simple-step="extras">4. Extras</button>
+    </nav>
+    <div class="simple-step-pane active stack-form" data-simple-pane="brand" id="simple-brand"></div>
+    <div class="simple-step-pane stack-form" data-simple-pane="look" id="simple-look"></div>
+    <div class="simple-step-pane stack-form" data-simple-pane="music" id="simple-music"></div>
+    <div class="simple-step-pane stack-form" data-simple-pane="extras" id="simple-extras"></div>
+  </aside>
 
   <aside class="builder-left">
     <div class="panel-tabs">
@@ -110,6 +133,7 @@ $cfgJson = json_encode($project['config'] ?? [], JSON_UNESCAPED_SLASHES | JSON_U
 <script src="/assets/js/builder/canvas.js"></script>
 <script src="/assets/js/builder/inspector.js"></script>
 <script src="/assets/js/builder/autosave.js"></script>
+<script src="/assets/js/builder/simple.js"></script>
 <script src="/assets/js/builder/editor.js"></script>
 </body>
 </html>

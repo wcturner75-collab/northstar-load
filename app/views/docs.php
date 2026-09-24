@@ -19,6 +19,20 @@
   </article>
 
   <article class="doc-block">
+    <h2>Simple vs Advanced</h2>
+    <ul>
+      <li><strong>Simple</strong> — guided Brand → Look → Music → Extras. Ideal for first-time operators.</li>
+      <li><strong>Advanced</strong> — full canvas with components, layers, snap, and inspectors.</li>
+    </ul>
+    <p>Pick either at signup, or toggle in the editor header / Account settings anytime.</p>
+  </article>
+
+  <article class="doc-block">
+    <h2>Plans (not pay-to-win)</h2>
+    <p><strong>Free</strong> can ship a complete loading screen (branding, YouTube or file music, slideshow, staff, announcements, ZIP generate). Standard/Pro mainly add capacity and studio extras like Ken Burns and video backgrounds.</p>
+  </article>
+
+  <article class="doc-block">
     <h2>Music</h2>
     <p>Upload MP3/OGG in <strong>Media</strong>, or (Standard/Pro) paste a YouTube link. YouTube audio plays through a <em>hidden</em> embed in the loading screen — no visible player chrome.</p>
   </article>

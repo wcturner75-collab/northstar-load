@@ -250,7 +250,58 @@ a:hover { text-decoration: underline; }
   background: var(--bg-panel);
   padding: 1.5rem;
 }
+.auth-panel-wide { width: min(100%, 720px); }
 .auth-panel h1 { margin-top: 0; font-family: var(--font-display); }
+
+.form-grid-2 {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.choice-set {
+  border: 1px solid var(--line);
+  padding: 1rem;
+  margin: 0;
+}
+.choice-set legend {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0 0.35rem;
+  color: var(--accent);
+}
+.choice-lead { margin: 0 0 0.85rem; color: var(--muted); font-size: 0.9rem; }
+.choice-cards {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.choice-card {
+  display: block;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  padding: 0.85rem;
+  cursor: pointer;
+  position: relative;
+}
+.choice-card.recommended { border-color: var(--accent); }
+.choice-card input { position: absolute; opacity: 0; pointer-events: none; }
+.choice-card:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.choice-body { display: grid; gap: 0.25rem; }
+.choice-body strong {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+}
+.choice-body em { font-style: normal; color: var(--accent); font-size: 0.8rem; }
+.choice-body small { color: var(--muted); line-height: 1.35; }
+
+.plan-matrix { margin-top: 2rem; }
 
 .stack-form { display: grid; gap: 0.85rem; }
 .stack-form.compact { gap: 0.55rem; }

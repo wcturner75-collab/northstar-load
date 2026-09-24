@@ -53,27 +53,13 @@ return [
     ],
 
     'entitlements' => [
-        // Feature gates are enforced on save + generate (not only in the UI).
+        // Philosophy: Free can ship a complete loading screen.
+        // Paid plans add capacity + convenience, not a paywall on basics.
         'free' => [
-            'max_projects' => 3,
-            'max_media' => 40,
-            'max_builds_per_day' => 10,
-            'max_components' => 12,
-            'features' => [
-                'youtube_music' => false,
-                'music_file' => true,
-                'slideshow_background' => false,
-                'video_background' => false,
-                'staff' => false,
-                'announcements' => false,
-                'ken_burns' => false,
-            ],
-        ],
-        'standard' => [
-            'max_projects' => 25,
-            'max_media' => 250,
-            'max_builds_per_day' => 50,
-            'max_components' => 40,
+            'max_projects' => 5,
+            'max_media' => 60,
+            'max_builds_per_day' => 15,
+            'max_components' => 24,
             'features' => [
                 'youtube_music' => true,
                 'music_file' => true,
@@ -82,6 +68,21 @@ return [
                 'staff' => true,
                 'announcements' => true,
                 'ken_burns' => false,
+            ],
+        ],
+        'standard' => [
+            'max_projects' => 25,
+            'max_media' => 250,
+            'max_builds_per_day' => 50,
+            'max_components' => 50,
+            'features' => [
+                'youtube_music' => true,
+                'music_file' => true,
+                'slideshow_background' => true,
+                'video_background' => false,
+                'staff' => true,
+                'announcements' => true,
+                'ken_burns' => true,
             ],
         ],
         'pro' => [

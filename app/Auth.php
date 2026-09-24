@@ -48,7 +48,7 @@ final class Auth
         if ($cacheId === $id && is_array($cache)) {
             return $cache;
         }
-        $stmt = Database::pdo()->prepare('SELECT id, email, username, status, created_at FROM users WHERE id = ? LIMIT 1');
+        $stmt = Database::pdo()->prepare('SELECT id, email, username, status, editor_mode, created_at FROM users WHERE id = ? LIMIT 1');
         $stmt->execute([$id]);
         $row = $stmt->fetch();
         $cache = $row ?: null;
@@ -56,10 +56,21 @@ final class Auth
         return $cache;
     }
 
-    public static function register(string $email, string $username, string $password): array
-    {
+    /**
+     * @param 'free'|'standard'|'pro' $plan
+     * @param 'simple'|'advanced' $editorMode
+     */
+    public static function register(
+        string $email,
+        string $username,
+        string $password,
+        string $plan = 'free',
+        string $editorMode = 'simple'
+    ): array {
         $email = strtolower(trim($email));
         $username = trim($username);
+        $plan = strtolower(trim($plan));
+        $editorMode = strtolower(trim($editorMode));
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 255) {
             throw new \InvalidArgumentException('Invalid email address.');
@@ -69,6 +80,12 @@ final class Auth
         }
         if (strlen($password) < 8 || strlen($password) > 128) {
             throw new \InvalidArgumentException('Password must be 8–128 characters.');
+        }
+        if (!in_array($plan, ['free', 'standard', 'pro'], true)) {
+            throw new \InvalidArgumentException('Invalid plan.');
+        }
+        if (!in_array($editorMode, ['simple', 'advanced'], true)) {
+            throw new \InvalidArgumentException('Invalid editor mode.');
         }
 
         $pdo = Database::pdo();
@@ -81,12 +98,22 @@ final class Auth
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $pdo->beginTransaction();
         try {
-            $ins = $pdo->prepare('INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)');
-            $ins->execute([$email, $username, $hash]);
+            $ins = $pdo->prepare('INSERT INTO users (email, username, password_hash, editor_mode) VALUES (?, ?, ?, ?)');
+            $ins->execute([$email, $username, $hash, $editorMode]);
             $userId = (int) $pdo->lastInsertId();
 
-            $ent = $pdo->prepare('INSERT INTO entitlements (user_id, product_key, plan_key, source) VALUES (?, ?, ?, ?)');
-            $ent->execute([$userId, 'load', 'free', 'signup']);
+            // Billing not wired yet — selected plan is granted for early access.
+            $ent = $pdo->prepare(
+                'INSERT INTO entitlements (user_id, product_key, plan_key, source, meta_json)
+                 VALUES (?, ?, ?, ?, ?)'
+            );
+            $ent->execute([
+                $userId,
+                'load',
+                $plan,
+                'signup',
+                json_encode(['editor_mode' => $editorMode], JSON_UNESCAPED_SLASHES),
+            ]);
 
             $pdo->commit();
         } catch (\Throwable $e) {
@@ -97,6 +124,16 @@ final class Auth
 
         self::loginUser($userId);
         return self::user() ?? ['id' => $userId];
+    }
+
+    public static function setEditorMode(int $userId, string $mode): void
+    {
+        $mode = strtolower(trim($mode));
+        if (!in_array($mode, ['simple', 'advanced'], true)) {
+            throw new \InvalidArgumentException('Invalid editor mode.');
+        }
+        $stmt = Database::pdo()->prepare('UPDATE users SET editor_mode = ? WHERE id = ?');
+        $stmt->execute([$mode, $userId]);
     }
 
     public static function attemptLogin(string $email, string $password, array $config): bool
