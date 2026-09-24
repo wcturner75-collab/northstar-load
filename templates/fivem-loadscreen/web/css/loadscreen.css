@@ -141,3 +141,16 @@ html, body {
   font-size: 12px;
   z-index: 50;
 }
+
+/* Invisible YouTube embed — plays audio without showing the player */
+.yt-host {
+  position: fixed !important;
+  width: 1px !important;
+  height: 1px !important;
+  left: -9999px !important;
+  top: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  z-index: -1 !important;
+}

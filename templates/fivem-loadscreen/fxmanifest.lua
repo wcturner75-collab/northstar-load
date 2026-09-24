@@ -4,7 +4,7 @@ game 'gta5'
 name 'northstar_loadscreen'
 author 'Northstar Load'
 description 'Master loading screen runtime'
-version '1.0.0'
+version '1.1.0'
 
 loadscreen 'web/index.html'
 loadscreen_cursor 'yes'

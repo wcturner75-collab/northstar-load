@@ -19,6 +19,21 @@
   </article>
 
   <article class="doc-block">
+    <h2>Music</h2>
+    <p>Upload MP3/OGG in <strong>Media</strong>, or (Standard/Pro) paste a YouTube link. YouTube audio plays through a <em>hidden</em> embed in the loading screen — no visible player chrome.</p>
+  </article>
+
+  <article class="doc-block">
+    <h2>Plans</h2>
+    <ul>
+      <li><strong>Free</strong> — core editor, file music, image/color backgrounds, limited components.</li>
+      <li><strong>Standard</strong> — YouTube music, slideshows, staff &amp; announcements.</li>
+      <li><strong>Pro</strong> — video backgrounds, Ken Burns, higher limits.</li>
+    </ul>
+    <p>Limits are enforced on save and generate, not only in the UI.</p>
+  </article>
+
+  <article class="doc-block">
     <h2>How generation works</h2>
     <p>Northstar keeps one tested FiveM master runtime. Your project JSON and approved media are merged into that template, then packaged with PHP <code>ZipArchive</code>. The ZIP contains a top-level resource folder so extraction stays clean.</p>
   </article>

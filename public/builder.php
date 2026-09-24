@@ -19,4 +19,5 @@ if (!$project) {
     'project' => $project,
     'csrf' => \Northstar\Security::csrfToken(),
     'config' => $config,
+    'entitlements' => \Northstar\Entitlement::limits($userId, 'load', $config),
 ]);

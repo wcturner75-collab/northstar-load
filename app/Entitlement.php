@@ -6,6 +6,14 @@ namespace Northstar;
 
 final class Entitlement
 {
+    public const FEATURE_YOUTUBE_MUSIC = 'youtube_music';
+    public const FEATURE_SLIDESHOW = 'slideshow_background';
+    public const FEATURE_VIDEO_BG = 'video_background';
+    public const FEATURE_STAFF = 'staff';
+    public const FEATURE_ANNOUNCEMENTS = 'announcements';
+    public const FEATURE_KEN_BURNS = 'ken_burns';
+    public const FEATURE_MUSIC_FILE = 'music_file';
+
     /** @param array<string,mixed> $config */
     public static function planFor(int $userId, string $productKey, array $config): string
     {
@@ -21,17 +29,109 @@ final class Entitlement
         return is_string($plan) && $plan !== '' ? $plan : 'free';
     }
 
-    /** @param array<string,mixed> $config @return array<string,int> */
+    /**
+     * @param array<string,mixed> $config
+     * @return array<string,mixed>
+     */
     public static function limits(int $userId, string $productKey, array $config): array
     {
         $plan = self::planFor($userId, $productKey, $config);
         $limits = $config['entitlements'][$plan] ?? $config['entitlements']['free'];
+        $features = is_array($limits['features'] ?? null) ? $limits['features'] : [];
+
         return [
             'plan' => $plan,
-            'max_projects' => (int) $limits['max_projects'],
-            'max_media' => (int) $limits['max_media'],
-            'max_builds_per_day' => (int) $limits['max_builds_per_day'],
+            'max_projects' => (int) ($limits['max_projects'] ?? 0),
+            'max_media' => (int) ($limits['max_media'] ?? 0),
+            'max_builds_per_day' => (int) ($limits['max_builds_per_day'] ?? 0),
+            'max_components' => (int) ($limits['max_components'] ?? 12),
+            'features' => [
+                self::FEATURE_YOUTUBE_MUSIC => (bool) ($features[self::FEATURE_YOUTUBE_MUSIC] ?? false),
+                self::FEATURE_SLIDESHOW => (bool) ($features[self::FEATURE_SLIDESHOW] ?? false),
+                self::FEATURE_VIDEO_BG => (bool) ($features[self::FEATURE_VIDEO_BG] ?? false),
+                self::FEATURE_STAFF => (bool) ($features[self::FEATURE_STAFF] ?? false),
+                self::FEATURE_ANNOUNCEMENTS => (bool) ($features[self::FEATURE_ANNOUNCEMENTS] ?? false),
+                self::FEATURE_KEN_BURNS => (bool) ($features[self::FEATURE_KEN_BURNS] ?? false),
+                self::FEATURE_MUSIC_FILE => (bool) ($features[self::FEATURE_MUSIC_FILE] ?? true),
+            ],
         ];
+    }
+
+    /** @param array<string,mixed> $config */
+    public static function can(int $userId, string $feature, array $config, string $productKey = 'load'): bool
+    {
+        $limits = self::limits($userId, $productKey, $config);
+        return !empty($limits['features'][$feature]);
+    }
+
+    /** @param array<string,mixed> $config */
+    public static function assertFeature(int $userId, string $feature, array $config, string $label = ''): void
+    {
+        if (self::can($userId, $feature, $config)) {
+            return;
+        }
+        $plan = self::planFor($userId, 'load', $config);
+        $name = $label !== '' ? $label : $feature;
+        throw new \RuntimeException(
+            ucfirst($name) . ' is not available on the ' . $plan . ' plan. Upgrade to unlock it.'
+        );
+    }
+
+    /**
+     * Enforce plan limits against a validated builder config.
+     *
+     * @param array<string,mixed> $doc
+     * @param array<string,mixed> $config
+     */
+    public static function assertConfigAllowed(array $doc, int $userId, array $config): void
+    {
+        $limits = self::limits($userId, 'load', $config);
+        $features = $limits['features'];
+        $maxComponents = (int) $limits['max_components'];
+
+        $components = $doc['components'] ?? [];
+        if (count($components) > $maxComponents) {
+            throw new \RuntimeException(
+                'Component limit for your plan is ' . $maxComponents . ' (you have ' . count($components) . ').'
+            );
+        }
+
+        foreach ($components as $comp) {
+            $type = (string) ($comp['type'] ?? '');
+            if ($type === 'staff' && empty($features[self::FEATURE_STAFF])) {
+                self::assertFeature($userId, self::FEATURE_STAFF, $config, 'Staff blocks');
+            }
+            if ($type === 'announcements' && empty($features[self::FEATURE_ANNOUNCEMENTS])) {
+                self::assertFeature($userId, self::FEATURE_ANNOUNCEMENTS, $config, 'Announcements');
+            }
+        }
+
+        $bg = $doc['background'] ?? [];
+        $bgType = (string) ($bg['type'] ?? 'color');
+        if ($bgType === 'slideshow' && empty($features[self::FEATURE_SLIDESHOW])) {
+            self::assertFeature($userId, self::FEATURE_SLIDESHOW, $config, 'Slideshow backgrounds');
+        }
+        if ($bgType === 'video' && empty($features[self::FEATURE_VIDEO_BG])) {
+            self::assertFeature($userId, self::FEATURE_VIDEO_BG, $config, 'Video backgrounds');
+        }
+        if (!empty($bg['kenBurns']) && empty($features[self::FEATURE_KEN_BURNS])) {
+            self::assertFeature($userId, self::FEATURE_KEN_BURNS, $config, 'Ken Burns effect');
+        }
+
+        $music = $doc['music'] ?? [];
+        $source = (string) ($music['source'] ?? 'file');
+        if (!empty($music['enabled'])) {
+            if ($source === 'youtube') {
+                self::assertFeature($userId, self::FEATURE_YOUTUBE_MUSIC, $config, 'YouTube music');
+            } elseif ($source === 'file' || !empty($music['mediaId'])) {
+                if (empty($features[self::FEATURE_MUSIC_FILE])) {
+                    self::assertFeature($userId, self::FEATURE_MUSIC_FILE, $config, 'Uploaded music files');
+                }
+            }
+        }
+        if ($source === 'youtube' && !empty($music['youtubeId']) && empty($features[self::FEATURE_YOUTUBE_MUSIC])) {
+            self::assertFeature($userId, self::FEATURE_YOUTUBE_MUSIC, $config, 'YouTube music');
+        }
     }
 
     /** @param array<string,mixed> $config */

@@ -143,18 +143,92 @@ final class BuilderConfigValidator
     /** @param array<string,mixed> $music @return array<string,mixed> */
     private static function music(array $music, int $userId, bool $strict): array
     {
-        $mediaId = isset($music['mediaId']) ? (int) $music['mediaId'] : null;
-        if ($mediaId && $strict) {
-            self::assertMediaOwned($mediaId, $userId, ['audio']);
+        $source = strtolower(trim((string) ($music['source'] ?? 'file')));
+        if (!in_array($source, ['file', 'youtube'], true)) {
+            $source = 'file';
         }
+
+        $mediaId = isset($music['mediaId']) ? (int) $music['mediaId'] : null;
+        $youtubeUrl = trim((string) ($music['youtubeUrl'] ?? ''));
+        $youtubeId = trim((string) ($music['youtubeId'] ?? ''));
+
+        if ($youtubeId === '' && $youtubeUrl !== '') {
+            $youtubeId = self::extractYoutubeId($youtubeUrl) ?? '';
+        }
+        if ($youtubeUrl === '' && $youtubeId !== '') {
+            $youtubeUrl = 'https://www.youtube.com/watch?v=' . $youtubeId;
+        }
+
+        if ($source === 'youtube') {
+            if ($youtubeId === '' || !preg_match('/^[a-zA-Z0-9_-]{11}$/', $youtubeId)) {
+                if ($strict || $youtubeUrl !== '' || !empty($music['enabled'])) {
+                    throw new \InvalidArgumentException('Invalid YouTube URL or video id.');
+                }
+            }
+            $mediaId = null;
+        } else {
+            $youtubeId = '';
+            $youtubeUrl = '';
+            if ($mediaId && $strict) {
+                self::assertMediaOwned($mediaId, $userId, ['audio']);
+            }
+        }
+
         return [
             'enabled' => (bool) ($music['enabled'] ?? false),
+            'source' => $source,
             'mediaId' => $mediaId ?: null,
+            'youtubeUrl' => $youtubeUrl,
+            'youtubeId' => $youtubeId !== '' ? $youtubeId : null,
             'volume' => max(0, min(1, (float) ($music['volume'] ?? 0.15))),
             'autoplay' => (bool) ($music['autoplay'] ?? true),
             'loop' => (bool) ($music['loop'] ?? true),
             'startMutedHint' => (bool) ($music['startMutedHint'] ?? true),
         ];
+    }
+
+    public static function extractYoutubeId(string $input): ?string
+    {
+        $input = trim($input);
+        if ($input === '') {
+            return null;
+        }
+        if (preg_match('/^[a-zA-Z0-9_-]{11}$/', $input)) {
+            return $input;
+        }
+        if (!preg_match('#^https?://#i', $input)) {
+            return null;
+        }
+        $parts = parse_url($input);
+        if ($parts === false) {
+            return null;
+        }
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        $host = preg_replace('/^www\./', '', $host) ?? $host;
+        $path = (string) ($parts['path'] ?? '');
+
+        if ($host === 'youtu.be') {
+            $id = ltrim($path, '/');
+            $id = explode('/', $id)[0] ?? '';
+            return preg_match('/^[a-zA-Z0-9_-]{11}$/', $id) ? $id : null;
+        }
+
+        if (!in_array($host, ['youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtube-nocookie.com'], true)) {
+            return null;
+        }
+
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $q);
+            if (!empty($q['v']) && preg_match('/^[a-zA-Z0-9_-]{11}$/', (string) $q['v'])) {
+                return (string) $q['v'];
+            }
+        }
+
+        if (preg_match('#/(?:embed|shorts|live|v)/([a-zA-Z0-9_-]{11})#', $path, $m)) {
+            return $m[1];
+        }
+
+        return null;
     }
 
     /** @param array<string,mixed> $loading @return array<string,mixed> */
@@ -351,7 +425,10 @@ final class BuilderConfigValidator
             ],
             'music' => [
                 'enabled' => false,
+                'source' => 'file',
                 'mediaId' => null,
+                'youtubeUrl' => '',
+                'youtubeId' => null,
                 'volume' => 0.15,
                 'autoplay' => true,
                 'loop' => true,

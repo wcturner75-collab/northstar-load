@@ -22,6 +22,7 @@ final class ResourceGenerator
         $resourceName = ResourceName::assert((string) $project['resource_name']);
         $rawConfig = is_array($project['config'] ?? null) ? $project['config'] : [];
         $validated = BuilderConfigValidator::validate($rawConfig, $userId, true);
+        Entitlement::assertConfigAllowed($validated, $userId, $configApp);
 
         $buildToken = bin2hex(random_bytes(32));
         $tempId = bin2hex(random_bytes(16));
@@ -98,6 +99,10 @@ final class ResourceGenerator
         if (!empty($config['music']['mediaId'])) {
             $ids[(int) $config['music']['mediaId']] = 'music';
         }
+        // YouTube music copies no files — youtubeId stays in config.json
+        if (($config['music']['source'] ?? '') === 'file' && !empty($config['music']['mediaId'])) {
+            // already handled
+        }
         foreach ($config['components'] ?? [] as $comp) {
             if (!empty($comp['props']['mediaId'])) {
                 $ids[(int) $comp['props']['mediaId']] = 'images';
@@ -142,12 +147,17 @@ final class ResourceGenerator
         }
         unset($config['background']['mediaIds']);
 
-        if (!empty($config['music']['mediaId']) && isset($mediaMap[(int) $config['music']['mediaId']])) {
+        if (($config['music']['source'] ?? 'file') === 'youtube') {
+            $config['music']['asset'] = null;
+            // Keep youtubeId for the runtime hidden embed
+            unset($config['music']['mediaId']);
+        } elseif (!empty($config['music']['mediaId']) && isset($mediaMap[(int) $config['music']['mediaId']])) {
             $config['music']['asset'] = $mediaMap[(int) $config['music']['mediaId']];
+            unset($config['music']['mediaId']);
         } else {
             $config['music']['asset'] = null;
+            unset($config['music']['mediaId']);
         }
-        unset($config['music']['mediaId']);
 
         foreach ($config['components'] as &$comp) {
             if (!empty($comp['props']['mediaId']) && isset($mediaMap[(int) $comp['props']['mediaId']])) {

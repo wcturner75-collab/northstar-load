@@ -5,6 +5,34 @@
     doc.version = 1;
   }
   const projectId = parseInt(document.body.dataset.projectId, 10);
+  const entitlements = JSON.parse(document.getElementById('entitlements-boot')?.textContent || '{}');
+  const features = entitlements.features || {};
+  const maxComponents = entitlements.max_components || 12;
+  const plan = (entitlements.plan || 'free').toUpperCase();
+  const planBadge = document.getElementById('plan-badge');
+  if (planBadge) planBadge.textContent = plan;
+
+  function canFeature(key) {
+    return !!features[key];
+  }
+
+  function featureLockReason(key) {
+    const labels = {
+      youtube_music: 'YouTube music (Standard+)',
+      slideshow_background: 'Slideshow backgrounds (Standard+)',
+      video_background: 'Video backgrounds (Pro)',
+      staff: 'Staff blocks (Standard+)',
+      announcements: 'Announcements (Standard+)',
+      ken_burns: 'Ken Burns (Pro)',
+    };
+    return labels[key] || key;
+  }
+
+  function componentFeature(type) {
+    if (type === 'staff') return 'staff';
+    if (type === 'announcements') return 'announcements';
+    return null;
+  }
 
   NSBuilder.History.push(doc);
   NSBuilder.Autosave.init({
@@ -73,16 +101,28 @@
   NSBuilder.COMPONENTS.forEach((c) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.textContent = c.label;
-    btn.addEventListener('click', () => {
-      const comp = NSBuilder.createComponent(c.type, 200, 200);
-      doc.components = doc.components || [];
-      doc.layersOrder = doc.layersOrder || [];
-      doc.components.push(comp);
-      doc.layersOrder.push(comp.id);
-      commit(doc, true);
-      NSBuilder.Canvas.select(comp.id);
-    });
+    const need = componentFeature(c.type);
+    const locked = need && !canFeature(need);
+    btn.textContent = locked ? c.label + ' 🔒' : c.label;
+    if (locked) {
+      btn.classList.add('palette-locked');
+      btn.title = 'Upgrade required: ' + featureLockReason(need);
+      btn.addEventListener('click', () => alert(featureLockReason(need) + ' is not on your ' + plan + ' plan.'));
+    } else {
+      btn.addEventListener('click', () => {
+        doc.components = doc.components || [];
+        if (doc.components.length >= maxComponents) {
+          alert('Your ' + plan + ' plan allows up to ' + maxComponents + ' components.');
+          return;
+        }
+        const comp = NSBuilder.createComponent(c.type, 200, 200);
+        doc.layersOrder = doc.layersOrder || [];
+        doc.components.push(comp);
+        doc.layersOrder.push(comp.id);
+        commit(doc, true);
+        NSBuilder.Canvas.select(comp.id);
+      });
+    }
     palette.appendChild(btn);
   });
 
@@ -149,6 +189,14 @@
     doc.content = doc.content || { rules: [], announcements: [], staff: [], socials: [] };
 
     bg.appendChild(field('Type (color|image|slideshow|video)', doc.background.type || 'color', (v) => {
+      if (v === 'slideshow' && !canFeature('slideshow_background')) {
+        alert(featureLockReason('slideshow_background'));
+        return;
+      }
+      if (v === 'video' && !canFeature('video_background')) {
+        alert(featureLockReason('video_background'));
+        return;
+      }
       doc.background.type = v; commit(doc, false);
     }));
     bg.appendChild(field('Color', doc.background.color || '#0B0C10', (v) => {
@@ -158,13 +206,65 @@
       doc.background.mediaIds = v.split(',').map((s) => parseInt(s.trim(), 10)).filter(Boolean);
       commit(doc, false);
     }));
+    if (canFeature('ken_burns')) {
+      bg.appendChild(field('Ken Burns (true/false)', String(!!doc.background.kenBurns), (v) => {
+        doc.background.kenBurns = v === 'true'; commit(doc, false);
+      }));
+    } else {
+      const hint = document.createElement('p');
+      hint.className = 'plan-hint';
+      hint.textContent = 'Ken Burns effect: Pro plan';
+      bg.appendChild(hint);
+    }
 
     music.appendChild(field('Enabled (true/false)', String(!!doc.music.enabled), (v) => {
       doc.music.enabled = v === 'true'; commit(doc, false);
     }));
-    music.appendChild(field('Media ID', doc.music.mediaId || '', (v) => {
-      doc.music.mediaId = parseInt(v, 10) || null; commit(doc, false);
+
+    const sourceOptions = ['file'];
+    if (canFeature('youtube_music')) sourceOptions.push('youtube');
+    const sourceVal = doc.music.source || 'file';
+    music.appendChild(field('Source (' + sourceOptions.join('|') + ')', sourceVal, (v) => {
+      if (v === 'youtube' && !canFeature('youtube_music')) {
+        alert(featureLockReason('youtube_music'));
+        return;
+      }
+      doc.music.source = v;
+      if (v === 'youtube') doc.music.mediaId = null;
+      else {
+        doc.music.youtubeUrl = '';
+        doc.music.youtubeId = null;
+      }
+      commit(doc, false);
     }));
+
+    if ((doc.music.source || 'file') === 'youtube') {
+      if (canFeature('youtube_music')) {
+        const ytHint = document.createElement('p');
+        ytHint.className = 'plan-hint';
+        ytHint.textContent = 'YouTube plays as a hidden embed (no visible player) in the loading screen.';
+        music.appendChild(ytHint);
+        music.appendChild(field('YouTube URL', doc.music.youtubeUrl || '', (v) => {
+          doc.music.youtubeUrl = v;
+          doc.music.source = 'youtube';
+          commit(doc, false);
+        }));
+      }
+    } else {
+      music.appendChild(field('Media ID (uploaded audio)', doc.music.mediaId || '', (v) => {
+        doc.music.mediaId = parseInt(v, 10) || null;
+        doc.music.source = 'file';
+        commit(doc, false);
+      }));
+    }
+
+    if (!canFeature('youtube_music')) {
+      const lock = document.createElement('p');
+      lock.className = 'plan-hint';
+      lock.textContent = 'YouTube music embed: Standard or Pro plan';
+      music.appendChild(lock);
+    }
+
     music.appendChild(field('Volume 0-1', doc.music.volume ?? 0.15, (v) => {
       doc.music.volume = Math.max(0, Math.min(1, parseFloat(v) || 0)); commit(doc, false);
     }));

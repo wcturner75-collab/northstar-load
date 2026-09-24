@@ -26,7 +26,7 @@ if (!is_array($configDoc)) {
 }
 
 try {
-    $project = \Northstar\Project::saveConfig($id, $userId, $configDoc, false);
+    $project = \Northstar\Project::saveConfig($id, $userId, $configDoc, false, $config);
     \Northstar\Response::jsonOk([
         'savedAt' => $project['last_saved_at'] ?? date('c'),
         'configVersion' => (int) ($project['config_version'] ?? 0),

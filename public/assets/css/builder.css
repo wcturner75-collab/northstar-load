@@ -31,6 +31,25 @@
 .builder-status { margin-left: auto; color: #6f9e7a; font-size: 0.85rem; min-width: 70px; }
 .builder-status.is-saving { color: #c4a35a; }
 .builder-status.is-error { color: #c45c5c; }
+.builder-plan {
+  font-family: Orbitron, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  border: 1px solid #c4a35a;
+  color: #c4a35a;
+  padding: 0.2rem 0.45rem;
+}
+.palette-locked {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+  position: relative;
+}
+.plan-hint {
+  font-size: 0.75rem;
+  color: #c4a35a;
+  margin: 0.35rem 0 0.5rem;
+  line-height: 1.35;
+}
 .builder-actions { display: flex; gap: 0.45rem; }
 
 .builder-left, .builder-right {

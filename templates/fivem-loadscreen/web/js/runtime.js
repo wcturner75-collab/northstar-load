@@ -73,30 +73,123 @@
   }
 
   function setupMusic(cfg) {
-    const audio = document.getElementById('music');
     const music = cfg.music || {};
-    if (!music.enabled || !music.asset) return;
+    if (!music.enabled) return;
+
+    const source = music.source || (music.youtubeId ? 'youtube' : 'file');
+    if (source === 'youtube' && music.youtubeId) {
+      setupYoutubeMusic(music);
+      return;
+    }
+    if (!music.asset) return;
+
+    const audio = document.getElementById('music');
     audio.src = music.asset;
     audio.loop = !!music.loop;
     audio.volume = Math.max(0, Math.min(1, music.volume ?? 0.15));
 
     const tryPlay = () => {
-      audio.play().catch(() => {
-        if (!music.startMutedHint) return;
-        if (document.querySelector('.music-hint')) return;
-        const hint = document.createElement('div');
-        hint.className = 'music-hint';
-        hint.textContent = 'Click to enable music';
-        hint.addEventListener('click', () => {
-          audio.play().catch(() => {});
-          hint.remove();
-        });
-        document.body.appendChild(hint);
-      });
+      audio.play().catch(() => showMusicHint(() => audio.play().catch(() => {})));
+    };
+
+    window.NSLoad._musicToggle = () => {
+      if (audio.paused) audio.play().catch(() => {});
+      else audio.pause();
     };
 
     if (music.autoplay) tryPlay();
     document.addEventListener('click', tryPlay, { once: true });
+  }
+
+  function showMusicHint(onClick) {
+    const music = (state.config && state.config.music) || {};
+    if (!music.startMutedHint) return;
+    if (document.querySelector('.music-hint')) return;
+    const hint = document.createElement('div');
+    hint.className = 'music-hint';
+    hint.textContent = 'Click to enable music';
+    hint.addEventListener('click', () => {
+      onClick();
+      hint.remove();
+    });
+    document.body.appendChild(hint);
+  }
+
+  function setupYoutubeMusic(music) {
+    const host = document.getElementById('yt-host');
+    if (!host) return;
+    const videoId = String(music.youtubeId || '').trim();
+    if (!/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
+
+    let player = null;
+    const vol = Math.round(Math.max(0, Math.min(1, music.volume ?? 0.15)) * 100);
+
+    function mountPlayer() {
+      player = new YT.Player('yt-player', {
+        width: 1,
+        height: 1,
+        videoId: videoId,
+        playerVars: {
+          autoplay: music.autoplay ? 1 : 0,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          rel: 0,
+          loop: music.loop ? 1 : 0,
+          playlist: music.loop ? videoId : undefined,
+          origin: window.location.origin || undefined,
+        },
+        events: {
+          onReady: (e) => {
+            try {
+              e.target.setVolume(vol);
+              if (music.autoplay) e.target.playVideo();
+            } catch (_) {}
+          },
+          onError: () => {
+            state.status = 'Music unavailable';
+            updateLoadingUI();
+          },
+        },
+      });
+
+      window.NSLoad._musicToggle = () => {
+        if (!player || typeof player.getPlayerState !== 'function') return;
+        const st = player.getPlayerState();
+        if (st === YT.PlayerState.PLAYING) player.pauseVideo();
+        else player.playVideo();
+      };
+    }
+
+    window.onYouTubeIframeAPIReady = function () {
+      mountPlayer();
+    };
+
+    if (window.YT && window.YT.Player) {
+      mountPlayer();
+    } else {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+
+    // Browser/NUI autoplay policies may still require a gesture
+    document.addEventListener('click', () => {
+      if (player && typeof player.playVideo === 'function') {
+        try {
+          player.setVolume(vol);
+          player.playVideo();
+        } catch (_) {}
+      }
+    }, { once: true });
+
+    if (music.startMutedHint) {
+      showMusicHint(() => {
+        if (player && player.playVideo) player.playVideo();
+      });
+    }
   }
 
   function textNode(text, props) {
@@ -192,6 +285,10 @@
           child.type = 'button';
           child.textContent = p.label || 'Music';
           child.addEventListener('click', () => {
+            if (window.NSLoad && typeof window.NSLoad._musicToggle === 'function') {
+              window.NSLoad._musicToggle();
+              return;
+            }
             const audio = document.getElementById('music');
             if (audio.paused) audio.play().catch(() => {});
             else audio.pause();

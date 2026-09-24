@@ -19,6 +19,7 @@ $cfgJson = json_encode($project['config'] ?? [], JSON_UNESCAPED_SLASHES | JSON_U
 </head>
 <body class="builder-body" data-project-id="<?= (int) $project['id'] ?>">
 <script type="application/json" id="project-boot"><?= $cfgJson ?: '{}' ?></script>
+<script type="application/json" id="entitlements-boot"><?= json_encode($entitlements ?? ['plan' => 'free', 'features' => []], JSON_UNESCAPED_SLASHES) ?></script>
 
 <div class="builder-app">
   <header class="builder-top">
@@ -31,6 +32,7 @@ $cfgJson = json_encode($project['config'] ?? [], JSON_UNESCAPED_SLASHES | JSON_U
       <span class="mono" id="project-resource"><?= \Northstar\Security::e($project['resource_name']) ?></span>
     </div>
     <div class="builder-status" id="save-status">Saved</div>
+    <div class="builder-plan" id="plan-badge" title="Your plan limits">FREE</div>
     <div class="builder-actions">
       <button type="button" class="btn btn-ghost" id="btn-preview-toggle">Preview</button>
       <button type="button" class="btn btn-primary" id="btn-generate">Generate Resource</button>

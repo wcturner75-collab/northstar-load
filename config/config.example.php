@@ -49,24 +49,55 @@ return [
 
     'builds' => [
         'expire_days' => 30,
-        'runtime_version' => '1.0.0',
+        'runtime_version' => '1.1.0',
     ],
 
     'entitlements' => [
+        // Feature gates are enforced on save + generate (not only in the UI).
         'free' => [
             'max_projects' => 3,
             'max_media' => 40,
             'max_builds_per_day' => 10,
+            'max_components' => 12,
+            'features' => [
+                'youtube_music' => false,
+                'music_file' => true,
+                'slideshow_background' => false,
+                'video_background' => false,
+                'staff' => false,
+                'announcements' => false,
+                'ken_burns' => false,
+            ],
         ],
         'standard' => [
             'max_projects' => 25,
             'max_media' => 250,
             'max_builds_per_day' => 50,
+            'max_components' => 40,
+            'features' => [
+                'youtube_music' => true,
+                'music_file' => true,
+                'slideshow_background' => true,
+                'video_background' => false,
+                'staff' => true,
+                'announcements' => true,
+                'ken_burns' => false,
+            ],
         ],
         'pro' => [
             'max_projects' => 200,
             'max_media' => 2000,
             'max_builds_per_day' => 200,
+            'max_components' => 80,
+            'features' => [
+                'youtube_music' => true,
+                'music_file' => true,
+                'slideshow_background' => true,
+                'video_background' => true,
+                'staff' => true,
+                'announcements' => true,
+                'ken_burns' => true,
+            ],
         ],
     ],
 

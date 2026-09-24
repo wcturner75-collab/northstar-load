@@ -100,15 +100,18 @@ final class Project
         return $project;
     }
 
-    /** @param array<string,mixed> $rawConfig */
-    public static function saveConfig(int $projectId, int $userId, array $rawConfig, bool $strict = false): array
+    /** @param array<string,mixed> $rawConfig @param array<string,mixed>|null $configApp */
+    public static function saveConfig(int $projectId, int $userId, array $rawConfig, bool $strict = false, ?array $configApp = null): array
     {
         $project = self::findOwned($projectId, $userId);
         if (!$project) {
             throw new \RuntimeException('Project not found.');
         }
 
+        $app = $configApp ?? (is_array($GLOBALS['ns_config'] ?? null) ? $GLOBALS['ns_config'] : []);
         $validated = BuilderConfigValidator::validate($rawConfig, $userId, $strict);
+        Entitlement::assertConfigAllowed($validated, $userId, $app);
+
         $stmt = Database::pdo()->prepare(
             'UPDATE projects
              SET config_json = ?, config_version = config_version + 1, last_saved_at = NOW(3), status = \'ready\',
@@ -125,7 +128,6 @@ final class Project
             $userId,
         ]);
 
-        // Snapshot occasionally (every save for now, capped later)
         self::snapshot($projectId, $userId, $validated, 'autosave');
 
         return self::findOwned($projectId, $userId) ?? $project;

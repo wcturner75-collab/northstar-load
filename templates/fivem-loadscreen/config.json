@@ -33,7 +33,10 @@
   },
   "music": {
     "enabled": false,
+    "source": "file",
     "asset": null,
+    "youtubeUrl": "",
+    "youtubeId": null,
     "volume": 0.15,
     "autoplay": true,
     "loop": true,
