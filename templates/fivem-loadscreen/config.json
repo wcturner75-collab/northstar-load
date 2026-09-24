@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "server": {
+    "name": "Northstar Server",
+    "tagline": "Your Story Starts Here",
+    "locale": "en"
+  },
+  "theme": {
+    "preset": "cinematic",
+    "accent": "#C4A35A",
+    "fonts": {
+      "display": "Orbitron",
+      "body": "Source Sans 3"
+    },
+    "colors": {
+      "text": "#F5F5F5",
+      "muted": "#A8A8A8",
+      "panel": "rgba(8,10,14,0.55)"
+    }
+  },
+  "background": {
+    "type": "color",
+    "color": "#0B0C10",
+    "assets": [],
+    "fit": "cover",
+    "intervalMs": 8000,
+    "kenBurns": false,
+    "overlay": {
+      "enabled": true,
+      "color": "#000000",
+      "opacity": 0.35
+    }
+  },
+  "music": {
+    "enabled": false,
+    "asset": null,
+    "volume": 0.15,
+    "autoplay": true,
+    "loop": true,
+    "startMutedHint": true
+  },
+  "loading": {
+    "showBar": true,
+    "showStatus": true,
+    "showPercentWhenKnown": true,
+    "indeterminateWhenUnknown": true
+  },
+  "content": {
+    "rules": [],
+    "announcements": [],
+    "staff": [],
+    "socials": []
+  },
+  "components": [],
+  "layersOrder": []
+}

@@ -1,0 +1,334 @@
+(function () {
+  const state = {
+    config: null,
+    progressKnown: false,
+    progress: 0,
+    status: 'Connecting…',
+  };
+
+  async function loadConfig() {
+    const res = await fetch('../config.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('config missing');
+    return res.json();
+  }
+
+  function pct(n, base) {
+    return ((n / base) * 100) + '%';
+  }
+
+  function applyTheme(cfg) {
+    const root = document.documentElement;
+    root.style.setProperty('--accent', (cfg.theme && cfg.theme.accent) || '#C4A35A');
+    root.style.setProperty('--text', (cfg.theme && cfg.theme.colors && cfg.theme.colors.text) || '#F5F5F5');
+    root.style.setProperty('--muted', (cfg.theme && cfg.theme.colors && cfg.theme.colors.muted) || '#A8A8A8');
+  }
+
+  function setupBackground(cfg) {
+    const el = document.getElementById('background');
+    const ov = document.getElementById('overlay');
+    const bg = cfg.background || {};
+    el.innerHTML = '';
+    el.className = '';
+
+    if (bg.type === 'color' || !(bg.assets && bg.assets.length)) {
+      el.style.background = bg.color || '#0B0C10';
+    } else if (bg.type === 'video' && bg.assets[0]) {
+      const video = document.createElement('video');
+      video.src = bg.assets[0];
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.style.width = '100%';
+      video.style.height = '100%';
+      video.style.objectFit = bg.fit || 'cover';
+      el.appendChild(video);
+    } else {
+      el.classList.add('slideshow');
+      if (bg.kenBurns) el.classList.add('kenburns');
+      bg.assets.forEach((src, i) => {
+        const img = document.createElement('img');
+        img.src = src;
+        if (i === 0) img.classList.add('active');
+        el.appendChild(img);
+      });
+      if (bg.assets.length > 1) {
+        let idx = 0;
+        setInterval(() => {
+          const imgs = el.querySelectorAll('img');
+          imgs[idx].classList.remove('active');
+          idx = (idx + 1) % imgs.length;
+          imgs[idx].classList.add('active');
+        }, bg.intervalMs || 8000);
+      }
+    }
+
+    if (bg.overlay && bg.overlay.enabled) {
+      ov.style.background = bg.overlay.color || '#000';
+      ov.style.opacity = String(bg.overlay.opacity ?? 0.35);
+      ov.style.display = 'block';
+    } else {
+      ov.style.display = 'none';
+    }
+  }
+
+  function setupMusic(cfg) {
+    const audio = document.getElementById('music');
+    const music = cfg.music || {};
+    if (!music.enabled || !music.asset) return;
+    audio.src = music.asset;
+    audio.loop = !!music.loop;
+    audio.volume = Math.max(0, Math.min(1, music.volume ?? 0.15));
+
+    const tryPlay = () => {
+      audio.play().catch(() => {
+        if (!music.startMutedHint) return;
+        if (document.querySelector('.music-hint')) return;
+        const hint = document.createElement('div');
+        hint.className = 'music-hint';
+        hint.textContent = 'Click to enable music';
+        hint.addEventListener('click', () => {
+          audio.play().catch(() => {});
+          hint.remove();
+        });
+        document.body.appendChild(hint);
+      });
+    };
+
+    if (music.autoplay) tryPlay();
+    document.addEventListener('click', tryPlay, { once: true });
+  }
+
+  function textNode(text, props) {
+    const el = document.createElement('div');
+    el.className = 'ns-text';
+    el.textContent = text;
+    el.style.fontFamily = (props.fontFamily || 'Segoe UI') + ', sans-serif';
+    el.style.fontSize = (props.fontSize || 20) + 'px';
+    el.style.fontWeight = String(props.fontWeight || 400);
+    el.style.textAlign = props.align || 'left';
+    el.style.color = props.color || 'var(--text)';
+    el.style.letterSpacing = (props.letterSpacing || 0) + 'px';
+    if (props.shadow) el.style.textShadow = '0 2px 18px rgba(0,0,0,0.65)';
+    return el;
+  }
+
+  function renderComponents(cfg) {
+    const host = document.getElementById('components');
+    host.innerHTML = '';
+    const order = (cfg.layersOrder && cfg.layersOrder.length)
+      ? cfg.layersOrder
+      : (cfg.components || []).map((c) => c.id);
+
+    order.forEach((id) => {
+      const comp = (cfg.components || []).find((c) => c.id === id);
+      if (!comp || comp.visible === false) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'ns-comp';
+      wrap.dataset.type = comp.type;
+      wrap.dataset.id = comp.id;
+      wrap.style.left = pct(comp.x, 1920);
+      wrap.style.top = pct(comp.y, 1080);
+      wrap.style.width = pct(comp.w, 1920);
+      wrap.style.height = pct(comp.h, 1080);
+      wrap.style.zIndex = String(comp.zIndex || 1);
+
+      const p = comp.props || {};
+      let child;
+      switch (comp.type) {
+        case 'serverName':
+          child = textNode(cfg.server.name || '', p);
+          break;
+        case 'tagline':
+          child = textNode(cfg.server.tagline || '', p);
+          break;
+        case 'text':
+          child = textNode(p.text || '', p);
+          break;
+        case 'loadingStatus':
+          child = textNode(state.status, p);
+          child.dataset.role = 'status';
+          break;
+        case 'clock':
+          child = textNode('', p);
+          child.dataset.role = 'clock';
+          break;
+        case 'loadingBar': {
+          child = document.createElement('div');
+          child.className = 'ns-bar';
+          child.style.borderRadius = (p.radius || 0) + 'px';
+          const fill = document.createElement('div');
+          fill.className = 'ns-bar-fill is-indeterminate';
+          fill.dataset.role = 'bar';
+          child.appendChild(fill);
+          break;
+        }
+        case 'logo':
+        case 'image': {
+          child = document.createElement('img');
+          child.src = p.asset || '';
+          child.alt = '';
+          child.style.width = '100%';
+          child.style.height = '100%';
+          child.style.objectFit = p.objectFit || 'contain';
+          child.style.opacity = String(p.opacity ?? 1);
+          break;
+        }
+        case 'rulesButton':
+        case 'discordButton':
+        case 'websiteButton':
+        case 'socialButton': {
+          child = document.createElement('a');
+          child.className = 'ns-btn';
+          child.textContent = p.label || comp.name;
+          child.href = p.url || '#';
+          child.target = '_blank';
+          child.rel = 'noopener noreferrer';
+          break;
+        }
+        case 'musicPlayer': {
+          child = document.createElement('button');
+          child.className = 'ns-btn';
+          child.type = 'button';
+          child.textContent = p.label || 'Music';
+          child.addEventListener('click', () => {
+            const audio = document.getElementById('music');
+            if (audio.paused) audio.play().catch(() => {});
+            else audio.pause();
+          });
+          break;
+        }
+        case 'announcements': {
+          child = document.createElement('div');
+          child.className = 'ns-panel';
+          (cfg.content.announcements || []).forEach((a) => {
+            const h = document.createElement('h4');
+            h.textContent = a.title || '';
+            const para = document.createElement('p');
+            para.textContent = a.body || '';
+            child.appendChild(h);
+            child.appendChild(para);
+          });
+          break;
+        }
+        case 'staff': {
+          child = document.createElement('div');
+          child.className = 'ns-panel';
+          (cfg.content.staff || []).forEach((s) => {
+            const h = document.createElement('h4');
+            h.textContent = (s.name || '') + (s.role ? ' — ' + s.role : '');
+            child.appendChild(h);
+          });
+          break;
+        }
+        case 'serverInfo': {
+          child = document.createElement('div');
+          child.className = 'ns-panel';
+          const h = document.createElement('h4');
+          h.textContent = cfg.server.name || '';
+          const para = document.createElement('p');
+          para.textContent = cfg.server.tagline || '';
+          child.appendChild(h);
+          child.appendChild(para);
+          break;
+        }
+        case 'panel': {
+          child = document.createElement('div');
+          child.style.width = '100%';
+          child.style.height = '100%';
+          child.style.background = p.background || 'rgba(0,0,0,0.45)';
+          if (p.border) child.style.border = '1px solid rgba(255,255,255,0.12)';
+          break;
+        }
+        default:
+          child = document.createElement('div');
+      }
+      wrap.appendChild(child);
+      host.appendChild(wrap);
+    });
+  }
+
+  function updateLoadingUI() {
+    const cfg = state.config || {};
+    const loading = cfg.loading || {};
+    document.querySelectorAll('[data-role="status"]').forEach((el) => {
+      if (loading.showStatus === false) {
+        el.style.display = 'none';
+        return;
+      }
+      let text = state.status;
+      if (state.progressKnown && loading.showPercentWhenKnown !== false) {
+        text = Math.round(state.progress * 100) + '% — ' + state.status;
+      }
+      el.textContent = text;
+    });
+    document.querySelectorAll('[data-role="bar"]').forEach((el) => {
+      if (loading.showBar === false) {
+        el.parentElement.style.display = 'none';
+        return;
+      }
+      if (state.progressKnown) {
+        el.classList.remove('is-indeterminate');
+        el.style.width = Math.max(0, Math.min(100, state.progress * 100)) + '%';
+      } else if (loading.indeterminateWhenUnknown !== false) {
+        el.classList.add('is-indeterminate');
+        el.style.width = '';
+      }
+    });
+  }
+
+  function tickClock() {
+    const now = new Date();
+    const text = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.querySelectorAll('[data-role="clock"]').forEach((el) => {
+      el.textContent = text;
+    });
+  }
+
+  window.NSLoad = {
+    setProgress(fraction) {
+      if (typeof fraction === 'number' && Number.isFinite(fraction)) {
+        state.progressKnown = true;
+        state.progress = Math.max(0, Math.min(1, fraction));
+        updateLoadingUI();
+      }
+    },
+    setStatus(message) {
+      if (typeof message === 'string' && message.trim()) {
+        state.status = message.slice(0, 240);
+        updateLoadingUI();
+      }
+    },
+    markUnknown() {
+      state.progressKnown = false;
+      updateLoadingUI();
+    },
+  };
+
+  async function boot() {
+    try {
+      const cfg = await loadConfig();
+      state.config = cfg;
+      applyTheme(cfg);
+      setupBackground(cfg);
+      setupMusic(cfg);
+      renderComponents(cfg);
+      updateLoadingUI();
+      tickClock();
+      setInterval(tickClock, 15000);
+
+      if (window.nuiHandoverData && window.nuiHandoverData.name) {
+        // Welcome hint only — never inject HTML
+        const name = String(window.nuiHandoverData.name);
+        state.status = 'Welcome, ' + name;
+        updateLoadingUI();
+      }
+    } catch (err) {
+      console.error(err);
+      state.status = 'Loading…';
+      updateLoadingUI();
+    }
+  }
+
+  boot();
+})();

@@ -1,0 +1,243 @@
+.builder-body {
+  margin: 0;
+  background: #0a0b0f;
+  color: #e8e6e1;
+  font-family: "Source Sans 3", sans-serif;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.builder-app {
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  grid-template-rows: 52px 1fr 44px;
+  height: 100vh;
+}
+
+.builder-top {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 0.85rem;
+  border-bottom: 1px solid #2a2e38;
+  background: #101219;
+}
+
+.brand.compact { gap: 0.5rem; color: inherit; text-decoration: none; font-family: Orbitron, sans-serif; letter-spacing: 0.08em; font-size: 0.8rem; }
+.builder-project { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.builder-project strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.builder-project .mono { color: #9a9aa2; font-size: 0.75rem; }
+.builder-status { margin-left: auto; color: #6f9e7a; font-size: 0.85rem; min-width: 70px; }
+.builder-status.is-saving { color: #c4a35a; }
+.builder-status.is-error { color: #c45c5c; }
+.builder-actions { display: flex; gap: 0.45rem; }
+
+.builder-left, .builder-right {
+  background: #12141a;
+  border-right: 1px solid #2a2e38;
+  overflow: auto;
+  padding: 0.65rem;
+}
+.builder-right { border-right: 0; border-left: 1px solid #2a2e38; }
+.builder-right h2 { margin: 0 0 0.75rem; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-family: Orbitron, sans-serif; color: #9a9aa2; }
+
+.panel-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem; margin-bottom: 0.75rem; }
+.panel-tabs button {
+  background: #0b0c10;
+  border: 1px solid #2a2e38;
+  color: #9a9aa2;
+  padding: 0.4rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+}
+.panel-tabs button.active { color: #c4a35a; border-color: #c4a35a; }
+.left-pane { display: none; }
+.left-pane.active { display: block; }
+.pane-label { color: #9a9aa2; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; margin: 0.85rem 0 0.4rem; }
+
+.component-palette {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+.component-palette button {
+  background: #0b0c10;
+  border: 1px solid #2a2e38;
+  color: #e8e6e1;
+  padding: 0.45rem 0.35rem;
+  font-size: 0.78rem;
+  cursor: grab;
+  text-align: left;
+}
+.component-palette button:hover { border-color: #c4a35a; }
+
+.builder-center {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(196,163,90,0.07), transparent 40%),
+    #0a0b0f;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.canvas-stage {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.canvas-frame {
+  background: #000;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #2a2e38;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+  background: #0b0c10;
+  user-select: none;
+}
+
+.canvas-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.canvas-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.comp {
+  position: absolute;
+  outline: 1px solid transparent;
+  cursor: move;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.comp.selected { outline: 1px solid #c4a35a; z-index: 9999 !important; }
+.comp.locked { cursor: default; opacity: 0.85; }
+.comp.hidden-comp { opacity: 0.25; }
+
+.comp .handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #c4a35a;
+  right: -4px;
+  bottom: -4px;
+  cursor: nwse-resize;
+  display: none;
+}
+.comp.selected .handle { display: block; }
+
+.guide-v, .guide-h {
+  position: absolute;
+  background: rgba(196,163,90,0.7);
+  pointer-events: none;
+  z-index: 10000;
+}
+.guide-v { width: 1px; top: 0; bottom: 0; }
+.guide-h { height: 1px; left: 0; right: 0; }
+
+.builder-bottom {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 0.85rem;
+  border-top: 1px solid #2a2e38;
+  background: #101219;
+  font-size: 0.85rem;
+}
+.builder-bottom button {
+  background: #0b0c10;
+  border: 1px solid #2a2e38;
+  color: #e8e6e1;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font: inherit;
+}
+.res-presets { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+.res-presets button.active { border-color: #c4a35a; color: #c4a35a; }
+.check { display: flex; align-items: center; gap: 0.35rem; color: #9a9aa2; }
+.history-controls { margin-left: auto; display: flex; gap: 0.35rem; }
+
+.layer-list { list-style: none; margin: 0; padding: 0; }
+.layer-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border: 1px solid #2a2e38;
+  margin-bottom: 0.3rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+.layer-list li.active { border-color: #c4a35a; }
+.layer-list .layer-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.loading-bar-track {
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.12);
+  position: relative;
+  overflow: hidden;
+}
+.loading-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 42%;
+  background: #c4a35a;
+}
+.loading-bar-fill.indeterminate {
+  width: 35%;
+  animation: indeterminate 1.4s ease-in-out infinite;
+}
+@keyframes indeterminate {
+  0% { left: -35%; }
+  100% { left: 100%; }
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+}
+.modal.hidden, .hidden { display: none !important; }
+.modal-card {
+  width: min(92vw, 420px);
+  background: #161922;
+  border: 1px solid #2a2e38;
+  padding: 1.25rem;
+}
+
+@media (max-width: 980px) {
+  .builder-app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 52px auto 50vh auto 44px;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+  .builder-body { overflow: auto; height: auto; }
+  .builder-left, .builder-right { max-height: 280px; }
+}

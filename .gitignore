@@ -1,0 +1,14 @@
+# Northstar Load
+/vendor/
+/config/config.php
+/storage/uploads/**
+/storage/builds/**
+/storage/build-temp/**
+/storage/logs/**
+!/storage/uploads/.gitkeep
+!/storage/builds/.gitkeep
+!/storage/build-temp/.gitkeep
+!/storage/logs/.gitkeep
+.DS_Store
+*.log
+.env
