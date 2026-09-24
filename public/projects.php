@@ -13,4 +13,5 @@ $userId = (int) \Northstar\Auth::userId();
     'projects' => \Northstar\Project::listForUser($userId),
     'templates' => \Northstar\Template::listActive(),
     'showCreate' => isset($_GET['new']),
+    'extraJs' => '/assets/js/projects.js',
 ]);

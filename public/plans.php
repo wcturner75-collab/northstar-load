@@ -14,4 +14,5 @@ $limits = \Northstar\Entitlement::limits($userId, 'load', $config);
     'limits' => $limits,
     'catalog' => \Northstar\Entitlement::catalog(),
     'currentPlan' => $limits['plan'] ?? 'free',
+    'extraJs' => '/assets/js/account.js',
 ]);

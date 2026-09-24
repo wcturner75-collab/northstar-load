@@ -36,28 +36,3 @@
 
   <p class="muted" style="margin-top:1.25rem">Need the comparison table? See <a href="/account.php">Account</a>.</p>
 </section>
-<script>
-(function () {
-  const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
-
-  document.querySelectorAll('.btn-choose-plan').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const plan = btn.dataset.plan;
-      if (!plan) return;
-      btn.disabled = true;
-      try {
-        const data = await NS.api('/api/account/plan.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
-          body: JSON.stringify({ plan }),
-        });
-        NS.toast('Plan updated to ' + String(data.plan || plan).toUpperCase(), 'success');
-        location.reload();
-      } catch (err) {
-        btn.disabled = false;
-        NS.toast(err.message || 'Could not change plan', 'error');
-      }
-    });
-  });
-})();
-</script>

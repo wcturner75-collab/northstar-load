@@ -27,7 +27,8 @@ final class Security
         }
 
         header('X-Frame-Options: SAMEORIGIN');
-        header("Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self'; connect-src 'self'; frame-ancestors 'self'");
+        // unsafe-inline kept as fallback; primary page logic lives in /assets/js/*.js
+        header("Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'self'");
     }
 
     public static function ensureCsrfToken(bool $force = false): string

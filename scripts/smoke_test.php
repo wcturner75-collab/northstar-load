@@ -34,7 +34,7 @@ echo "token={$result['buildToken']}\n";
 echo "zip={$result['downloadUrl']}\n";
 echo "loadUrl={$result['loadUrl']}\n";
 
-if (empty($result['loadUrl']) || !str_contains((string) $result['loadUrl'], '/load?t=')) {
+if (empty($result['loadUrl']) || !str_contains((string) $result['loadUrl'], '/load.php?t=')) {
     fwrite(STDERR, "Missing hosted loadUrl\n");
     exit(1);
 }

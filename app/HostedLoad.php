@@ -13,18 +13,35 @@ final class HostedLoad
     /** @param array<string,mixed> $configApp */
     public static function loadBaseUrl(array $configApp): string
     {
-        $base = (string) ($configApp['hosting']['load_base_url'] ?? '');
+        $base = trim((string) ($configApp['hosting']['load_base_url'] ?? ''));
         if ($base === '') {
-            $base = (string) ($configApp['app']['url'] ?? '');
+            $base = trim((string) ($configApp['app']['url'] ?? ''));
+        }
+        // Prefer the current request host when browsing locally so
+        // localhost vs 127.0.0.1 doesn't break the hosted page.
+        if (self::isLocalBase($base) && !empty($_SERVER['HTTP_HOST'])) {
+            $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                || ((int) ($_SERVER['SERVER_PORT'] ?? 80) === 443);
+            $base = ($https ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'];
         }
         return rtrim($base, '/');
+    }
+
+    private static function isLocalBase(string $base): bool
+    {
+        if ($base === '') {
+            return true;
+        }
+        $host = parse_url($base, PHP_URL_HOST);
+        return in_array($host, ['localhost', '127.0.0.1', '::1'], true);
     }
 
     /** Public URL FiveM will open for this project. */
     public static function publicUrl(string $publishToken, array $configApp): string
     {
         $token = self::normalizeToken($publishToken);
-        return self::loadBaseUrl($configApp) . '/load?t=' . rawurlencode($token);
+        // load.php works on Apache/XAMPP even without rewrite rules
+        return self::loadBaseUrl($configApp) . '/load.php?t=' . rawurlencode($token);
     }
 
     public static function normalizeToken(string $token): string
@@ -96,8 +113,11 @@ final class HostedLoad
         $validated = BuilderConfigValidator::validate($raw, $userId, true);
 
         $base = self::loadBaseUrl($configApp);
+        // Relative URLs so localhost vs 127.0.0.1 / CSP never break the page.
+        // Absolute also included for FiveM CEF edge cases.
         $mediaUrl = static function (int $mediaId) use ($base, $token): string {
-            return $base . '/api/load/media.php?t=' . rawurlencode($token) . '&id=' . $mediaId;
+            $rel = '/api/load/media.php?t=' . rawurlencode($token) . '&id=' . $mediaId;
+            return $base . $rel;
         };
 
         $cfg = $validated;

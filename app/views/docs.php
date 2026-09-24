@@ -51,7 +51,7 @@
   <article class="doc-block">
     <h2>Hosted loading screens</h2>
     <p>Generated resources do <strong>not</strong> ship HTML/CSS/media locally. The ZIP is a thin FiveM resource whose <code>loadscreen</code> points at your Northstar URL:</p>
-    <p><code>https://load.northstarscripts.us/load?t=YOUR_TOKEN</code></p>
+    <p><code>https://load.northstarscripts.us/load.php?t=YOUR_TOKEN</code></p>
     <p>Edit anytime in the builder — players see updates without regenerating the ZIP (same publish link). Media is served only for assets referenced by that project.</p>
 
     <h2>How generation works</h2>

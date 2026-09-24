@@ -6,8 +6,15 @@
   </div>
 </footer>
 <script src="/assets/js/app.js"></script>
-<?php if (!empty($extraJs)): ?>
-<script src="<?= \Northstar\Security::e($extraJs) ?>"></script>
-<?php endif; ?>
+<?php
+$scripts = [];
+if (!empty($extraJs)) {
+    $scripts = is_array($extraJs) ? $extraJs : [$extraJs];
+}
+foreach ($scripts as $src):
+    if (!is_string($src) || $src === '') continue;
+?>
+<script src="<?= \Northstar\Security::e($src) ?>"></script>
+<?php endforeach; ?>
 </body>
 </html>

@@ -11,4 +11,5 @@ $userId = (int) \Northstar\Auth::userId();
 \Northstar\View::render('media', [
     'pageTitle' => 'Media',
     'items' => \Northstar\MediaManager::listForUser($userId),
+    'extraJs' => '/assets/js/media.js',
 ]);

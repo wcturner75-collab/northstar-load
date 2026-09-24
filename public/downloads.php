@@ -11,4 +11,5 @@ $userId = (int) \Northstar\Auth::userId();
 \Northstar\View::render('downloads', [
     'pageTitle' => 'Downloads',
     'builds' => \Northstar\Build::listForUser($userId),
+    'extraJs' => '/assets/js/downloads.js',
 ]);

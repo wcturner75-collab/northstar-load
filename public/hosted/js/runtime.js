@@ -8,9 +8,13 @@
   };
 
   async function loadConfig() {
-    const url = (typeof window.NS_LOAD_CONFIG_URL === 'string' && window.NS_LOAD_CONFIG_URL)
+    const fromWindow = (typeof window.NS_LOAD_CONFIG_URL === 'string' && window.NS_LOAD_CONFIG_URL)
       ? window.NS_LOAD_CONFIG_URL
-      : '../config.json';
+      : '';
+    const fromBody = document.body && document.body.dataset
+      ? (document.body.dataset.configUrl || '')
+      : '';
+    const url = fromWindow || fromBody || '../config.json';
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error('config missing');
     return res.json();

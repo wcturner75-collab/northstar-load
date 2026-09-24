@@ -36,7 +36,11 @@ final class Entitlement
     public static function limits(int $userId, string $productKey, array $config): array
     {
         $plan = self::planFor($userId, $productKey, $config);
-        $limits = $config['entitlements'][$plan] ?? $config['entitlements']['free'];
+        $bucket = $config['entitlements'] ?? [];
+        $limits = $bucket[$plan] ?? ($bucket['free'] ?? []);
+        if (!is_array($limits)) {
+            $limits = [];
+        }
         $features = is_array($limits['features'] ?? null) ? $limits['features'] : [];
 
         return [
