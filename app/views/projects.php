@@ -68,7 +68,7 @@ document.getElementById('create-project-form')?.addEventListener('submit', async
     body: fd
   });
   const json = await res.json();
-  if (!json.ok) { alert(json.error?.message || 'Create failed'); return; }
+  if (!json.ok) { NS.toast(json.error?.message || 'Create failed', 'error'); return; }
   location.href = '/builder.php?id=' + json.data.project.id;
 });
 document.querySelectorAll('[data-delete-project]').forEach(btn => {
@@ -80,7 +80,7 @@ document.querySelectorAll('[data-delete-project]').forEach(btn => {
     fd.append('_csrf', csrf);
     const res = await fetch('/api/projects/delete.php', { method: 'POST', headers: { 'X-CSRF-Token': csrf }, body: fd });
     const json = await res.json();
-    if (!json.ok) { alert(json.error?.message || 'Delete failed'); return; }
+    if (!json.ok) { NS.toast(json.error?.message || 'Delete failed', 'error'); return; }
     location.reload();
   });
 });

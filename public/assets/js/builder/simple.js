@@ -5,6 +5,10 @@ NSBuilder.Simple = (function () {
   let onChange = () => {};
   let features = {};
 
+  function toast(msg, type) {
+    if (window.NS && typeof NS.toast === 'function') NS.toast(msg, type);
+  }
+
   function init(options) {
     doc = options.doc;
     onChange = options.onChange;
@@ -15,6 +19,7 @@ NSBuilder.Simple = (function () {
 
   function setDoc(next, opts) {
     doc = next;
+    // soft: update pointer only — never rebuild form DOM (preserves focus)
     if (opts && opts.soft) return;
     render();
   }
@@ -32,8 +37,8 @@ NSBuilder.Simple = (function () {
   }
 
   function touch(rebuild) {
-    // skipUi keeps focus; omit skipUi when the form layout must change
-    onChange(doc, false, rebuild ? {} : { skipUi: true });
+    // skipUi keeps focus; rebuildUi when the form layout must change
+    onChange(doc, false, rebuild ? { rebuildUi: true, forceUi: true } : { skipUi: true });
   }
 
   function field(parent, label, value, onInput, type) {
@@ -49,6 +54,43 @@ NSBuilder.Simple = (function () {
     input.addEventListener('input', () => onInput(input.value));
     lab.appendChild(input);
     parent.appendChild(lab);
+  }
+
+  function renderThemePicker(parent) {
+    const wrap = document.createElement('div');
+    wrap.className = 'theme-picker';
+    const title = document.createElement('p');
+    title.className = 'pane-label';
+    title.textContent = 'Layout theme';
+    wrap.appendChild(title);
+    const tip = document.createElement('p');
+    tip.className = 'plan-hint';
+    tip.textContent = 'Pick a Northstar layout look. This updates colors and repositions standard elements.';
+    wrap.appendChild(tip);
+    const current = (doc.theme && doc.theme.preset) || 'cinematic';
+    (NSBuilder.LAYOUT_THEMES || []).forEach((theme) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'theme-chip' + (theme.id === current || (theme.aliases || []).indexOf(current) >= 0 ? ' active' : '');
+      btn.style.setProperty('--accent', theme.accent);
+      const strong = document.createElement('strong');
+      strong.textContent = theme.name;
+      const span = document.createElement('span');
+      span.textContent = theme.blurb;
+      const swatch = document.createElement('span');
+      swatch.className = 'theme-swatch';
+      swatch.style.background = theme.accent;
+      btn.appendChild(strong);
+      btn.appendChild(span);
+      btn.appendChild(swatch);
+      btn.addEventListener('click', () => {
+        NSBuilder.applyLayoutTheme(doc, theme.id, { reposition: true });
+        onChange(doc, true, { rebuildUi: true, forceUi: true });
+        toast('Applied “' + theme.name + '” layout theme', 'success');
+      });
+      wrap.appendChild(btn);
+    });
+    parent.appendChild(wrap);
   }
 
   function render() {
@@ -80,10 +122,18 @@ NSBuilder.Simple = (function () {
       doc.server.tagline = v;
       touch(false);
     });
+    field(brand, 'Made By (creator watermark)', doc.server.creator || (doc.watermark && doc.watermark.madeBy) || doc.server.name || '', (v) => {
+      doc.server.creator = v;
+      doc.watermark = doc.watermark || {};
+      doc.watermark.madeBy = v;
+      touch(false);
+    });
     field(brand, 'Accent color', doc.theme.accent || '#C4A35A', (v) => {
       doc.theme.accent = v;
       touch(false);
     }, 'color');
+
+    renderThemePicker(look);
 
     const bgType = doc.background.type || 'color';
     field(look, 'Background type (color / image / slideshow)', bgType, (v) => {
@@ -91,7 +141,7 @@ NSBuilder.Simple = (function () {
       if (features.slideshow_background) allowed.push('slideshow');
       if (features.video_background) allowed.push('video');
       if (!allowed.includes(v)) {
-        alert('That background type needs a higher plan or is invalid.');
+        toast('That background type needs a higher plan or is invalid.', 'error');
         return;
       }
       doc.background.type = v;
@@ -109,13 +159,28 @@ NSBuilder.Simple = (function () {
       touch(false);
     });
 
+    if (NSBuilder.isDualPanelLayout && NSBuilder.isDualPanelLayout(doc)) {
+      field(look, 'Map', doc.server.map || '', (v) => {
+        doc.server.map = v;
+        touch(false);
+      });
+      field(look, 'Slots', doc.server.slots ?? 64, (v) => {
+        doc.server.slots = parseInt(v, 10) || 0;
+        touch(false);
+      });
+      field(look, 'Game mode', doc.server.mode || '', (v) => {
+        doc.server.mode = v;
+        touch(false);
+      });
+    }
+
     field(music, 'Enable music (true/false)', String(!!doc.music.enabled), (v) => {
       doc.music.enabled = v === 'true';
       touch(false);
     });
     field(music, 'Source (file / youtube)', doc.music.source || 'file', (v) => {
       if (v === 'youtube' && !features.youtube_music) {
-        alert('YouTube music is not on your plan.');
+        toast('YouTube music is not on your plan.', 'error');
         return;
       }
       doc.music.source = v;

@@ -14,6 +14,10 @@
 
   let editorMode = document.body.dataset.editorMode === 'advanced' ? 'advanced' : 'simple';
 
+  function toast(msg, type) {
+    if (window.NS && typeof NS.toast === 'function') NS.toast(msg, type);
+  }
+
   function canFeature(key) {
     return !!features[key];
   }
@@ -34,6 +38,45 @@
     if (type === 'staff') return 'staff';
     if (type === 'announcements') return 'announcements';
     return null;
+  }
+
+  /** True when the user is typing in a text field inside builder forms. */
+  function isTextEditing() {
+    const ae = document.activeElement;
+    if (!ae) return false;
+    const tag = ae.tagName;
+    if (tag === 'TEXTAREA') return inBuilderForm(ae);
+    if (tag !== 'INPUT') return false;
+    const t = (ae.type || 'text').toLowerCase();
+    if (['checkbox', 'radio', 'button', 'submit', 'file', 'color', 'range'].includes(t)) return false;
+    return inBuilderForm(ae);
+  }
+
+  function inBuilderForm(el) {
+    return !!(
+      el.closest('#inspector') ||
+      el.closest('#bg-form') ||
+      el.closest('#music-form') ||
+      el.closest('#content-form') ||
+      el.closest('#simple-panel')
+    );
+  }
+
+  /**
+   * Form DOM rebuild steals focus. Only rebuild when explicitly requested
+   * (rebuildUi / structural action) and never while typing in a text field
+   * unless forceUi is set.
+   */
+  function shouldRebuildUi(meta) {
+    meta = meta || {};
+    if (meta.skipUi) return false;
+    if (meta.action) return true;
+    if (meta.rebuildUi) {
+      if (meta.forceUi) return true;
+      return !isTextEditing();
+    }
+    // Default: never rebuild while typing; otherwise allow one-shot rebuilds
+    return !isTextEditing();
   }
 
   NSBuilder.History.push(doc);
@@ -72,20 +115,18 @@
       document.getElementById('project-title').textContent = doc.server.name;
     }
 
-    // Always refresh the live canvas
+    // Always refresh the live canvas + keep inspector doc pointer in sync
     NSBuilder.Canvas.setDoc(doc);
     NSBuilder.Inspector.setDoc(doc);
 
-    // Rebuilding form/inspector DOM on every keystroke steals focus and breaks clicks.
-    // Only rebuild UI chrome when not typing in a field.
-    // Structural actions (delete/duplicate) always refresh UI.
-    const skipUi = !!meta.skipUi && !meta.action;
-    if (!skipUi) {
+    const rebuild = shouldRebuildUi(meta);
+    if (rebuild) {
       NSBuilder.Inspector.render(NSBuilder.Canvas.getSelectedId());
       renderLayers();
       renderContentForms();
       if (window.NSBuilder.Simple) NSBuilder.Simple.setDoc(doc);
     } else if (window.NSBuilder.Simple) {
+      // Soft update: never rebuild Simple form DOM while typing
       NSBuilder.Simple.setDoc(doc, { soft: true });
     }
 
@@ -101,15 +142,18 @@
     snap: true,
     onChange: (d, snapshot) => commit(d, snapshot, { skipUi: true }),
     onSelect: (id) => {
-      NSBuilder.Inspector.render(id);
-      renderLayers();
+      // Selection changes inspector — only if not mid-keystroke in a form
+      if (!isTextEditing()) {
+        NSBuilder.Inspector.render(id);
+        renderLayers();
+      }
     },
   });
 
   NSBuilder.Inspector.init({
     host: document.getElementById('inspector'),
     doc,
-    onChange: (d, snapshot, meta) => commit(d, snapshot, meta || {}),
+    onChange: (d, snapshot, meta) => commit(d, snapshot, meta || { skipUi: true }),
   });
 
   if (window.NSBuilder.Simple) {
@@ -150,19 +194,21 @@
     if (locked) {
       btn.classList.add('palette-locked');
       btn.title = 'Upgrade required: ' + featureLockReason(need);
-      btn.addEventListener('click', () => alert(featureLockReason(need) + ' is not on your ' + plan + ' plan.'));
+      btn.addEventListener('click', () => {
+        toast(featureLockReason(need) + ' is not on your ' + plan + ' plan.', 'error');
+      });
     } else {
       btn.addEventListener('click', () => {
         doc.components = doc.components || [];
         if (doc.components.length >= maxComponents) {
-          alert('Your ' + plan + ' plan allows up to ' + maxComponents + ' components.');
+          toast('Your ' + plan + ' plan allows up to ' + maxComponents + ' components.', 'error');
           return;
         }
         const comp = NSBuilder.createComponent(c.type, 200, 200);
         doc.layersOrder = doc.layersOrder || [];
         doc.components.push(comp);
         doc.layersOrder.push(comp.id);
-        commit(doc, true);
+        commit(doc, true, { rebuildUi: true });
         NSBuilder.Canvas.select(comp.id);
       });
     }
@@ -198,7 +244,7 @@
       vis.onclick = (e) => {
         e.stopPropagation();
         comp.visible = !comp.visible;
-        commit(doc, true);
+        commit(doc, true, { rebuildUi: true });
       };
       li.appendChild(name);
       li.appendChild(vis);
@@ -217,6 +263,40 @@
     return lab;
   }
 
+  function renderThemePicker(parent) {
+    const wrap = document.createElement('div');
+    wrap.className = 'theme-picker';
+    const title = document.createElement('p');
+    title.className = 'pane-label';
+    title.textContent = 'Layout theme';
+    wrap.appendChild(title);
+    const current = (doc.theme && doc.theme.preset) || 'cinematic';
+    (NSBuilder.LAYOUT_THEMES || []).forEach((theme) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'theme-chip' + (theme.id === current || (theme.aliases || []).indexOf(current) >= 0 ? ' active' : '');
+      btn.dataset.themeId = theme.id;
+      btn.style.setProperty('--accent', theme.accent);
+      const strong = document.createElement('strong');
+      strong.textContent = theme.name;
+      const span = document.createElement('span');
+      span.textContent = theme.blurb;
+      const swatch = document.createElement('span');
+      swatch.className = 'theme-swatch';
+      swatch.style.background = theme.accent;
+      btn.appendChild(strong);
+      btn.appendChild(span);
+      btn.appendChild(swatch);
+      btn.addEventListener('click', () => {
+        NSBuilder.applyLayoutTheme(doc, theme.id, { reposition: true });
+        commit(doc, true, { rebuildUi: true, forceUi: true });
+        toast('Applied “' + theme.name + '” layout theme', 'success');
+      });
+      wrap.appendChild(btn);
+    });
+    parent.appendChild(wrap);
+  }
+
   function renderContentForms() {
     const bg = document.getElementById('bg-form');
     const music = document.getElementById('music-form');
@@ -231,13 +311,15 @@
     doc.theme = doc.theme || {};
     doc.content = doc.content || { rules: [], announcements: [], staff: [], socials: [] };
 
+    renderThemePicker(bg);
+
     bg.appendChild(field('Type (color|image|slideshow|video)', doc.background.type || 'color', (v) => {
       if (v === 'slideshow' && !canFeature('slideshow_background')) {
-        alert(featureLockReason('slideshow_background'));
+        toast(featureLockReason('slideshow_background'), 'error');
         return;
       }
       if (v === 'video' && !canFeature('video_background')) {
-        alert(featureLockReason('video_background'));
+        toast(featureLockReason('video_background'), 'error');
         return;
       }
       doc.background.type = v; commit(doc, false, { skipUi: true });
@@ -269,7 +351,7 @@
     const sourceVal = doc.music.source || 'file';
     music.appendChild(field('Source (' + sourceOptions.join('|') + ')', sourceVal, (v) => {
       if (v === 'youtube' && !canFeature('youtube_music')) {
-        alert(featureLockReason('youtube_music'));
+        toast(featureLockReason('youtube_music'), 'error');
         return;
       }
       doc.music.source = v;
@@ -279,7 +361,7 @@
         doc.music.youtubeId = null;
       }
       // Rebuild music fields when source changes shape
-      commit(doc, false);
+      commit(doc, false, { rebuildUi: true, forceUi: true });
     }));
 
     if ((doc.music.source || 'file') === 'youtube') {
@@ -319,9 +401,26 @@
     content.appendChild(field('Tagline', doc.server.tagline || '', (v) => {
       doc.server.tagline = v; commit(doc, false, { skipUi: true });
     }));
+    content.appendChild(field('Made By (creator watermark)', doc.server.creator || (doc.watermark && doc.watermark.madeBy) || '', (v) => {
+      doc.server.creator = v;
+      doc.watermark = doc.watermark || {};
+      doc.watermark.madeBy = v;
+      commit(doc, false, { skipUi: true });
+    }));
     content.appendChild(field('Accent', doc.theme.accent || '#C4A35A', (v) => {
       doc.theme.accent = v; commit(doc, false, { skipUi: true });
     }));
+    if (NSBuilder.isDualPanelLayout && NSBuilder.isDualPanelLayout(doc)) {
+      content.appendChild(field('Map', doc.server.map || '', (v) => {
+        doc.server.map = v; commit(doc, false, { skipUi: true });
+      }));
+      content.appendChild(field('Slots', doc.server.slots ?? 64, (v) => {
+        doc.server.slots = parseInt(v, 10) || 0; commit(doc, false, { skipUi: true });
+      }));
+      content.appendChild(field('Mode', doc.server.mode || '', (v) => {
+        doc.server.mode = v; commit(doc, false, { skipUi: true });
+      }));
+    }
     content.appendChild(field('Rules JSON', JSON.stringify(doc.content.rules || []), (v) => {
       try { doc.content.rules = JSON.parse(v); commit(doc, false, { skipUi: true }); } catch (_) {}
     }));
@@ -358,7 +457,7 @@
       doc.meta = doc.meta || {};
       doc.meta.previewMode = btn.dataset.res;
       NSBuilder.Canvas.setResolution(w, h);
-      commit(doc, false);
+      commit(doc, false, { skipUi: true });
     });
   });
 
@@ -428,8 +527,10 @@
       a.href = data.downloadUrl;
       a.textContent = 'Download ' + data.resourceName + '.zip';
       result.appendChild(a);
+      toast('Resource generated', 'success');
     } catch (err) {
       document.getElementById('generate-msg').textContent = err.message || 'Generate failed';
+      toast(err.message || 'Generate failed', 'error');
     }
   };
   document.getElementById('generate-close').onclick = () => modal.classList.add('hidden');

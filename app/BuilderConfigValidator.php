@@ -31,6 +31,7 @@ final class BuilderConfigValidator
             'music' => self::music($config['music'] ?? [], $userId, $strict),
             'loading' => self::loading($config['loading'] ?? []),
             'content' => self::content($config['content'] ?? []),
+            'watermark' => self::watermark($config['watermark'] ?? [], $config['server'] ?? []),
             'components' => [],
             'layersOrder' => [],
         ];
@@ -83,9 +84,19 @@ final class BuilderConfigValidator
     /** @param array<string,mixed> $server @return array<string,mixed> */
     private static function server(array $server): array
     {
+        $slotsRaw = $server['slots'] ?? null;
+        $slots = null;
+        if ($slotsRaw !== null && $slotsRaw !== '') {
+            $slots = max(0, min(1024, (int) $slotsRaw));
+        }
+
         return [
             'name' => self::str($server['name'] ?? 'My Server', 80),
             'tagline' => self::str($server['tagline'] ?? '', 160),
+            'creator' => self::str($server['creator'] ?? '', 80),
+            'map' => self::str($server['map'] ?? '', 80),
+            'slots' => $slots,
+            'mode' => self::str($server['mode'] ?? '', 64),
             'locale' => self::str($server['locale'] ?? 'en', 8),
         ];
     }
@@ -93,8 +104,29 @@ final class BuilderConfigValidator
     /** @param array<string,mixed> $theme @return array<string,mixed> */
     private static function theme(array $theme): array
     {
+        $allowed = [
+            'cinematic', 'minimal', 'neon', 'dual_panel', 'info_rules',
+            'horizon', 'ember', 'arctic', 'noir', 'stadium',
+        ];
+        $preset = self::str($theme['preset'] ?? 'cinematic', 64);
+        if (!in_array($preset, $allowed, true)) {
+            $preset = 'cinematic';
+        }
+        if ($preset === 'info_rules') {
+            $preset = 'dual_panel';
+        }
+        $layout = self::str($theme['layout'] ?? '', 32);
+        if ($layout === 'info_rules') {
+            $layout = 'dual_panel';
+        }
+        if ($preset === 'dual_panel') {
+            $layout = 'dual_panel';
+        } elseif ($layout !== 'dual_panel') {
+            $layout = 'freeform';
+        }
         return [
-            'preset' => self::str($theme['preset'] ?? 'cinematic', 64),
+            'preset' => $preset,
+            'layout' => $layout,
             'accent' => self::color($theme['accent'] ?? '#C4A35A'),
             'fonts' => [
                 'display' => self::str($theme['fonts']['display'] ?? 'Orbitron', 64),
@@ -291,7 +323,33 @@ final class BuilderConfigValidator
                 'url' => $url ?? '',
             ];
         }
-        return compact('rules', 'announcements', 'staff', 'socials');
+        $playerIn = is_array($content['player'] ?? null) ? $content['player'] : [];
+        $player = [
+            'name' => self::str($playerIn['name'] ?? '', 80),
+            'steamId' => self::str($playerIn['steamId'] ?? '', 64),
+            'lastSeen' => self::str($playerIn['lastSeen'] ?? '', 64),
+        ];
+        return compact('rules', 'announcements', 'staff', 'socials', 'player');
+    }
+
+    /**
+     * @param array<string,mixed> $watermark
+     * @param array<string,mixed> $server
+     * @return array<string,mixed>
+     */
+    private static function watermark(array $watermark, array $server): array
+    {
+        $madeBy = self::str($watermark['madeBy'] ?? '', 80);
+        if ($madeBy === '') {
+            $madeBy = self::str($server['creator'] ?? '', 80);
+        }
+        if ($madeBy === '') {
+            $madeBy = self::str($server['name'] ?? 'Server', 80);
+        }
+        return [
+            'madeBy' => $madeBy,
+            'copyright' => self::str($watermark['copyright'] ?? 'NorthStar Scripts', 80) ?: 'NorthStar Scripts',
+        ];
     }
 
     /** @param array<string,mixed> $comp @return array<string,mixed> */
@@ -402,10 +460,15 @@ final class BuilderConfigValidator
             'server' => [
                 'name' => $serverName,
                 'tagline' => 'Your Story Starts Here',
+                'creator' => $serverName,
+                'map' => '',
+                'slots' => null,
+                'mode' => '',
                 'locale' => 'en',
             ],
             'theme' => [
                 'preset' => $theme,
+                'layout' => $theme === 'dual_panel' || $theme === 'info_rules' ? 'dual_panel' : 'freeform',
                 'accent' => '#C4A35A',
                 'fonts' => ['display' => 'Orbitron', 'body' => 'Source Sans 3'],
                 'colors' => [
@@ -453,6 +516,15 @@ final class BuilderConfigValidator
                     ['type' => 'discord', 'label' => 'Discord', 'url' => 'https://discord.gg/example'],
                     ['type' => 'website', 'label' => 'Website', 'url' => 'https://example.com'],
                 ],
+                'player' => [
+                    'name' => '',
+                    'steamId' => '',
+                    'lastSeen' => '',
+                ],
+            ],
+            'watermark' => [
+                'madeBy' => $serverName,
+                'copyright' => 'NorthStar Scripts',
             ],
             'components' => [
                 [

@@ -4,6 +4,7 @@
     progressKnown: false,
     progress: 0,
     status: 'Connecting…',
+    playerName: '',
   };
 
   async function loadConfig() {
@@ -18,19 +19,76 @@
 
   function applyTheme(cfg) {
     const root = document.documentElement;
-    root.style.setProperty('--accent', (cfg.theme && cfg.theme.accent) || '#C4A35A');
-    root.style.setProperty('--text', (cfg.theme && cfg.theme.colors && cfg.theme.colors.text) || '#F5F5F5');
-    root.style.setProperty('--muted', (cfg.theme && cfg.theme.colors && cfg.theme.colors.muted) || '#A8A8A8');
+    const theme = cfg.theme || {};
+    const colors = theme.colors || {};
+    root.style.setProperty('--accent', theme.accent || '#C4A35A');
+    root.style.setProperty('--text', colors.text || '#F5F5F5');
+    root.style.setProperty('--muted', colors.muted || '#A8A8A8');
+    root.style.setProperty('--panel', colors.panel || 'rgba(0,0,0,0.45)');
+    const preset = theme.preset || 'cinematic';
+    document.body.dataset.layout = preset;
+    document.body.dataset.themeLayout = theme.layout || (preset === 'dual_panel' ? 'dual_panel' : 'freeform');
+  }
+
+  function isDualPanel(cfg) {
+    const theme = cfg.theme || {};
+    const preset = String(theme.preset || '').toLowerCase();
+    const layout = String(theme.layout || '').toLowerCase();
+    return layout === 'dual_panel' || layout === 'info_rules'
+      || preset === 'dual_panel' || preset === 'info_rules';
+  }
+
+  function madeByLabel(cfg) {
+    const wm = cfg.watermark || {};
+    const server = cfg.server || {};
+    return (wm.madeBy && String(wm.madeBy).trim())
+      || (server.creator && String(server.creator).trim())
+      || server.name
+      || 'Server';
+  }
+
+  function copyrightLabel(cfg) {
+    const wm = cfg.watermark || {};
+    return (wm.copyright && String(wm.copyright).trim()) || 'NorthStar Scripts';
+  }
+
+  function renderWatermarks(cfg) {
+    let host = document.getElementById('watermarks');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'watermarks';
+      host.className = 'ns-watermarks';
+      document.getElementById('stage')?.appendChild(host);
+    }
+    host.innerHTML = '';
+    // Dual panel embeds credits inside the info card
+    if (isDualPanel(cfg)) {
+      host.style.display = 'none';
+      return;
+    }
+    host.style.display = '';
+    const made = document.createElement('div');
+    made.className = 'ns-wm-made';
+    made.textContent = 'Made By: ' + madeByLabel(cfg);
+    const copy = document.createElement('div');
+    copy.className = 'ns-wm-copy';
+    copy.textContent = 'Copyright © ' + copyrightLabel(cfg);
+    host.appendChild(made);
+    host.appendChild(copy);
   }
 
   function setupBackground(cfg) {
     const el = document.getElementById('background');
     const ov = document.getElementById('overlay');
     const bg = cfg.background || {};
+    const dual = isDualPanel(cfg);
     el.innerHTML = '';
     el.className = '';
 
-    if (bg.type === 'color' || !(bg.assets && bg.assets.length)) {
+    if (dual && (bg.type === 'color' || !(bg.assets && bg.assets.length))) {
+      const base = bg.color || (cfg.theme && cfg.theme.accent) || '#B71C1C';
+      el.style.background = 'radial-gradient(ellipse at center, ' + base + ' 0%, ' + base + ' 42%, #1a0505 100%)';
+    } else if (bg.type === 'color' || !(bg.assets && bg.assets.length)) {
       el.style.background = bg.color || '#0B0C10';
     } else if (bg.type === 'video' && bg.assets[0]) {
       const video = document.createElement('video');
@@ -63,7 +121,7 @@
       }
     }
 
-    if (bg.overlay && bg.overlay.enabled) {
+    if (bg.overlay && bg.overlay.enabled && !dual) {
       ov.style.background = bg.overlay.color || '#000';
       ov.style.opacity = String(bg.overlay.opacity ?? 0.35);
       ov.style.display = 'block';
@@ -206,7 +264,120 @@
     return el;
   }
 
+  function renderDualPanel(cfg) {
+    const host = document.getElementById('components');
+    host.innerHTML = '';
+    const server = cfg.server || {};
+    const content = cfg.content || {};
+    const player = content.player || {};
+    const accent = (cfg.theme && cfg.theme.accent) || '#C62828';
+    const panelBg = (cfg.theme && cfg.theme.colors && cfg.theme.colors.panel) || 'rgba(40,0,0,0.55)';
+    const rules = content.rules || [];
+
+    const root = document.createElement('div');
+    root.className = 'dual-panel-layout';
+    root.style.setProperty('--dp-accent', accent);
+    root.style.setProperty('--dp-panel', panelBg);
+
+    const title = document.createElement('h1');
+    title.className = 'dual-panel-title';
+    title.textContent = server.name || 'Server';
+    root.appendChild(title);
+
+    const columns = document.createElement('div');
+    columns.className = 'dual-panel-columns';
+
+    const left = document.createElement('div');
+    left.className = 'dual-panel-card';
+    left.appendChild(dpHead('Server Info'));
+    left.appendChild(dpRow('Name', server.name || '—'));
+    left.appendChild(dpRow('Map', server.map || '—'));
+    left.appendChild(dpRow('Slots', String(server.slots != null ? server.slots : '—')));
+    left.appendChild(dpRow('Mode', server.mode || '—'));
+    const divider = document.createElement('div');
+    divider.className = 'dual-panel-divider';
+    left.appendChild(divider);
+    left.appendChild(dpHead('Player Info'));
+    left.appendChild(dpRow('Name', player.name || 'Connecting…'));
+    left.appendChild(dpRow('SteamID', player.steamId || '—'));
+    left.appendChild(dpRow('Last Seen', player.lastSeen || '—'));
+
+    const mark = document.createElement('div');
+    mark.className = 'dual-panel-watermark';
+    const line1 = document.createElement('div');
+    line1.textContent = 'Made By: ' + madeByLabel(cfg);
+    const line2 = document.createElement('div');
+    line2.textContent = 'Copyright © ' + copyrightLabel(cfg);
+    mark.appendChild(line1);
+    mark.appendChild(line2);
+    left.appendChild(mark);
+
+    const right = document.createElement('div');
+    right.className = 'dual-panel-card dual-panel-rules';
+    right.appendChild(dpHead('Rules'));
+    const list = document.createElement('ol');
+    list.className = 'dual-panel-rules-list';
+    const fallback = [
+      { body: 'Respect staff and other players!' },
+      { body: "Don't kill players without a reason (RDM)" },
+      { body: "Don't kill players with cars (CDM)" },
+    ];
+    (rules.length ? rules : fallback).slice(0, 12).forEach((rule, i) => {
+      const li = document.createElement('li');
+      const num = String(i + 1).padStart(2, '0');
+      const text = (rule.body && String(rule.body).trim())
+        || (rule.title && String(rule.title).trim())
+        || '';
+      li.textContent = num + '. ' + text;
+      list.appendChild(li);
+    });
+    right.appendChild(list);
+
+    columns.appendChild(left);
+    columns.appendChild(right);
+    root.appendChild(columns);
+
+    const foot = document.createElement('div');
+    foot.className = 'dual-panel-loading';
+    const track = document.createElement('div');
+    track.className = 'ns-bar';
+    const fill = document.createElement('div');
+    fill.className = 'ns-bar-fill is-indeterminate';
+    fill.dataset.role = 'bar';
+    track.appendChild(fill);
+    const status = document.createElement('div');
+    status.className = 'dual-panel-status ns-text';
+    status.dataset.role = 'status';
+    status.textContent = state.status;
+    foot.appendChild(track);
+    foot.appendChild(status);
+    root.appendChild(foot);
+
+    host.appendChild(root);
+
+    function dpHead(label) {
+      const h = document.createElement('h2');
+      h.className = 'dual-panel-section';
+      h.textContent = label;
+      return h;
+    }
+    function dpRow(label, value) {
+      const row = document.createElement('div');
+      row.className = 'dual-panel-row';
+      const strong = document.createElement('strong');
+      strong.textContent = label + ':';
+      row.appendChild(strong);
+      row.appendChild(document.createTextNode(' ' + value));
+      return row;
+    }
+  }
+
   function renderComponents(cfg) {
+    if (isDualPanel(cfg)) {
+      renderDualPanel(cfg);
+      return;
+    }
+
     const host = document.getElementById('components');
     host.innerHTML = '';
     const order = (cfg.layersOrder && cfg.layersOrder.length)
@@ -410,6 +581,7 @@
       setupBackground(cfg);
       setupMusic(cfg);
       renderComponents(cfg);
+      renderWatermarks(cfg);
       updateLoadingUI();
       tickClock();
       setInterval(tickClock, 15000);
@@ -417,7 +589,14 @@
       if (window.nuiHandoverData && window.nuiHandoverData.name) {
         // Welcome hint only — never inject HTML
         const name = String(window.nuiHandoverData.name);
+        state.playerName = name;
         state.status = 'Welcome, ' + name;
+        if (cfg.content && cfg.content.player && !cfg.content.player.name) {
+          cfg.content.player.name = name;
+        }
+        if (isDualPanel(cfg)) {
+          renderComponents(cfg);
+        }
         updateLoadingUI();
       }
     } catch (err) {

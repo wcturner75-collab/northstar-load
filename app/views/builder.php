@@ -128,8 +128,10 @@ $mode = (($editorMode ?? 'simple') === 'advanced') ? 'advanced' : 'simple';
   </div>
 </div>
 
+<script src="/assets/js/app.js"></script>
 <script src="/assets/js/builder/history.js"></script>
 <script src="/assets/js/builder/components.js"></script>
+<script src="/assets/js/builder/themes.js"></script>
 <script src="/assets/js/builder/canvas.js"></script>
 <script src="/assets/js/builder/inspector.js"></script>
 <script src="/assets/js/builder/autosave.js"></script>

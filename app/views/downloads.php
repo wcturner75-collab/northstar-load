@@ -44,7 +44,7 @@ document.querySelectorAll('[data-delete-build]').forEach(btn => {
     fd.append('_csrf', csrf);
     const res = await fetch('/api/build/delete.php', { method: 'POST', headers: { 'X-CSRF-Token': csrf }, body: fd });
     const json = await res.json();
-    if (!json.ok) { alert(json.error?.message || 'Failed'); return; }
+    if (!json.ok) { NS.toast(json.error?.message || 'Failed', 'error'); return; }
     location.reload();
   });
 });

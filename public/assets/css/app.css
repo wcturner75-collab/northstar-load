@@ -387,6 +387,37 @@ code {
   font-size: 0.9em;
 }
 
+/* Toast notifications */
+.ns-toast-host {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(360px, calc(100vw - 2rem));
+  pointer-events: none;
+}
+.ns-toast {
+  pointer-events: auto;
+  padding: 0.75rem 0.95rem;
+  border: 1px solid var(--line);
+  background: var(--bg-panel);
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.35;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.ns-toast.is-in { opacity: 1; transform: translateY(0); }
+.ns-toast.is-out { opacity: 0; transform: translateY(6px); }
+.ns-toast-error { border-color: var(--danger); color: #f0c8c8; background: rgba(196, 92, 92, 0.16); }
+.ns-toast-success { border-color: var(--ok); color: #c8e0cf; background: rgba(111, 158, 122, 0.14); }
+.ns-toast-info { border-color: var(--accent); }
+
 @media (max-width: 720px) {
   .stat-row { grid-template-columns: 1fr; }
   .header-inner { flex-direction: column; align-items: flex-start; padding: 0.75rem 0; }

@@ -22,7 +22,7 @@ document.querySelectorAll('[data-delete-media]').forEach((btn) => {
       await NS.api('/api/media/delete.php', { method: 'POST', body: fd });
       location.reload();
     } catch (err) {
-      alert(err.message);
+      NS.toast(err.message, 'error');
     }
   });
 });

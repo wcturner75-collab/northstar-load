@@ -60,25 +60,67 @@ NSBuilder.Canvas = (function () {
     root.style.height = '1080px';
   }
 
+  function appendWatermarks() {
+    if (root.querySelector('.canvas-watermarks')) return;
+    const wm = document.createElement('div');
+    wm.className = 'canvas-watermarks';
+    const server = doc.server || {};
+    const watermark = doc.watermark || {};
+    const madeBy = (watermark.madeBy && String(watermark.madeBy).trim())
+      || (server.creator && String(server.creator).trim())
+      || server.name
+      || 'Server';
+    const copyName = (watermark.copyright && String(watermark.copyright).trim()) || 'NorthStar Scripts';
+    const made = document.createElement('div');
+    made.className = 'canvas-wm-made';
+    made.textContent = 'Made By: ' + madeBy;
+    const copy = document.createElement('div');
+    copy.className = 'canvas-wm-copy';
+    copy.textContent = 'Copyright © ' + copyName;
+    wm.appendChild(made);
+    wm.appendChild(copy);
+    root.appendChild(wm);
+  }
+
   function render() {
     root.innerHTML = '';
+    const preset = (doc.theme && doc.theme.preset) || 'cinematic';
+    root.dataset.layout = preset;
+    root.style.setProperty('--accent', (doc.theme && doc.theme.accent) || '#C4A35A');
+
     const bg = document.createElement('div');
     bg.className = 'canvas-bg';
     const b = doc.background || {};
-    if (b.type === 'color' || !b.mediaIds || !b.mediaIds.length) {
+    const dual = typeof NSBuilder.isDualPanelLayout === 'function' && NSBuilder.isDualPanelLayout(doc);
+    const accent = (doc.theme && doc.theme.accent) || '#C4A35A';
+
+    if (dual && (b.type === 'color' || !b.mediaIds || !b.mediaIds.length)) {
+      const base = b.color || accent || '#B71C1C';
+      bg.style.background = 'radial-gradient(ellipse at center, ' + base + ' 0%, ' + base + ' 42%, #1a0505 100%)';
+    } else if (b.type === 'color' || !b.mediaIds || !b.mediaIds.length) {
       bg.style.background = b.color || '#0B0C10';
     } else if (b.mediaIds && b.mediaIds[0]) {
       bg.style.backgroundImage = 'url(/api/media/serve.php?id=' + encodeURIComponent(b.mediaIds[0]) + ')';
     }
     root.appendChild(bg);
 
-    if (b.overlay && b.overlay.enabled) {
+    if (b.overlay && b.overlay.enabled && !dual) {
       const ov = document.createElement('div');
       ov.className = 'canvas-overlay';
       const op = b.overlay.opacity ?? 0.35;
       ov.style.background = b.overlay.color || '#000';
       ov.style.opacity = String(op);
       root.appendChild(ov);
+    }
+
+    if (dual && typeof NSBuilder.renderDualPanel === 'function') {
+      const stage = NSBuilder.renderDualPanel(doc, { preview: true });
+      stage.style.position = 'absolute';
+      stage.style.inset = '0';
+      stage.style.zIndex = '5';
+      root.appendChild(stage);
+      // Dual panel embeds its own Made By / Copyright block
+      return;
     }
 
     const order = doc.layersOrder && doc.layersOrder.length
@@ -115,6 +157,8 @@ NSBuilder.Canvas = (function () {
 
       root.appendChild(el);
     });
+
+    appendWatermarks();
   }
 
   function beginDrag(e, comp) {
@@ -140,7 +184,7 @@ NSBuilder.Canvas = (function () {
       document.removeEventListener('mousemove', move);
       document.removeEventListener('mouseup', up);
       clearGuides();
-      onChange(doc, true);
+      onChange(doc, true, { skipUi: true });
     }
     document.addEventListener('mousemove', move);
     document.addEventListener('mouseup', up);
@@ -169,7 +213,7 @@ NSBuilder.Canvas = (function () {
       function up() {
         document.removeEventListener('mousemove', move);
         document.removeEventListener('mouseup', up);
-        onChange(doc, true);
+        onChange(doc, true, { skipUi: true });
       }
       document.addEventListener('mousemove', move);
       document.addEventListener('mouseup', up);
