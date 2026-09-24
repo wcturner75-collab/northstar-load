@@ -57,7 +57,16 @@
     "rules": [],
     "announcements": [],
     "staff": [],
-    "socials": []
+    "socials": [],
+    "player": {
+      "name": "",
+      "steamId": "",
+      "lastSeen": ""
+    }
+  },
+  "watermark": {
+    "madeBy": "Northstar Server",
+    "copyright": "NorthStar Scripts"
   },
   "components": [],
   "layersOrder": []
