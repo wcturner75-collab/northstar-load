@@ -408,6 +408,96 @@ body.mode-simple .builder-center {
   margin-top: 0.15rem;
 }
 
+
+/* Unique layout chrome on canvas (#canvas[data-layout]) */
+#canvas {
+  --font-display: "Syne", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+}
+#canvas .canvas-chrome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+#canvas .canvas-chrome::before,
+#canvas .canvas-chrome::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+#canvas[data-layout="cinematic"] .canvas-chrome::before {
+  inset: -8%;
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 42%, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(0,0,0,0.45) 100%);
+  animation: ns-breathe 7s ease-in-out infinite alternate;
+}
+#canvas[data-layout="neon"] .canvas-chrome::before {
+  top: 0; bottom: 0; left: 0; width: 8px;
+  background: linear-gradient(180deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+#canvas[data-layout="neon"] .canvas-chrome::after {
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+  opacity: 0.4;
+}
+#canvas[data-layout="horizon"] .canvas-chrome::before {
+  left: 0; right: 0; bottom: 0; height: 30%;
+  background: linear-gradient(180deg, transparent, rgba(4,12,18,0.85));
+  border-top: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+#canvas[data-layout="horizon"] .canvas-chrome::after {
+  left: 4%; right: 4%; bottom: 29.4%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+#canvas[data-layout="ember"] .canvas-chrome::before,
+#canvas[data-layout="ember"] .canvas-chrome::after {
+  width: 96px; height: 96px;
+  border-color: color-mix(in srgb, var(--accent) 80%, #fff 10%);
+  border-style: solid;
+}
+#canvas[data-layout="ember"] .canvas-chrome::before {
+  top: 48px; left: 48px; border-width: 3px 0 0 3px;
+}
+#canvas[data-layout="ember"] .canvas-chrome::after {
+  bottom: 48px; right: 48px; border-width: 0 3px 3px 0;
+}
+#canvas[data-layout="arctic"] .canvas-chrome::before {
+  top: 0; left: 0; right: 0; height: 150px;
+  background: linear-gradient(180deg, rgba(8,16,24,0.92), transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+#canvas[data-layout="arctic"] .canvas-chrome::after {
+  top: 146px; left: 0; width: 280px; height: 2px; background: var(--accent);
+}
+#canvas[data-layout="noir"] .canvas-chrome::before,
+#canvas[data-layout="noir"] .canvas-chrome::after {
+  left: 0; right: 0; height: 90px; background: #000;
+}
+#canvas[data-layout="noir"] .canvas-chrome::before { top: 0; }
+#canvas[data-layout="noir"] .canvas-chrome::after { bottom: 0; }
+#canvas[data-layout="stadium"] .canvas-chrome::before {
+  left: 48px; right: 48px; bottom: 28px; height: 280px;
+  background: rgba(6,8,12,0.88);
+  border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+}
+#canvas[data-layout="stadium"] .canvas-chrome::after {
+  left: 48px; bottom: 304px; width: 180px; height: 4px; background: var(--accent);
+}
+#canvas[data-layout="glass"] .canvas-chrome::before {
+  top: 28%; left: 18%; right: 18%; bottom: 28%;
+  background: color-mix(in srgb, var(--panel, rgba(18,28,36,0.55)) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, rgba(255,255,255,0.2));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+}
+@keyframes ns-breathe {
+  from { opacity: 0.85; transform: scale(1); }
+  to { opacity: 1; transform: scale(1.02); }
+}
+
 /* Dual panel canvas preview */
 .dual-panel-layout {
   display: flex;
@@ -416,12 +506,13 @@ body.mode-simple .builder-center {
   justify-content: flex-start;
   padding: 36px 64px 28px;
   color: #fff;
-  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-family: var(--font-body, "DM Sans", sans-serif);
   pointer-events: none;
   box-sizing: border-box;
 }
 .dual-panel-title {
   margin: 0 0 28px;
+  font-family: var(--font-display, "Syne", sans-serif);
   font-size: 56px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -437,8 +528,9 @@ body.mode-simple .builder-center {
   min-height: 0;
 }
 .dual-panel-card {
-  background: var(--dp-panel, rgba(40, 0, 0, 0.55));
-  border-radius: 28px;
+  background: var(--dp-panel, rgba(24, 6, 10, 0.62));
+  border: 1px solid color-mix(in srgb, var(--dp-accent, #E11D48) 28%, transparent);
+  border-radius: 22px;
   padding: 28px 32px 22px;
   display: flex;
   flex-direction: column;

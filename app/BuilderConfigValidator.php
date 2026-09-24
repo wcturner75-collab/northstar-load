@@ -105,14 +105,14 @@ final class BuilderConfigValidator
     private static function theme(array $theme): array
     {
         $allowed = [
-            'cinematic', 'minimal', 'neon', 'dual_panel', 'info_rules',
-            'horizon', 'ember', 'arctic', 'noir', 'stadium',
+            'cinematic', 'minimal', 'neon', 'dual_panel', 'info_rules', 'rulebook',
+            'horizon', 'ember', 'arctic', 'noir', 'stadium', 'glass',
         ];
         $preset = self::str($theme['preset'] ?? 'cinematic', 64);
         if (!in_array($preset, $allowed, true)) {
             $preset = 'cinematic';
         }
-        if ($preset === 'info_rules') {
+        if ($preset === 'info_rules' || $preset === 'rulebook') {
             $preset = 'dual_panel';
         }
         $layout = self::str($theme['layout'] ?? '', 32);
@@ -129,8 +129,8 @@ final class BuilderConfigValidator
             'layout' => $layout,
             'accent' => self::color($theme['accent'] ?? '#C4A35A'),
             'fonts' => [
-                'display' => self::str($theme['fonts']['display'] ?? 'Orbitron', 64),
-                'body' => self::str($theme['fonts']['body'] ?? 'Source Sans 3', 64),
+                'display' => self::str($theme['fonts']['display'] ?? 'Syne', 64),
+                'body' => self::str($theme['fonts']['body'] ?? 'DM Sans', 64),
             ],
             'colors' => [
                 'text' => self::color($theme['colors']['text'] ?? '#F5F5F5'),
@@ -468,9 +468,9 @@ final class BuilderConfigValidator
             ],
             'theme' => [
                 'preset' => $theme,
-                'layout' => $theme === 'dual_panel' || $theme === 'info_rules' ? 'dual_panel' : 'freeform',
+                'layout' => $theme === 'dual_panel' || $theme === 'info_rules' || $theme === 'rulebook' ? 'dual_panel' : 'freeform',
                 'accent' => '#C4A35A',
-                'fonts' => ['display' => 'Orbitron', 'body' => 'Source Sans 3'],
+                'fonts' => ['display' => 'Syne', 'body' => 'DM Sans'],
                 'colors' => [
                     'text' => '#F5F5F5',
                     'muted' => '#A8A8A8',

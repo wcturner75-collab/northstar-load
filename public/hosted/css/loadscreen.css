@@ -1,7 +1,13 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=Orbitron:wght@500;700&family=Syne:wght@600;700&display=swap");
+
 :root {
   --accent: #c4a35a;
   --text: #f5f5f5;
   --muted: #a8a8a8;
+  --panel: rgba(0,0,0,0.45);
+  --font-display: "Syne", sans-serif;
+  --font-body: "DM Sans", "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -12,7 +18,7 @@ html, body {
   overflow: hidden;
   background: #0b0c10;
   color: var(--text);
-  font-family: "Segoe UI", "Source Sans 3", sans-serif;
+  font-family: var(--font-body);
 }
 
 #stage {
@@ -57,6 +63,7 @@ html, body {
 #components {
   position: absolute;
   inset: 0;
+  z-index: 3;
 }
 
 .ns-comp {
@@ -142,7 +149,6 @@ html, body {
   z-index: 50;
 }
 
-/* Invisible YouTube embed — plays audio without showing the player */
 .yt-host {
   position: fixed !important;
   width: 1px !important;
@@ -155,7 +161,6 @@ html, body {
   z-index: -1 !important;
 }
 
-/* Freeform watermarks */
 .ns-watermarks {
   position: absolute;
   left: 1.4vw;
@@ -170,29 +175,238 @@ html, body {
 .ns-wm-made { font-weight: 600; }
 .ns-wm-copy { font-size: 0.92em; opacity: 0.9; }
 
-/* Layout theme accents */
+/* ===== Unique layout stage chrome ===== */
+#stage::before,
+#stage::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Spotlight — soft radial stage glow */
+body[data-layout="cinematic"] #stage::before {
+  inset: -10%;
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 42%, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(0,0,0,0.55) 100%);
+  animation: ns-breathe 7s ease-in-out infinite alternate;
+}
+body[data-layout="cinematic"] .ns-text {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  text-align: center;
+  justify-content: center;
+}
+body[data-layout="cinematic"] .ns-bar {
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+}
+body[data-layout="cinematic"] .ns-bar-fill { border-radius: 999px; }
+
+@keyframes ns-breathe {
+  from { opacity: 0.85; transform: scale(1); }
+  to { opacity: 1; transform: scale(1.03); }
+}
+
+/* Quiet Line — no chrome, hairline only */
+body[data-layout="minimal"] #stage::before { display: none; }
 body[data-layout="minimal"] .ns-btn {
-  border-color: rgba(255,255,255,0.35);
-  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.28);
+  background: transparent;
+}
+body[data-layout="minimal"] .ns-bar { background: rgba(255,255,255,0.1); }
+body[data-layout="minimal"] .ns-text {
+  letter-spacing: 0.02em;
+  font-weight: 600;
+}
+
+/* Afterhours — left signal rail + scanlines */
+body[data-layout="neon"] #stage::before {
+  top: 0; bottom: 0; left: 0; width: 6px;
+  background: linear-gradient(180deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 70%, transparent);
+  animation: ns-pulse-rail 2.8s ease-in-out infinite;
+}
+body[data-layout="neon"] #stage::after {
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  opacity: 0.35;
+  mix-blend-mode: multiply;
 }
 body[data-layout="neon"] .ns-bar-fill {
   box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 70%, transparent);
 }
-body[data-layout="noir"] .ns-btn {
-  border-width: 2px;
-  background: transparent;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+body[data-layout="neon"] .ns-text {
+  font-family: var(--font-display);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+@keyframes ns-pulse-rail {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+
+/* Coastline — bottom HUD plate */
+body[data-layout="horizon"] #stage::before {
+  left: 0; right: 0; bottom: 0; height: 28vh;
+  background: linear-gradient(180deg, transparent 0%, rgba(4,12,18,0.55) 35%, rgba(4,12,18,0.88) 100%);
+  border-top: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+body[data-layout="horizon"] #stage::after {
+  left: 3vw; right: 3vw; bottom: 27.2vh; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.7;
+  animation: ns-horizon-sweep 5s ease-in-out infinite;
+}
+body[data-layout="horizon"] .ns-bar {
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+}
+
+@keyframes ns-horizon-sweep {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
+}
+
+/* Foundry — copper corner brackets */
+body[data-layout="ember"] #stage::before,
+body[data-layout="ember"] #stage::after {
+  width: 88px;
+  height: 88px;
+  border-color: color-mix(in srgb, var(--accent) 80%, #fff 10%);
+  border-style: solid;
+  opacity: 0.85;
+}
+body[data-layout="ember"] #stage::before {
+  top: 4.5vh; left: 3.5vw;
+  border-width: 3px 0 0 3px;
+}
+body[data-layout="ember"] #stage::after {
+  bottom: 4.5vh; right: 3.5vw;
+  border-width: 0 3px 3px 0;
 }
 body[data-layout="ember"] .ns-panel {
   border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+}
+body[data-layout="ember"] .ns-text {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+body[data-layout="ember"] .ns-bar {
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: rgba(0,0,0,0.35);
+}
+
+/* Overwatch — top masthead strip */
+body[data-layout="arctic"] #stage::before {
+  top: 0; left: 0; right: 0; height: 14vh;
+  background: linear-gradient(180deg, rgba(8,16,24,0.92) 0%, rgba(8,16,24,0.55) 70%, transparent 100%);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+body[data-layout="arctic"] #stage::after {
+  top: 13.6vh; left: 0; width: 22vw; height: 2px;
+  background: var(--accent);
+  animation: ns-mast-slide 4.5s ease-in-out infinite alternate;
+}
+body[data-layout="arctic"] .ns-text {
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+}
+body[data-layout="arctic"] .ns-bar {
+  background: rgba(255,255,255,0.1);
+}
+
+@keyframes ns-mast-slide {
+  from { transform: translateX(0); opacity: 0.55; }
+  to { transform: translateX(40vw); opacity: 1; }
+}
+
+/* Marquee — letterbox bars */
+body[data-layout="noir"] #stage::before,
+body[data-layout="noir"] #stage::after {
+  left: 0; right: 0; height: 9vh;
+  background: #000;
+}
+body[data-layout="noir"] #stage::before { top: 0; }
+body[data-layout="noir"] #stage::after { bottom: 0; }
+body[data-layout="noir"] .ns-text {
+  font-family: var(--font-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  justify-content: center;
+}
+body[data-layout="noir"] .ns-btn {
+  border-width: 2px;
+  background: transparent;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+body[data-layout="noir"] .ns-bar { background: rgba(255,255,255,0.18); }
+
+/* Scoreboard — chunky bottom plate */
+body[data-layout="stadium"] #stage::before {
+  left: 2.5vw; right: 2.5vw; bottom: 2.2vh; height: 26vh;
+  background: rgba(6,8,12,0.88);
+  border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 18px 50px rgba(0,0,0,0.45);
+}
+body[data-layout="stadium"] #stage::after {
+  left: 2.5vw; width: 12vw; bottom: 27.8vh; height: 4px;
+  background: var(--accent);
 }
 body[data-layout="stadium"] .ns-bar {
   background: rgba(0,0,0,0.45);
   border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
 }
+body[data-layout="stadium"] .ns-text {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 
-/* Dual panel layout */
+/* Glass Card — frosted center pane */
+body[data-layout="glass"] #stage::before {
+  top: 28%;
+  left: 18%;
+  right: 18%;
+  bottom: 28%;
+  background: color-mix(in srgb, var(--panel) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, rgba(255,255,255,0.2));
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+  animation: ns-glass-in 0.9s ease-out both;
+}
+body[data-layout="glass"] .ns-text {
+  font-family: var(--font-display);
+  text-align: center;
+  justify-content: center;
+}
+body[data-layout="glass"] .ns-bar {
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+}
+body[data-layout="glass"] .ns-bar-fill { border-radius: 999px; }
+body[data-layout="glass"] .ns-watermarks {
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+@keyframes ns-glass-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Dual panel / Rulebook */
 .dual-panel-layout {
   position: absolute;
   inset: 0;
@@ -204,9 +418,11 @@ body[data-layout="stadium"] .ns-bar {
   color: #fff;
   box-sizing: border-box;
   z-index: 5;
+  font-family: var(--font-body);
 }
 .dual-panel-title {
   margin: 0 0 2.4vh;
+  font-family: var(--font-display);
   font-size: clamp(28px, 4.2vw, 56px);
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -222,19 +438,23 @@ body[data-layout="stadium"] .ns-bar {
   min-height: 0;
 }
 .dual-panel-card {
-  background: var(--dp-panel, rgba(40, 0, 0, 0.55));
-  border-radius: clamp(16px, 1.6vw, 28px);
+  background: var(--dp-panel, rgba(24, 6, 10, 0.62));
+  border-radius: clamp(14px, 1.4vw, 22px);
+  border: 1px solid color-mix(in srgb, var(--dp-accent, #E11D48) 28%, transparent);
   padding: clamp(16px, 1.8vw, 28px) clamp(18px, 2vw, 32px);
   display: flex;
   flex-direction: column;
   min-height: 0;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.28);
+  backdrop-filter: blur(6px);
 }
 .dual-panel-section {
   margin: 0 0 1.2vh;
   text-align: center;
+  font-family: var(--font-display);
   font-size: clamp(18px, 1.7vw, 28px);
   font-weight: 700;
+  color: color-mix(in srgb, var(--dp-accent, #E11D48) 70%, #fff);
 }
 .dual-panel-row {
   display: flex;
@@ -290,7 +510,8 @@ body[data-layout="stadium"] .ns-bar {
   width: min(800px, 70vw);
   margin-top: 2vh;
 }
-.dual-panel-loading .ns-bar { height: 10px; }
+.dual-panel-loading .ns-bar,
+.dual-panel-loading .loading-bar-track { height: 10px; }
 .dual-panel-status {
   margin-top: 0.7vh;
   text-align: center;
@@ -300,4 +521,7 @@ body[data-layout="stadium"] .ns-bar {
 
 @media (max-width: 900px) {
   .dual-panel-columns { grid-template-columns: 1fr; }
+  body[data-layout="glass"] #stage::before {
+    top: 18%; left: 6%; right: 6%; bottom: 18%;
+  }
 }

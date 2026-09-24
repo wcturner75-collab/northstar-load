@@ -99,17 +99,25 @@ NSBuilder.Canvas = (function () {
   function render() {
     root.innerHTML = '';
     const preset = (doc.theme && doc.theme.preset) || 'cinematic';
+    const theme = doc.theme || {};
+    const colors = theme.colors || {};
+    const fonts = theme.fonts || {};
     root.dataset.layout = preset;
-    root.style.setProperty('--accent', (doc.theme && doc.theme.accent) || '#C4A35A');
+    root.style.setProperty('--accent', theme.accent || '#C4A35A');
+    root.style.setProperty('--text', colors.text || '#F5F5F5');
+    root.style.setProperty('--muted', colors.muted || '#A8A8A8');
+    root.style.setProperty('--panel', colors.panel || 'rgba(0,0,0,0.45)');
+    root.style.setProperty('--font-display', '"' + (fonts.display || 'Syne') + '", sans-serif');
+    root.style.setProperty('--font-body', '"' + (fonts.body || 'DM Sans') + '", sans-serif');
 
     const bg = document.createElement('div');
     bg.className = 'canvas-bg';
     const b = doc.background || {};
     const dual = typeof NSBuilder.isDualPanelLayout === 'function' && NSBuilder.isDualPanelLayout(doc);
-    const accent = (doc.theme && doc.theme.accent) || '#C4A35A';
+    const accent = theme.accent || '#C4A35A';
 
     if (dual && (b.type === 'color' || !b.mediaIds || !b.mediaIds.length)) {
-      const base = b.color || accent || '#B71C1C';
+      const base = b.color || accent || '#7F1D1D';
       bg.style.background = 'radial-gradient(ellipse at center, ' + base + ' 0%, ' + base + ' 42%, #1a0505 100%)';
     } else if (b.type === 'color' || !b.mediaIds || !b.mediaIds.length) {
       bg.style.background = b.color || '#0B0C10';
@@ -117,6 +125,12 @@ NSBuilder.Canvas = (function () {
       bg.style.backgroundImage = 'url(/api/media/serve.php?id=' + encodeURIComponent(b.mediaIds[0]) + ')';
     }
     root.appendChild(bg);
+
+    // Stage chrome layer (unique per layout via CSS on #canvas[data-layout])
+    const chrome = document.createElement('div');
+    chrome.className = 'canvas-chrome';
+    chrome.setAttribute('aria-hidden', 'true');
+    root.appendChild(chrome);
 
     if (b.overlay && b.overlay.enabled && !dual) {
       const ov = document.createElement('div');

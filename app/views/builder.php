@@ -16,7 +16,7 @@ $mode = (($editorMode ?? 'simple') === 'advanced') ? 'advanced' : 'simple';
   <title>Editor — <?= \Northstar\Security::e($project['name'] ?? 'Project') ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=Orbitron:wght@500;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/app.css">
   <link rel="stylesheet" href="/assets/css/builder.css">
 </head>

@@ -28,13 +28,17 @@
     const root = document.documentElement;
     const theme = cfg.theme || {};
     const colors = theme.colors || {};
+    const fonts = theme.fonts || {};
     root.style.setProperty('--accent', theme.accent || '#C4A35A');
     root.style.setProperty('--text', colors.text || '#F5F5F5');
     root.style.setProperty('--muted', colors.muted || '#A8A8A8');
     root.style.setProperty('--panel', colors.panel || 'rgba(0,0,0,0.45)');
+    root.style.setProperty('--font-display', '"' + (fonts.display || 'Syne') + '", sans-serif');
+    root.style.setProperty('--font-body', '"' + (fonts.body || 'DM Sans') + '", sans-serif');
     const preset = theme.preset || 'cinematic';
     document.body.dataset.layout = preset;
     document.body.dataset.themeLayout = theme.layout || (preset === 'dual_panel' ? 'dual_panel' : 'freeform');
+    document.body.style.fontFamily = 'var(--font-body)';
   }
 
   function isDualPanel(cfg) {
@@ -42,7 +46,7 @@
     const preset = String(theme.preset || '').toLowerCase();
     const layout = String(theme.layout || '').toLowerCase();
     return layout === 'dual_panel' || layout === 'info_rules'
-      || preset === 'dual_panel' || preset === 'info_rules';
+      || preset === 'dual_panel' || preset === 'info_rules' || preset === 'rulebook';
   }
 
   function madeByLabel(cfg) {

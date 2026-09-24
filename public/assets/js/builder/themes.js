@@ -1,158 +1,173 @@
 window.NSBuilder = window.NSBuilder || {};
 
 /**
- * Layout theme presets for loading screens.
- * Freeform themes reposition common components; dual_panel uses a structured layout mode.
+ * Unique layout themes — each has a different composition, chrome, and type voice.
+ * dual_panel is a structured mode; others are freeform with CSS stage treatments.
  */
 NSBuilder.LAYOUT_THEMES = [
   {
     id: 'cinematic',
-    name: 'Cinematic',
-    blurb: 'Centered gold branding — classic RP stage.',
+    name: 'Spotlight',
+    blurb: 'Centered marque under a soft stage glow.',
     accent: '#C4A35A',
-    background: '#0B0C10',
-    overlay: 0.35,
-    fonts: { display: 'Orbitron', body: 'Source Sans 3' },
-    colors: { text: '#F5F5F5', muted: '#A8A8A8', panel: 'rgba(8,10,14,0.55)' },
+    background: '#0A0B0F',
+    overlay: 0.42,
+    fonts: { display: 'Syne', body: 'DM Sans' },
+    colors: { text: '#F4F0E6', muted: '#9C9588', panel: 'rgba(10,12,16,0.55)' },
     layout: {
-      serverName: { x: 360, y: 340, w: 1200, h: 90 },
-      tagline: { x: 460, y: 440, w: 1000, h: 48 },
-      loadingBar: { x: 610, y: 920, w: 700, h: 12 },
-      loadingStatus: { x: 610, y: 940, w: 700, h: 32 },
+      serverName: { x: 280, y: 360, w: 1360, h: 100 },
+      tagline: { x: 420, y: 480, w: 1080, h: 44 },
+      loadingBar: { x: 660, y: 900, w: 600, h: 6 },
+      loadingStatus: { x: 660, y: 920, w: 600, h: 28 },
     },
   },
   {
     id: 'minimal',
-    name: 'Minimal',
-    blurb: 'Sparse and quiet — name + progress only.',
-    accent: '#E8E6E1',
-    background: '#12141A',
-    overlay: 0.18,
-    fonts: { display: 'Source Sans 3', body: 'Source Sans 3' },
-    colors: { text: '#F2F2F0', muted: '#9A9AA2', panel: 'rgba(18,20,26,0.4)' },
+    name: 'Quiet Line',
+    blurb: 'Almost nothing — name + a hairline progress.',
+    accent: '#ECEAE4',
+    background: '#101218',
+    overlay: 0.12,
+    fonts: { display: 'DM Sans', body: 'DM Sans' },
+    colors: { text: '#F2F1ED', muted: '#8E8E96', panel: 'rgba(16,18,24,0.35)' },
     layout: {
-      serverName: { x: 160, y: 880, w: 900, h: 64 },
-      tagline: { x: 160, y: 950, w: 720, h: 36 },
-      loadingBar: { x: 160, y: 1000, w: 1600, h: 4 },
-      loadingStatus: { x: 160, y: 1012, w: 600, h: 28 },
+      serverName: { x: 96, y: 900, w: 820, h: 52 },
+      tagline: { x: 96, y: 958, w: 640, h: 30 },
+      loadingBar: { x: 96, y: 1016, w: 1728, h: 2 },
+      loadingStatus: { x: 96, y: 1028, w: 480, h: 24 },
     },
   },
   {
     id: 'neon',
-    name: 'Neon Night',
-    blurb: 'Teal glow on deep night for nightlife servers.',
-    accent: '#3DDC97',
-    background: '#05080F',
-    overlay: 0.42,
-    fonts: { display: 'Orbitron', body: 'Source Sans 3' },
-    colors: { text: '#E8FFF6', muted: '#7AA898', panel: 'rgba(5,12,18,0.6)' },
+    name: 'Afterhours',
+    blurb: 'Left rail brand with nightlife signal glow.',
+    accent: '#2EE6A6',
+    background: '#04070D',
+    overlay: 0.48,
+    fonts: { display: 'Orbitron', body: 'DM Sans' },
+    colors: { text: '#E7FFF5', muted: '#6F9B8A', panel: 'rgba(4,14,18,0.62)' },
     layout: {
-      serverName: { x: 120, y: 160, w: 1100, h: 80 },
-      tagline: { x: 120, y: 250, w: 800, h: 40 },
-      loadingBar: { x: 120, y: 960, w: 640, h: 10 },
-      loadingStatus: { x: 120, y: 980, w: 640, h: 28 },
+      serverName: { x: 120, y: 140, w: 980, h: 78 },
+      tagline: { x: 120, y: 236, w: 720, h: 36 },
+      loadingBar: { x: 120, y: 960, w: 520, h: 8 },
+      loadingStatus: { x: 120, y: 982, w: 520, h: 28 },
     },
   },
   {
     id: 'dual_panel',
-    aliases: ['info_rules'],
-    name: 'Dual Panel',
-    blurb: 'Info + Rules boards — translucent panels on a bold stage.',
+    aliases: ['info_rules', 'rulebook'],
+    name: 'Rulebook',
+    blurb: 'Server info + numbered rules on twin boards.',
     mode: 'dual_panel',
-    accent: '#C62828',
-    background: '#B71C1C',
-    overlay: 0.22,
-    fonts: { display: 'Source Sans 3', body: 'Source Sans 3' },
+    accent: '#E11D48',
+    background: '#7F1D1D',
+    overlay: 0.2,
+    fonts: { display: 'Syne', body: 'DM Sans' },
     colors: {
       text: '#FFFFFF',
       muted: 'rgba(255,255,255,0.78)',
-      panel: 'rgba(40,0,0,0.55)',
+      panel: 'rgba(24,6,10,0.62)',
     },
-    // Freeform comps stay available in Advanced; dual_panel renderer owns the stage.
     layout: {
-      serverName: { x: 260, y: 48, w: 1400, h: 72 },
+      serverName: { x: 260, y: 40, w: 1400, h: 72 },
       loadingBar: { x: 560, y: 1008, w: 800, h: 10 },
       loadingStatus: { x: 560, y: 1024, w: 800, h: 28 },
     },
   },
   {
     id: 'horizon',
-    name: 'Horizon',
-    blurb: 'Wide bottom HUD with left-aligned brand.',
-    accent: '#7EB6D9',
-    background: '#0A1218',
-    overlay: 0.4,
-    fonts: { display: 'Orbitron', body: 'Source Sans 3' },
-    colors: { text: '#EEF5FA', muted: '#8AA0B0', panel: 'rgba(8,16,24,0.55)' },
+    name: 'Coastline',
+    blurb: 'Wide bottom HUD — brand sits on the shore line.',
+    accent: '#5FB3D4',
+    background: '#071018',
+    overlay: 0.38,
+    fonts: { display: 'Syne', body: 'DM Sans' },
+    colors: { text: '#EAF4FA', muted: '#7E98A8', panel: 'rgba(6,16,24,0.7)' },
     layout: {
-      serverName: { x: 80, y: 780, w: 900, h: 72 },
-      tagline: { x: 80, y: 860, w: 700, h: 40 },
-      loadingBar: { x: 80, y: 980, w: 1760, h: 8 },
-      loadingStatus: { x: 80, y: 1000, w: 500, h: 28 },
+      serverName: { x: 72, y: 820, w: 980, h: 68 },
+      tagline: { x: 72, y: 894, w: 760, h: 34 },
+      loadingBar: { x: 72, y: 988, w: 1776, h: 5 },
+      loadingStatus: { x: 72, y: 1008, w: 560, h: 26 },
     },
   },
   {
     id: 'ember',
-    name: 'Ember',
-    blurb: 'Warm copper frame — outlaw / western energy.',
-    accent: '#D4783A',
-    background: '#140C08',
-    overlay: 0.38,
-    fonts: { display: 'Orbitron', body: 'Source Sans 3' },
-    colors: { text: '#F6EDE4', muted: '#B0896C', panel: 'rgba(28,14,8,0.58)' },
+    name: 'Foundry',
+    blurb: 'Copper corner brackets — outlaw / industrial.',
+    accent: '#E08A45',
+    background: '#120C08',
+    overlay: 0.4,
+    fonts: { display: 'Bebas Neue', body: 'DM Sans' },
+    colors: { text: '#F7EDE3', muted: '#B0896C', panel: 'rgba(28,14,8,0.58)' },
     layout: {
-      serverName: { x: 420, y: 280, w: 1080, h: 88 },
-      tagline: { x: 520, y: 380, w: 880, h: 44 },
-      loadingBar: { x: 560, y: 900, w: 800, h: 14 },
-      loadingStatus: { x: 560, y: 926, w: 800, h: 30 },
+      serverName: { x: 360, y: 300, w: 1200, h: 96 },
+      tagline: { x: 480, y: 410, w: 960, h: 40 },
+      loadingBar: { x: 560, y: 910, w: 800, h: 12 },
+      loadingStatus: { x: 560, y: 936, w: 800, h: 28 },
     },
   },
   {
     id: 'arctic',
-    name: 'Arctic',
-    blurb: 'Cool steel header bar and crisp progress.',
-    accent: '#A8C5D4',
-    background: '#0B1218',
-    overlay: 0.28,
-    fonts: { display: 'Source Sans 3', body: 'Source Sans 3' },
-    colors: { text: '#F0F6FA', muted: '#8FA6B4', panel: 'rgba(12,20,28,0.5)' },
+    name: 'Overwatch',
+    blurb: 'Cold steel masthead across the top edge.',
+    accent: '#A9C6D6',
+    background: '#0A1218',
+    overlay: 0.3,
+    fonts: { display: 'Syne', body: 'DM Sans' },
+    colors: { text: '#F0F6FA', muted: '#849AAB', panel: 'rgba(10,18,26,0.72)' },
     layout: {
-      serverName: { x: 80, y: 60, w: 1000, h: 64 },
-      tagline: { x: 80, y: 130, w: 800, h: 36 },
-      loadingBar: { x: 640, y: 980, w: 640, h: 6 },
-      loadingStatus: { x: 640, y: 996, w: 640, h: 28 },
+      serverName: { x: 96, y: 72, w: 1100, h: 60 },
+      tagline: { x: 96, y: 142, w: 860, h: 32 },
+      loadingBar: { x: 680, y: 980, w: 560, h: 4 },
+      loadingStatus: { x: 680, y: 996, w: 560, h: 26 },
     },
   },
   {
     id: 'noir',
-    name: 'Noir',
-    blurb: 'High-contrast editorial — monochrome stage.',
+    name: 'Marquee',
+    blurb: 'Letterboxed title card — high-contrast editorial.',
     accent: '#FFFFFF',
     background: '#000000',
-    overlay: 0.15,
-    fonts: { display: 'Orbitron', body: 'Source Sans 3' },
-    colors: { text: '#FFFFFF', muted: '#8A8A8A', panel: 'rgba(0,0,0,0.65)' },
+    overlay: 0.08,
+    fonts: { display: 'Bebas Neue', body: 'DM Sans' },
+    colors: { text: '#FFFFFF', muted: '#8A8A8A', panel: 'rgba(0,0,0,0.7)' },
     layout: {
-      serverName: { x: 200, y: 420, w: 1520, h: 100 },
-      tagline: { x: 400, y: 540, w: 1120, h: 40 },
-      loadingBar: { x: 200, y: 980, w: 1520, h: 3 },
-      loadingStatus: { x: 200, y: 992, w: 600, h: 28 },
+      serverName: { x: 160, y: 430, w: 1600, h: 110 },
+      tagline: { x: 360, y: 560, w: 1200, h: 36 },
+      loadingBar: { x: 160, y: 990, w: 1600, h: 2 },
+      loadingStatus: { x: 160, y: 1004, w: 520, h: 24 },
     },
   },
   {
     id: 'stadium',
-    name: 'Stadium',
-    blurb: 'Bold bottom scoreboard-style loading HUD.',
-    accent: '#E2B84A',
-    background: '#0E1014',
-    overlay: 0.45,
-    fonts: { display: 'Orbitron', body: 'Source Sans 3' },
-    colors: { text: '#FFF8E8', muted: '#B0A488', panel: 'rgba(10,12,16,0.7)' },
+    name: 'Scoreboard',
+    blurb: 'Chunky bottom plate — broadcast / match-day energy.',
+    accent: '#F0C14A',
+    background: '#0C0E12',
+    overlay: 0.5,
+    fonts: { display: 'Orbitron', body: 'DM Sans' },
+    colors: { text: '#FFF6DF', muted: '#A89970', panel: 'rgba(8,10,14,0.82)' },
     layout: {
-      serverName: { x: 120, y: 820, w: 1100, h: 70 },
-      tagline: { x: 120, y: 900, w: 800, h: 36 },
-      loadingBar: { x: 120, y: 970, w: 1680, h: 16 },
-      loadingStatus: { x: 120, y: 1000, w: 800, h: 30 },
+      serverName: { x: 96, y: 780, w: 1200, h: 64 },
+      tagline: { x: 96, y: 852, w: 900, h: 32 },
+      loadingBar: { x: 96, y: 940, w: 1728, h: 18 },
+      loadingStatus: { x: 96, y: 972, w: 720, h: 28 },
+    },
+  },
+  {
+    id: 'glass',
+    name: 'Glass Card',
+    blurb: 'Frosted center card floating over the scene.',
+    accent: '#8FD3C8',
+    background: '#0B1420',
+    overlay: 0.45,
+    fonts: { display: 'Syne', body: 'DM Sans' },
+    colors: { text: '#F3FAF8', muted: '#8AA8A2', panel: 'rgba(18,28,36,0.55)' },
+    layout: {
+      serverName: { x: 460, y: 390, w: 1000, h: 80 },
+      tagline: { x: 520, y: 490, w: 880, h: 36 },
+      loadingBar: { x: 560, y: 600, w: 800, h: 6 },
+      loadingStatus: { x: 560, y: 622, w: 800, h: 28 },
     },
   },
 ];
@@ -182,14 +197,11 @@ NSBuilder.isDualPanelLayout = function (doc) {
   const preset = String(doc.theme.preset || '').toLowerCase();
   const layout = String(doc.theme.layout || '').toLowerCase();
   return layout === 'dual_panel' || layout === 'info_rules'
-    || preset === 'dual_panel' || preset === 'info_rules';
+    || preset === 'dual_panel' || preset === 'info_rules' || preset === 'rulebook';
 };
 
 /**
  * Apply a layout theme to the project doc (colors + optional component positions).
- * @param {object} doc
- * @param {string} themeId
- * @param {{ reposition?: boolean }} opts
  */
 NSBuilder.applyLayoutTheme = function (doc, themeId, opts) {
   const theme = NSBuilder.getTheme(themeId);
@@ -246,6 +258,23 @@ NSBuilder.applyLayoutTheme = function (doc, themeId, opts) {
       comp.y = box.y;
       comp.w = box.w;
       comp.h = box.h;
+      if (comp.props) {
+        if (theme.fonts && theme.fonts.display && ['serverName', 'tagline', 'text'].indexOf(comp.type) >= 0) {
+          comp.props.fontFamily = theme.fonts.display;
+        }
+        if (theme.colors && theme.colors.text && comp.props.color) {
+          if (comp.type === 'serverName' || comp.type === 'tagline') {
+            comp.props.color = comp.type === 'tagline' ? theme.colors.muted : theme.colors.text;
+          }
+        }
+        if (comp.type === 'serverName') {
+          comp.props.align = theme.id === 'noir' || theme.id === 'cinematic' || theme.id === 'ember' || theme.id === 'glass'
+            ? 'center'
+            : (theme.id === 'minimal' || theme.id === 'neon' || theme.id === 'horizon' || theme.id === 'arctic' || theme.id === 'stadium'
+              ? 'left'
+              : (comp.props.align || 'center'));
+        }
+      }
     });
   }
 
@@ -254,16 +283,14 @@ NSBuilder.applyLayoutTheme = function (doc, themeId, opts) {
 
 /**
  * Build dual-panel DOM for canvas preview or shared structure.
- * @param {object} doc
- * @param {{ preview?: boolean }} opts
  */
 NSBuilder.renderDualPanel = function (doc, opts) {
   opts = opts || {};
   const server = doc.server || {};
   const content = doc.content || {};
   const player = content.player || {};
-  const accent = (doc.theme && doc.theme.accent) || '#C62828';
-  const panelBg = (doc.theme && doc.theme.colors && doc.theme.colors.panel) || 'rgba(40,0,0,0.55)';
+  const accent = (doc.theme && doc.theme.accent) || '#E11D48';
+  const panelBg = (doc.theme && doc.theme.colors && doc.theme.colors.panel) || 'rgba(24,6,10,0.62)';
   const rules = content.rules || [];
 
   const root = document.createElement('div');
