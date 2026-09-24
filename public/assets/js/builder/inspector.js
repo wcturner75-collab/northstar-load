@@ -11,6 +11,10 @@ NSBuilder.Inspector = (function () {
 
   function setDoc(next) { doc = next; }
 
+  function touch(snapshot) {
+    onChange(doc, snapshot, { skipUi: true });
+  }
+
   function render(selectedId) {
     host.innerHTML = '';
     const comp = (doc.components || []).find((c) => c.id === selectedId);
@@ -19,33 +23,33 @@ NSBuilder.Inspector = (function () {
       return;
     }
 
-    addText(host, 'Name', comp.name, (v) => { comp.name = v; onChange(doc, true); });
-    addCheck(host, 'Visible', !!comp.visible, (v) => { comp.visible = v; onChange(doc, true); });
-    addCheck(host, 'Locked', !!comp.locked, (v) => { comp.locked = v; onChange(doc, true); });
-    addNumber(host, 'X', comp.x, (v) => { comp.x = v; onChange(doc, false); });
-    addNumber(host, 'Y', comp.y, (v) => { comp.y = v; onChange(doc, false); });
-    addNumber(host, 'Width', comp.w, (v) => { comp.w = Math.max(1, v); onChange(doc, false); });
-    addNumber(host, 'Height', comp.h, (v) => { comp.h = Math.max(1, v); onChange(doc, false); });
-    addNumber(host, 'Z Index', comp.zIndex || 1, (v) => { comp.zIndex = v; onChange(doc, true); });
+    addText(host, 'Name', comp.name, (v) => { comp.name = v; touch(true); });
+    addCheck(host, 'Visible', !!comp.visible, (v) => { comp.visible = v; touch(true); });
+    addCheck(host, 'Locked', !!comp.locked, (v) => { comp.locked = v; touch(true); });
+    addNumber(host, 'X', comp.x, (v) => { comp.x = v; touch(false); });
+    addNumber(host, 'Y', comp.y, (v) => { comp.y = v; touch(false); });
+    addNumber(host, 'Width', comp.w, (v) => { comp.w = Math.max(1, v); touch(false); });
+    addNumber(host, 'Height', comp.h, (v) => { comp.h = Math.max(1, v); touch(false); });
+    addNumber(host, 'Z Index', comp.zIndex || 1, (v) => { comp.zIndex = v; touch(true); });
 
     const p = comp.props || (comp.props = {});
     if ('fontSize' in p || ['serverName', 'tagline', 'text', 'loadingStatus', 'clock'].includes(comp.type)) {
-      addText(host, 'Font', p.fontFamily || 'Source Sans 3', (v) => { p.fontFamily = v; onChange(doc, false); });
-      addNumber(host, 'Size', p.fontSize || 20, (v) => { p.fontSize = v; onChange(doc, false); });
-      addNumber(host, 'Weight', p.fontWeight || 400, (v) => { p.fontWeight = v; onChange(doc, false); });
-      addSelect(host, 'Align', p.align || 'center', ['left', 'center', 'right'], (v) => { p.align = v; onChange(doc, true); });
-      addText(host, 'Color', p.color || '#FFFFFF', (v) => { p.color = v; onChange(doc, false); });
+      addText(host, 'Font', p.fontFamily || 'Source Sans 3', (v) => { p.fontFamily = v; touch(false); });
+      addNumber(host, 'Size', p.fontSize || 20, (v) => { p.fontSize = v; touch(false); });
+      addNumber(host, 'Weight', p.fontWeight || 400, (v) => { p.fontWeight = v; touch(false); });
+      addSelect(host, 'Align', p.align || 'center', ['left', 'center', 'right'], (v) => { p.align = v; touch(true); });
+      addText(host, 'Color', p.color || '#FFFFFF', (v) => { p.color = v; touch(false); });
     }
     if (comp.type === 'text') {
-      addText(host, 'Text', p.text || '', (v) => { p.text = v; onChange(doc, false); });
+      addText(host, 'Text', p.text || '', (v) => { p.text = v; touch(false); });
     }
     if (comp.type === 'logo' || comp.type === 'image') {
-      addNumber(host, 'Media ID', p.mediaId || 0, (v) => { p.mediaId = v || null; onChange(doc, true); });
-      addSelect(host, 'Fit', p.objectFit || 'contain', ['contain', 'cover'], (v) => { p.objectFit = v; onChange(doc, true); });
+      addNumber(host, 'Media ID', p.mediaId || 0, (v) => { p.mediaId = v || null; touch(true); });
+      addSelect(host, 'Fit', p.objectFit || 'contain', ['contain', 'cover'], (v) => { p.objectFit = v; touch(true); });
     }
     if (['rulesButton', 'discordButton', 'websiteButton', 'socialButton'].includes(comp.type)) {
-      addText(host, 'Label', p.label || '', (v) => { p.label = v; onChange(doc, false); });
-      addText(host, 'URL', p.url || '', (v) => { p.url = v; onChange(doc, false); });
+      addText(host, 'Label', p.label || '', (v) => { p.label = v; touch(false); });
+      addText(host, 'URL', p.url || '', (v) => { p.url = v; touch(false); });
     }
 
     const actions = document.createElement('div');

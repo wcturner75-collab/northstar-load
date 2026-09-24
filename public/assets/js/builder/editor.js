@@ -47,12 +47,13 @@
   const frame = document.getElementById('canvas-frame');
 
   function commit(nextDoc, snapshot, meta) {
-    if (meta && meta.action === 'delete') {
+    meta = meta || {};
+    if (meta.action === 'delete') {
       nextDoc.components = nextDoc.components.filter((c) => c.id !== meta.id);
       nextDoc.layersOrder = (nextDoc.layersOrder || []).filter((id) => id !== meta.id);
       NSBuilder.Canvas.select(null);
     }
-    if (meta && meta.action === 'duplicate') {
+    if (meta.action === 'duplicate') {
       const src = nextDoc.components.find((c) => c.id === meta.id);
       if (src) {
         const copy = JSON.parse(JSON.stringify(src));
@@ -70,12 +71,24 @@
     if (doc.server && doc.server.name) {
       document.getElementById('project-title').textContent = doc.server.name;
     }
+
+    // Always refresh the live canvas
     NSBuilder.Canvas.setDoc(doc);
     NSBuilder.Inspector.setDoc(doc);
-    NSBuilder.Inspector.render(NSBuilder.Canvas.getSelectedId());
-    renderLayers();
-    renderContentForms();
-    if (window.NSBuilder.Simple) NSBuilder.Simple.setDoc(doc);
+
+    // Rebuilding form/inspector DOM on every keystroke steals focus and breaks clicks.
+    // Only rebuild UI chrome when not typing in a field.
+    // Structural actions (delete/duplicate) always refresh UI.
+    const skipUi = !!meta.skipUi && !meta.action;
+    if (!skipUi) {
+      NSBuilder.Inspector.render(NSBuilder.Canvas.getSelectedId());
+      renderLayers();
+      renderContentForms();
+      if (window.NSBuilder.Simple) NSBuilder.Simple.setDoc(doc);
+    } else if (window.NSBuilder.Simple) {
+      NSBuilder.Simple.setDoc(doc, { soft: true });
+    }
+
     if (snapshot) NSBuilder.History.push(doc);
     NSBuilder.Autosave.schedule(doc);
   }
@@ -86,7 +99,7 @@
     frame,
     doc,
     snap: true,
-    onChange: (d, snapshot) => commit(d, snapshot),
+    onChange: (d, snapshot) => commit(d, snapshot, { skipUi: true }),
     onSelect: (id) => {
       NSBuilder.Inspector.render(id);
       renderLayers();
@@ -96,14 +109,14 @@
   NSBuilder.Inspector.init({
     host: document.getElementById('inspector'),
     doc,
-    onChange: (d, snapshot, meta) => commit(d, snapshot, meta),
+    onChange: (d, snapshot, meta) => commit(d, snapshot, meta || {}),
   });
 
   if (window.NSBuilder.Simple) {
     NSBuilder.Simple.init({
       doc,
       features,
-      onChange: (d, snapshot) => commit(d, snapshot),
+      onChange: (d, snapshot, meta) => commit(d, snapshot, meta || { skipUi: true }),
     });
   }
 
@@ -227,28 +240,28 @@
         alert(featureLockReason('video_background'));
         return;
       }
-      doc.background.type = v; commit(doc, false);
+      doc.background.type = v; commit(doc, false, { skipUi: true });
     }));
     bg.appendChild(field('Color', doc.background.color || '#0B0C10', (v) => {
-      doc.background.color = v; commit(doc, false);
+      doc.background.color = v; commit(doc, false, { skipUi: true });
     }));
     bg.appendChild(field('Media IDs (comma)', (doc.background.mediaIds || []).join(','), (v) => {
       doc.background.mediaIds = v.split(',').map((s) => parseInt(s.trim(), 10)).filter(Boolean);
-      commit(doc, false);
+      commit(doc, false, { skipUi: true });
     }));
     if (canFeature('ken_burns')) {
       bg.appendChild(field('Ken Burns (true/false)', String(!!doc.background.kenBurns), (v) => {
-        doc.background.kenBurns = v === 'true'; commit(doc, false);
+        doc.background.kenBurns = v === 'true'; commit(doc, false, { skipUi: true });
       }));
     } else {
       const hint = document.createElement('p');
       hint.className = 'plan-hint';
-      hint.textContent = 'Ken Burns effect: Pro plan';
+      hint.textContent = 'Ken Burns effect: Standard+ plan';
       bg.appendChild(hint);
     }
 
     music.appendChild(field('Enabled (true/false)', String(!!doc.music.enabled), (v) => {
-      doc.music.enabled = v === 'true'; commit(doc, false);
+      doc.music.enabled = v === 'true'; commit(doc, false, { skipUi: true });
     }));
 
     const sourceOptions = ['file'];
@@ -265,6 +278,7 @@
         doc.music.youtubeUrl = '';
         doc.music.youtubeId = null;
       }
+      // Rebuild music fields when source changes shape
       commit(doc, false);
     }));
 
@@ -277,48 +291,48 @@
         music.appendChild(field('YouTube URL', doc.music.youtubeUrl || '', (v) => {
           doc.music.youtubeUrl = v;
           doc.music.source = 'youtube';
-          commit(doc, false);
+          commit(doc, false, { skipUi: true });
         }));
       }
     } else {
       music.appendChild(field('Media ID (uploaded audio)', doc.music.mediaId || '', (v) => {
         doc.music.mediaId = parseInt(v, 10) || null;
         doc.music.source = 'file';
-        commit(doc, false);
+        commit(doc, false, { skipUi: true });
       }));
     }
 
     if (!canFeature('youtube_music')) {
       const lock = document.createElement('p');
       lock.className = 'plan-hint';
-      lock.textContent = 'YouTube music embed: Standard or Pro plan';
+      lock.textContent = 'YouTube music embed: not on your plan';
       music.appendChild(lock);
     }
 
     music.appendChild(field('Volume 0-1', doc.music.volume ?? 0.15, (v) => {
-      doc.music.volume = Math.max(0, Math.min(1, parseFloat(v) || 0)); commit(doc, false);
+      doc.music.volume = Math.max(0, Math.min(1, parseFloat(v) || 0)); commit(doc, false, { skipUi: true });
     }));
 
     content.appendChild(field('Server name', doc.server.name || '', (v) => {
-      doc.server.name = v; commit(doc, false);
+      doc.server.name = v; commit(doc, false, { skipUi: true });
     }));
     content.appendChild(field('Tagline', doc.server.tagline || '', (v) => {
-      doc.server.tagline = v; commit(doc, false);
+      doc.server.tagline = v; commit(doc, false, { skipUi: true });
     }));
     content.appendChild(field('Accent', doc.theme.accent || '#C4A35A', (v) => {
-      doc.theme.accent = v; commit(doc, false);
+      doc.theme.accent = v; commit(doc, false, { skipUi: true });
     }));
     content.appendChild(field('Rules JSON', JSON.stringify(doc.content.rules || []), (v) => {
-      try { doc.content.rules = JSON.parse(v); commit(doc, false); } catch (_) {}
+      try { doc.content.rules = JSON.parse(v); commit(doc, false, { skipUi: true }); } catch (_) {}
     }));
     content.appendChild(field('Announcements JSON', JSON.stringify(doc.content.announcements || []), (v) => {
-      try { doc.content.announcements = JSON.parse(v); commit(doc, false); } catch (_) {}
+      try { doc.content.announcements = JSON.parse(v); commit(doc, false, { skipUi: true }); } catch (_) {}
     }));
     content.appendChild(field('Staff JSON', JSON.stringify(doc.content.staff || []), (v) => {
-      try { doc.content.staff = JSON.parse(v); commit(doc, false); } catch (_) {}
+      try { doc.content.staff = JSON.parse(v); commit(doc, false, { skipUi: true }); } catch (_) {}
     }));
     content.appendChild(field('Socials JSON', JSON.stringify(doc.content.socials || []), (v) => {
-      try { doc.content.socials = JSON.parse(v); commit(doc, false); } catch (_) {}
+      try { doc.content.socials = JSON.parse(v); commit(doc, false, { skipUi: true }); } catch (_) {}
     }));
   }
 

@@ -13,8 +13,9 @@ NSBuilder.Simple = (function () {
     render();
   }
 
-  function setDoc(next) {
+  function setDoc(next, opts) {
     doc = next;
+    if (opts && opts.soft) return;
     render();
   }
 
@@ -28,6 +29,11 @@ NSBuilder.Simple = (function () {
         if (pane) pane.classList.add('active');
       });
     });
+  }
+
+  function touch(rebuild) {
+    // skipUi keeps focus; omit skipUi when the form layout must change
+    onChange(doc, false, rebuild ? {} : { skipUi: true });
   }
 
   function field(parent, label, value, onInput, type) {
@@ -52,6 +58,9 @@ NSBuilder.Simple = (function () {
     const extras = document.getElementById('simple-extras');
     if (!brand) return;
 
+    // Preserve which guided step is active
+    const activeStep = document.querySelector('[data-simple-step].active')?.dataset.simpleStep || 'brand';
+
     brand.innerHTML = '';
     look.innerHTML = '';
     music.innerHTML = '';
@@ -65,16 +74,15 @@ NSBuilder.Simple = (function () {
 
     field(brand, 'Server name', doc.server.name || '', (v) => {
       doc.server.name = v;
-      // Keep serverName component text in sync via runtime config
-      onChange(doc, false);
+      touch(false);
     });
     field(brand, 'Tagline', doc.server.tagline || '', (v) => {
       doc.server.tagline = v;
-      onChange(doc, false);
+      touch(false);
     });
     field(brand, 'Accent color', doc.theme.accent || '#C4A35A', (v) => {
       doc.theme.accent = v;
-      onChange(doc, false);
+      touch(false);
     }, 'color');
 
     const bgType = doc.background.type || 'color';
@@ -87,23 +95,23 @@ NSBuilder.Simple = (function () {
         return;
       }
       doc.background.type = v;
-      onChange(doc, false);
+      touch(false);
     });
     field(look, 'Background color', doc.background.color || '#0B0C10', (v) => {
       doc.background.color = v;
-      onChange(doc, false);
+      touch(false);
     }, 'color');
     field(look, 'Background media IDs (from Media library)', (doc.background.mediaIds || []).join(', '), (v) => {
       doc.background.mediaIds = v.split(',').map((s) => parseInt(s.trim(), 10)).filter(Boolean);
       if (doc.background.mediaIds.length && doc.background.type === 'color') {
         doc.background.type = 'image';
       }
-      onChange(doc, false);
+      touch(false);
     });
 
     field(music, 'Enable music (true/false)', String(!!doc.music.enabled), (v) => {
       doc.music.enabled = v === 'true';
-      onChange(doc, false);
+      touch(false);
     });
     field(music, 'Source (file / youtube)', doc.music.source || 'file', (v) => {
       if (v === 'youtube' && !features.youtube_music) {
@@ -111,7 +119,7 @@ NSBuilder.Simple = (function () {
         return;
       }
       doc.music.source = v;
-      onChange(doc, false);
+      touch(true); // rebuild fields for youtube vs file
     });
     if ((doc.music.source || 'file') === 'youtube') {
       const tip = document.createElement('p');
@@ -122,39 +130,47 @@ NSBuilder.Simple = (function () {
         doc.music.youtubeUrl = v;
         doc.music.source = 'youtube';
         doc.music.enabled = true;
-        onChange(doc, false);
+        touch(false);
       });
     } else {
       field(music, 'Audio media ID', doc.music.mediaId || '', (v) => {
         doc.music.mediaId = parseInt(v, 10) || null;
         doc.music.source = 'file';
         if (doc.music.mediaId) doc.music.enabled = true;
-        onChange(doc, false);
+        touch(false);
       });
     }
     field(music, 'Volume (0–1)', doc.music.volume ?? 0.15, (v) => {
       doc.music.volume = Math.max(0, Math.min(1, parseFloat(v) || 0));
-      onChange(doc, false);
+      touch(false);
     });
 
     field(extras, 'Rules (one per line: Title | Body)', rulesToText(doc.content.rules), (v) => {
       doc.content.rules = textToRules(v);
-      onChange(doc, false);
+      touch(false);
     }, 'textarea');
     field(extras, 'Discord URL', (doc.content.socials || []).find((s) => s.type === 'discord')?.url || '', (v) => {
       upsertSocial('discord', 'Discord', v);
-      onChange(doc, false);
+      touch(false);
     });
     field(extras, 'Website URL', (doc.content.socials || []).find((s) => s.type === 'website')?.url || '', (v) => {
       upsertSocial('website', 'Website', v);
-      onChange(doc, false);
+      touch(false);
     });
     if (features.announcements) {
       field(extras, 'Announcements (Title | Body per line)', rulesToText(doc.content.announcements), (v) => {
         doc.content.announcements = textToRules(v);
-        onChange(doc, false);
+        touch(false);
       }, 'textarea');
     }
+
+    // Restore active step after rebuild
+    document.querySelectorAll('[data-simple-step]').forEach((b) => {
+      b.classList.toggle('active', b.dataset.simpleStep === activeStep);
+    });
+    document.querySelectorAll('[data-simple-pane]').forEach((p) => {
+      p.classList.toggle('active', p.dataset.simplePane === activeStep);
+    });
   }
 
   function upsertSocial(type, label, url) {
