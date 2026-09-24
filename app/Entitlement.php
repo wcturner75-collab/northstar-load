@@ -172,4 +172,86 @@ final class Entitlement
             throw new \RuntimeException('Daily build limit reached for your plan (' . $limits['plan'] . ').');
         }
     }
+
+    /**
+     * Change (or create) the user's active plan for a product.
+     * Billing is not wired yet — this is an early-access plan switch.
+     *
+     * @param 'free'|'standard'|'pro' $plan
+     */
+    public static function setPlan(int $userId, string $plan, string $productKey = 'load', string $source = 'account'): string
+    {
+        $plan = strtolower(trim($plan));
+        if (!in_array($plan, ['free', 'standard', 'pro'], true)) {
+            throw new \InvalidArgumentException('Invalid plan.');
+        }
+
+        $pdo = Database::pdo();
+        $find = $pdo->prepare(
+            'SELECT id FROM entitlements
+             WHERE user_id = ? AND product_key = ?
+             ORDER BY id DESC LIMIT 1'
+        );
+        $find->execute([$userId, $productKey]);
+        $row = $find->fetch();
+
+        $meta = json_encode([
+            'changed_at' => date('c'),
+            'via' => $source,
+        ], JSON_UNESCAPED_SLASHES);
+
+        if ($row) {
+            $upd = $pdo->prepare(
+                'UPDATE entitlements
+                 SET plan_key = ?, source = ?, meta_json = ?, ends_at = NULL
+                 WHERE id = ?'
+            );
+            $upd->execute([$plan, $source, $meta, (int) $row['id']]);
+        } else {
+            $ins = $pdo->prepare(
+                'INSERT INTO entitlements (user_id, product_key, plan_key, source, meta_json)
+                 VALUES (?, ?, ?, ?, ?)'
+            );
+            $ins->execute([$userId, $productKey, $plan, $source, $meta]);
+        }
+
+        return $plan;
+    }
+
+    /** @return list<array{key:string,label:string,blurb:string,highlights:list<string>}> */
+    public static function catalog(): array
+    {
+        return [
+            [
+                'key' => 'free',
+                'label' => 'Free',
+                'blurb' => 'Ship a complete loading screen.',
+                'highlights' => [
+                    '5 projects · 60 media · 15 builds/day',
+                    'YouTube + file music',
+                    'Slideshow, staff, announcements',
+                ],
+            ],
+            [
+                'key' => 'standard',
+                'label' => 'Standard',
+                'blurb' => 'More room to grow.',
+                'highlights' => [
+                    '25 projects · 250 media · 50 builds/day',
+                    'Everything in Free',
+                    'Ken Burns motion',
+                ],
+            ],
+            [
+                'key' => 'pro',
+                'label' => 'Pro',
+                'blurb' => 'Studio capacity.',
+                'highlights' => [
+                    '200 projects · 2000 media · 200 builds/day',
+                    'Everything in Standard',
+                    'Video backgrounds',
+                ],
+            ],
+        ];
+    }
 }

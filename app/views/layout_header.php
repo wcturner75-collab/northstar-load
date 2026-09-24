@@ -39,6 +39,7 @@ $bodyClass = $bodyClass ?? '';
         <a href="/projects.php">Projects</a>
         <a href="/media.php">Media</a>
         <a href="/downloads.php">Downloads</a>
+        <a href="/plans.php">Plans</a>
         <a href="/docs.php">Docs</a>
         <a href="/account.php">Account</a>
         <a class="btn btn-ghost" href="/logout.php">Logout</a>

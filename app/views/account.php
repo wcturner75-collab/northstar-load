@@ -29,14 +29,48 @@
       <h2>Entitlements</h2>
       <dl class="kv">
         <dt>Product</dt><dd>Northstar Load</dd>
-        <dt>Plan</dt><dd><?= \Northstar\Security::e(strtoupper($limits['plan'] ?? 'free')) ?></dd>
+        <dt>Plan</dt><dd id="account-plan-label"><?= \Northstar\Security::e(strtoupper($limits['plan'] ?? 'free')) ?></dd>
         <dt>Project limit</dt><dd><?= (int) ($limits['max_projects'] ?? 0) ?></dd>
         <dt>Media limit</dt><dd><?= (int) ($limits['max_media'] ?? 0) ?></dd>
         <dt>Components / project</dt><dd><?= (int) ($limits['max_components'] ?? 0) ?></dd>
         <dt>Builds / day</dt><dd><?= (int) ($limits['max_builds_per_day'] ?? 0) ?></dd>
       </dl>
+      <p style="margin-top:1rem"><a class="btn btn-primary" href="/plans.php">Change plan</a></p>
     </div>
   </div>
+
+  <section class="plan-matrix" id="change-plan">
+    <h2>Change plan</h2>
+    <p class="muted">Pick a plan below — applies immediately (billing not connected yet).</p>
+    <div class="choice-cards plan-cards plan-switcher">
+      <?php
+      $catalog = \Northstar\Entitlement::catalog();
+      $currentPlan = $limits['plan'] ?? 'free';
+      foreach ($catalog as $card):
+        $key = $card['key'];
+        $isCurrent = $currentPlan === $key;
+      ?>
+        <article class="choice-card plan-pick <?= $isCurrent ? 'is-current' : '' ?>" data-plan="<?= \Northstar\Security::e($key) ?>">
+          <span class="choice-body">
+            <strong><?= \Northstar\Security::e($card['label']) ?></strong>
+            <em><?= \Northstar\Security::e($card['blurb']) ?></em>
+            <ul class="plan-highlights">
+              <?php foreach ($card['highlights'] as $h): ?>
+                <li><?= \Northstar\Security::e($h) ?></li>
+              <?php endforeach; ?>
+            </ul>
+            <?php if ($isCurrent): ?>
+              <button type="button" class="btn btn-ghost" disabled>Current plan</button>
+            <?php else: ?>
+              <button type="button" class="btn btn-primary btn-choose-plan" data-plan="<?= \Northstar\Security::e($key) ?>">
+                Switch to <?= \Northstar\Security::e($card['label']) ?>
+              </button>
+            <?php endif; ?>
+          </span>
+        </article>
+      <?php endforeach; ?>
+    </div>
+  </section>
 
   <section class="plan-matrix">
     <h2>What each plan is for</h2>
@@ -104,7 +138,7 @@
         </tr>
       </tbody>
     </table>
-    <p class="muted">Stripe/PayPal can replace early-access plan grants later. Until then, the plan chosen at signup is what you get.</p>
+    <p class="muted">Stripe/PayPal can replace early-access plan grants later.</p>
   </section>
 </section>
 <script>
@@ -120,8 +154,30 @@ document.getElementById('editor-mode-form')?.addEventListener('submit', async (e
       body: JSON.stringify({ editor_mode: mode }),
     });
     status.textContent = 'Saved. New editor sessions use this mode.';
+    if (window.NS?.toast) NS.toast('Editor preference saved', 'success');
   } catch (err) {
     status.textContent = err.message;
+    if (window.NS?.toast) NS.toast(err.message, 'error');
   }
+});
+
+document.querySelectorAll('.btn-choose-plan').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    const plan = btn.dataset.plan;
+    if (!plan) return;
+    btn.disabled = true;
+    try {
+      const data = await NS.api('/api/account/plan.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+      NS.toast('Plan updated to ' + String(data.plan || plan).toUpperCase(), 'success');
+      location.reload();
+    } catch (err) {
+      btn.disabled = false;
+      NS.toast(err.message || 'Could not change plan', 'error');
+    }
+  });
 });
 </script>
