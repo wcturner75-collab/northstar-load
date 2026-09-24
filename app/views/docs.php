@@ -15,7 +15,7 @@
       <li>Upload logos, backgrounds, and music in <strong>Media</strong>.</li>
       <li>Click <strong>Generate Resource</strong>, download the thin ZIP.</li>
       <li>Extract into your FiveM <code>resources</code> folder and add <code>ensure your_resource_name</code> to <code>server.cfg</code>.</li>
-      <li>Players open your screen from <code>https://load.northstarscripts.us/load?t=…</code> (already set in the ZIP’s <code>fxmanifest.lua</code>).</li>
+      <li>Players open your screen from <code>https://load.northstarscripts.us/load.php?t=…</code> (already set in the ZIP’s <code>fxmanifest.lua</code>).</li>
     </ol>
   </article>
 
