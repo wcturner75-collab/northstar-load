@@ -27,10 +27,10 @@ $bodyClass = $bodyClass ?? '';
 <header class="site-header">
   <div class="shell header-inner">
     <a class="brand" href="<?= $user ? '/dashboard.php' : '/' ?>">
-      <span class="brand-mark">NS</span>
+      <span class="brand-mark" aria-hidden="true">N</span>
       <span class="brand-text">
-        <strong><?= \Northstar\Security::e($brand) ?></strong>
-        <em><?= \Northstar\Security::e($appName) ?></em>
+        <strong>NORTHSTAR</strong>
+        <em>SCRIPTS</em>
       </span>
     </a>
     <nav class="nav">

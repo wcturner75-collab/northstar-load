@@ -2,7 +2,7 @@
 <footer class="site-footer">
   <div class="shell footer-inner">
     <span><?= \Northstar\Security::e($config['app']['brand'] ?? 'Northstar Scripts') ?></span>
-    <span>Loading screens without hand-editing resources.</span>
+    <span>Digital arctic tooling for FiveM operators.</span>
   </div>
 </footer>
 <script src="/assets/js/app.js"></script>

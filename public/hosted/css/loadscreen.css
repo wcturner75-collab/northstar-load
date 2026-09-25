@@ -184,6 +184,33 @@ html, body {
   z-index: 2;
 }
 
+
+/* Northstar brand arctic */
+body[data-layout="northstar"] #stage::before {
+  top: 0; bottom: 0; left: 0; width: 5px;
+  background: linear-gradient(180deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+body[data-layout="northstar"] #stage::after {
+  inset: 0;
+  background:
+    radial-gradient(ellipse 45% 35% at 60% 30%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+    repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(56,189,248,0.04) 47px, rgba(56,189,248,0.04) 48px);
+  pointer-events: none;
+}
+body[data-layout="northstar"] .ns-text {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+body[data-layout="northstar"] .ns-bar {
+  background: rgba(56,189,248,0.1);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+body[data-layout="northstar"] .ns-bar-fill {
+  box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
 /* Spotlight — soft radial stage glow */
 body[data-layout="cinematic"] #stage::before {
   inset: -10%;

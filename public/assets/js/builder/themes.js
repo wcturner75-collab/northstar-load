@@ -6,6 +6,22 @@ window.NSBuilder = window.NSBuilder || {};
  */
 NSBuilder.LAYOUT_THEMES = [
   {
+    id: 'northstar',
+    name: 'Northstar',
+    blurb: 'Brand arctic — cyan signal glow on deep navy.',
+    accent: '#38BDF8',
+    background: '#050B14',
+    overlay: 0.4,
+    fonts: { display: 'Syne', body: 'DM Sans' },
+    colors: { text: '#E8F1F8', muted: '#7F9BB0', panel: 'rgba(10,22,38,0.62)' },
+    layout: {
+      serverName: { x: 140, y: 180, w: 1100, h: 88 },
+      tagline: { x: 140, y: 290, w: 820, h: 40 },
+      loadingBar: { x: 140, y: 960, w: 720, h: 6 },
+      loadingStatus: { x: 140, y: 982, w: 720, h: 28 },
+    },
+  },
+  {
     id: 'cinematic',
     name: 'Spotlight',
     blurb: 'Centered marque under a soft stage glow.',

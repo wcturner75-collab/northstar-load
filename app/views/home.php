@@ -1,9 +1,9 @@
 <section class="hero">
-  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-bg" role="img" aria-label="Northstar Scripts brand artwork"></div>
   <div class="shell hero-content">
-    <p class="eyebrow">Northstar Scripts</p>
-    <h1 class="hero-brand">NORTHSTAR<br>LOAD</h1>
-    <p class="hero-lead">Design a FiveM loading screen visually — guided Simple mode for new operators, or Advanced canvas control. Preview in your browser. Generate a ready-to-ensure resource ZIP.</p>
+    <p class="eyebrow">Scripts</p>
+    <h1 class="hero-brand">NORTHSTAR<span>LOAD</span></h1>
+    <p class="hero-lead">Design FiveM loading screens visually. Preview live. Ship a hosted resource — no hand-edited HTML.</p>
     <div class="hero-actions">
       <a class="btn btn-primary btn-lg" href="/register.php">Start Building</a>
       <a class="btn btn-ghost btn-lg" href="/docs.php">Read the Docs</a>
@@ -17,9 +17,9 @@
     <p>One tested FiveM runtime. Your design becomes configuration, not a fragile custom fork.</p>
   </header>
   <ol class="flow-steps">
-    <li><strong>Create</strong> a project and pick a template</li>
+    <li><strong>Create</strong> a project and pick a layout theme</li>
     <li><strong>Design</strong> branding, media, rules, and socials in the editor</li>
-    <li><strong>Generate</strong> a validated resource ZIP with ZipArchive</li>
+    <li><strong>Generate</strong> a thin hosted resource ZIP</li>
     <li><strong>Ensure</strong> the resource on your FiveM server</li>
   </ol>
 </section>
@@ -28,15 +28,15 @@
   <div class="shell feature-grid">
     <article>
       <h3>Visual editor</h3>
-      <p>Drag components, snap to grid, inspect properties, undo/redo, and autosave — built for operators, not frontend engineers.</p>
+      <p>Simple guided mode or Advanced canvas — drag, snap, inspect, undo, and autosave.</p>
     </article>
     <article>
       <h3>Honest loading</h3>
-      <p>The runtime listens for real FiveM load events. When progress is unknown, it shows status motion — never a fake percentage timer.</p>
+      <p>The runtime listens for real FiveM load events — never a fake percentage timer.</p>
     </article>
     <article>
-      <h3>Secure by default</h3>
-      <p>Ownership checks, CSRF, hashed passwords, validated uploads, and tokenized downloads keep projects isolated between customers.</p>
+      <h3>Hosted &amp; secure</h3>
+      <p>Screens live on Northstar. Ownership checks, CSRF, hashed passwords, and tokenized media keep customers isolated.</p>
     </article>
   </div>
 </section>

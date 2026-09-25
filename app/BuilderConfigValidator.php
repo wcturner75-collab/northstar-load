@@ -105,12 +105,12 @@ final class BuilderConfigValidator
     private static function theme(array $theme): array
     {
         $allowed = [
-            'cinematic', 'minimal', 'neon', 'dual_panel', 'info_rules', 'rulebook',
+            'northstar', 'cinematic', 'minimal', 'neon', 'dual_panel', 'info_rules', 'rulebook',
             'horizon', 'ember', 'arctic', 'noir', 'stadium', 'glass',
         ];
-        $preset = self::str($theme['preset'] ?? 'cinematic', 64);
+        $preset = self::str($theme['preset'] ?? 'northstar', 64);
         if (!in_array($preset, $allowed, true)) {
-            $preset = 'cinematic';
+            $preset = 'northstar';
         }
         if ($preset === 'info_rules' || $preset === 'rulebook') {
             $preset = 'dual_panel';
