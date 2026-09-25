@@ -8,6 +8,9 @@ $brand = $config['app']['brand'] ?? 'Northstar Load';
 $appName = $config['app']['name'] ?? 'Northstar Load';
 $pageTitle = $pageTitle ?? $appName;
 $bodyClass = $bodyClass ?? '';
+$adsense = is_array($config['adsense'] ?? null) ? $config['adsense'] : [];
+$adsenseEnabled = !empty($adsense['enabled']) && !empty($adsense['client']);
+$adsenseClient = (string) ($adsense['client'] ?? '');
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +24,9 @@ $bodyClass = $bodyClass ?? '';
   <link rel="stylesheet" href="/assets/css/app.css">
   <?php if (!empty($extraCss)): ?>
   <link rel="stylesheet" href="<?= \Northstar\Security::e($extraCss) ?>">
+  <?php endif; ?>
+  <?php if ($adsenseEnabled): ?>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=<?= \Northstar\Security::e($adsenseClient) ?>" crossorigin="anonymous"></script>
   <?php endif; ?>
 </head>
 <body class="<?= \Northstar\Security::e($bodyClass) ?>">
