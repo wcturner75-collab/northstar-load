@@ -26,7 +26,7 @@ $mode = (($editorMode ?? 'simple') === 'advanced') ? 'advanced' : 'simple';
 
 <div class="builder-app">
   <header class="builder-top">
-    <a class="brand compact" href="/projects.php">
+    <a class="brand compact" href="/projects">
       <span class="brand-mark">N</span>
       <span>LOAD</span>
     </a>
@@ -132,6 +132,7 @@ $mode = (($editorMode ?? 'simple') === 'advanced') ? 'advanced' : 'simple';
 <script src="/assets/js/builder/history.js"></script>
 <script src="/assets/js/builder/components.js"></script>
 <script src="/assets/js/builder/fields.js"></script>
+<script src="/assets/js/builder/media-picker.js"></script>
 <script src="/assets/js/builder/themes.js"></script>
 <script src="/assets/js/builder/canvas.js"></script>
 <script src="/assets/js/builder/inspector.js"></script>

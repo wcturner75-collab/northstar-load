@@ -171,7 +171,7 @@
     document.getElementById('mode-simple')?.classList.toggle('active', editorMode === 'simple');
     document.getElementById('mode-advanced')?.classList.toggle('active', editorMode === 'advanced');
     NSBuilder.Canvas.fit();
-    NS.api('/api/account/editor-mode.php', {
+    NS.api('/api/account/editor-mode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ editor_mode: editorMode }),
@@ -331,10 +331,15 @@
       doc.background.color = v;
       preview();
     });
-    F.text(bg, 'Media IDs', (doc.background.mediaIds || []).join(','), (v) => {
-      doc.background.mediaIds = v.split(',').map((s) => parseInt(s.trim(), 10)).filter(Boolean);
+    F.media(bg, 'Background media', doc.background.mediaIds || [], (ids) => {
+      doc.background.mediaIds = ids || [];
       preview();
-    }, { placeholder: 'e.g. 12, 15' });
+    }, {
+      kind: doc.background.type === 'video' ? 'video' : 'image',
+      multiple: true,
+      title: 'Background media',
+      hint: 'Select images or video from your library.',
+    });
     if (canFeature('ken_burns')) {
       F.bool(bg, 'Ken Burns', !!doc.background.kenBurns, (v) => {
         doc.background.kenBurns = v;
@@ -376,11 +381,16 @@
         }, { placeholder: 'https://www.youtube.com/watch?v=…' });
       }
     } else {
-      F.number(music, 'Audio media ID', doc.music.mediaId || '', (v) => {
-        doc.music.mediaId = v ? Math.round(v) : null;
+      F.media(music, 'Audio file', doc.music.mediaId || null, (id) => {
+        doc.music.mediaId = id || null;
         doc.music.source = 'file';
         preview();
-      }, { min: 1, step: 1 });
+      }, {
+        kind: 'audio',
+        multiple: false,
+        title: 'Choose audio',
+        hint: 'Select an uploaded audio file.',
+      });
     }
     if (!canFeature('youtube_music')) {
       F.hint(music, 'YouTube music embed: not on your plan');
@@ -508,12 +518,12 @@
     document.getElementById('generate-result').classList.add('hidden');
     try {
       await NSBuilder.Autosave.flush();
-      await NS.api('/api/projects/save.php', {
+      await NS.api('/api/projects/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: projectId, config: doc }),
       });
-      const data = await NS.api('/api/build/generate.php', {
+      const data = await NS.api('/api/build/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ project_id: projectId }),

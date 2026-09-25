@@ -13,6 +13,9 @@ final class Security
         }
         header('X-Content-Type-Options: nosniff');
         header('Referrer-Policy: strict-origin-when-cross-origin');
+        // Never let Cloudflare/proxy cache HTML that embeds a CSRF token.
+        header('Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
 
         $path = (string) (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');
         $hosted = $path === '/load' || $path === '/load.php'
@@ -27,13 +30,26 @@ final class Security
         }
 
         header('X-Frame-Options: SAMEORIGIN');
-        // unsafe-inline kept as fallback; primary page logic lives in /assets/js/*.js
-        header("Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'self'");
+        // AdSense + fonts; unsafe-inline kept as fallback for page boot straps
+        header(
+            "Content-Security-Policy: default-src 'self'; "
+            . "img-src 'self' data: blob: https:; "
+            . "media-src 'self' blob:; "
+            . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            . "font-src 'self' https://fonts.gstatic.com data:; "
+            . "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagservices.com https://www.google.com https://partner.googleadservices.com https://tpc.googlesyndication.com; "
+            . "connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com https://tpc.googlesyndication.com; "
+            . "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com https://www.youtube.com https://www.youtube-nocookie.com; "
+            . "frame-ancestors 'self'"
+        );
     }
 
     public static function ensureCsrfToken(bool $force = false): string
     {
-        if ($force || empty($_SESSION['csrf_token'])) {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return '';
+        }
+        if ($force || empty($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
         return $_SESSION['csrf_token'];
@@ -46,8 +62,11 @@ final class Security
 
     public static function verifyCsrf(?string $token): bool
     {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return false;
+        }
         $session = $_SESSION['csrf_token'] ?? '';
-        if (!is_string($token) || $token === '' || $session === '') {
+        if (!is_string($token) || $token === '' || !is_string($session) || $session === '') {
             return false;
         }
         return hash_equals($session, $token);
@@ -57,7 +76,7 @@ final class Security
     {
         $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['_csrf'] ?? null);
         if (!self::verifyCsrf(is_string($token) ? $token : null)) {
-            Response::jsonError('Invalid CSRF token.', 403, 'csrf');
+            Response::jsonError('Invalid CSRF token. Refresh the page and try again.', 403, 'csrf');
         }
     }
 

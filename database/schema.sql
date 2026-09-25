@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash   VARCHAR(255) NOT NULL,
   status          ENUM('active','disabled','pending') NOT NULL DEFAULT 'active',
   editor_mode     ENUM('simple','advanced') NOT NULL DEFAULT 'simple',
+  role            ENUM('user','manager','admin') NOT NULL DEFAULT 'user',
   created_at      DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   updated_at      DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
                                   ON UPDATE CURRENT_TIMESTAMP(3),

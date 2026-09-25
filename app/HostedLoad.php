@@ -40,8 +40,7 @@ final class HostedLoad
     public static function publicUrl(string $publishToken, array $configApp): string
     {
         $token = self::normalizeToken($publishToken);
-        // load.php works on Apache/XAMPP even without rewrite rules
-        return self::loadBaseUrl($configApp) . '/load.php?t=' . rawurlencode($token);
+        return self::loadBaseUrl($configApp) . '/load?t=' . rawurlencode($token);
     }
 
     public static function normalizeToken(string $token): string
@@ -116,7 +115,7 @@ final class HostedLoad
         // Relative URLs so localhost vs 127.0.0.1 / CSP never break the page.
         // Absolute also included for FiveM CEF edge cases.
         $mediaUrl = static function (int $mediaId) use ($base, $token): string {
-            $rel = '/api/load/media.php?t=' . rawurlencode($token) . '&id=' . $mediaId;
+            $rel = '/api/load/media?t=' . rawurlencode($token) . '&id=' . $mediaId;
             return $base . $rel;
         };
 

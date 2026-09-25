@@ -44,7 +44,37 @@ NSBuilder.Inspector = (function () {
       addText(host, 'Text', p.text || '', (v) => { p.text = v; touch(false); });
     }
     if (comp.type === 'logo' || comp.type === 'image') {
-      addNumber(host, 'Media ID', p.mediaId || 0, (v) => { p.mediaId = v || null; touch(true); });
+      const wrap = document.createElement('div');
+      wrap.className = 'stack-form';
+      const lab = document.createElement('label');
+      lab.textContent = 'Image';
+      const row = document.createElement('div');
+      row.className = 'media-field-row';
+      const summary = document.createElement('div');
+      summary.className = 'media-field-summary';
+      summary.textContent = p.mediaId ? ('Selected #' + p.mediaId) : 'None selected';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-small btn-primary';
+      btn.textContent = 'Choose image…';
+      btn.onclick = () => {
+        NSBuilder.MediaPicker.open({
+          kind: 'image',
+          multiple: false,
+          selected: p.mediaId || null,
+          title: 'Choose image',
+          onPick: (id) => {
+            p.mediaId = id || null;
+            summary.textContent = id ? ('Selected #' + id) : 'None selected';
+            touch(true);
+          },
+        });
+      };
+      row.appendChild(summary);
+      row.appendChild(btn);
+      lab.appendChild(row);
+      wrap.appendChild(lab);
+      host.appendChild(wrap);
       addSelect(host, 'Fit', p.objectFit || 'contain', ['contain', 'cover'], (v) => { p.objectFit = v; touch(true); });
     }
     if (['rulesButton', 'discordButton', 'websiteButton', 'socialButton'].includes(comp.type)) {

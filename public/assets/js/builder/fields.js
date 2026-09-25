@@ -105,6 +105,53 @@ NSBuilder.Fields = (function () {
     ], (v) => onChange(v === 'true'));
   }
 
+  function media(parent, label, value, onPick, opts) {
+    opts = opts || {};
+    const kind = opts.kind || 'image';
+    const multiple = !!opts.multiple;
+    const lab = labelWrap(label);
+    const row = document.createElement('div');
+    row.className = 'media-field-row';
+    const summary = document.createElement('div');
+    summary.className = 'media-field-summary';
+    function paint(v) {
+      if (multiple) {
+        const ids = Array.isArray(v) ? v : [];
+        summary.textContent = ids.length ? (ids.length + ' selected: #' + ids.join(', #')) : 'None selected';
+      } else {
+        summary.textContent = v ? ('Selected #' + v) : 'None selected';
+      }
+    }
+    paint(value);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-small btn-primary';
+    btn.textContent = multiple ? 'Choose media…' : 'Choose file…';
+    btn.addEventListener('click', () => {
+      if (!NSBuilder.MediaPicker) {
+        if (window.NS) NS.toast('Media picker unavailable', 'error');
+        return;
+      }
+      NSBuilder.MediaPicker.open({
+        kind,
+        multiple,
+        selected: value,
+        title: opts.title || label,
+        hint: opts.hint || '',
+        onPick: (picked) => {
+          value = picked;
+          paint(picked);
+          onPick(picked);
+        },
+      });
+    });
+    row.appendChild(summary);
+    row.appendChild(btn);
+    lab.appendChild(row);
+    parent.appendChild(lab);
+    return btn;
+  }
+
   function hint(parent, text) {
     const p = document.createElement('p');
     p.className = 'plan-hint';
@@ -120,5 +167,5 @@ NSBuilder.Fields = (function () {
     return null;
   }
 
-  return { text, number, color, select, bool, hint, normalizeHex };
+  return { text, number, color, select, bool, media, hint, normalizeHex };
 })();

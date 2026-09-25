@@ -28,9 +28,11 @@ return [
     'session' => [
         'name' => 'NSLOADSESSID',
         'lifetime' => 7200,
-        'secure' => true,
+        // auto = Secure cookie only when the request is HTTPS (works behind Cloudflare)
+        'secure' => 'auto',
         'httponly' => true,
         'samesite' => 'Lax',
+        'domain' => '', // leave blank; set only if you share cookies across subdomains
     ],
 
     'security' => [
@@ -55,6 +57,35 @@ return [
     // Hosted FiveM loadscreens (players load from this origin)
     'hosting' => [
         'load_base_url' => 'https://load.northstarscripts.us',
+    ],
+
+    // Paid plan selection — leave disabled until Stripe/PayPal is wired.
+    'billing' => [
+        'enabled' => false,
+        'selectable_plans' => ['free'],
+    ],
+
+    // Free hosted try-out stays live. Full source / self-host for companies is private
+    // (DM / email) — not a public Tebex software listing. Hosted Standard/Pro optional later.
+    'pricing' => [
+        'self_host' => [
+            'label' => 'Private quote',
+            'note' => 'Company self-host · DM or email',
+            'cta' => 'Interested and want to self-host for your own company? Send us a DM.',
+            'url' => 'https://northstarscripts.us/contact.html',
+        ],
+        'load' => [
+            'free' => ['label' => '$0', 'note' => 'Hosted try-out · fair limits'],
+            'standard' => ['label' => '$19/mo', 'note' => 'Optional hosted upgrade later'],
+            'pro' => ['label' => '$39/mo', 'note' => 'Optional hosted upgrade later'],
+        ],
+    ],
+
+    'adsense' => [
+        'enabled' => true,
+        'client' => 'ca-pub-2047679408348701',
+        // Optional display unit slot from AdSense → Ads → By ad unit (leave blank for Auto ads only)
+        'slot' => '',
     ],
 
     'entitlements' => [

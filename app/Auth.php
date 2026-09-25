@@ -25,14 +25,14 @@ final class Auth
             if (self::wantsJson()) {
                 Response::jsonError('Authentication required.', 401, 'auth');
             }
-            Response::redirect('/login.php');
+            Response::redirect('/login');
         }
     }
 
     public static function guestOnly(): void
     {
         if (self::check()) {
-            Response::redirect('/dashboard.php');
+            Response::redirect('/dashboard');
         }
     }
 
@@ -48,7 +48,7 @@ final class Auth
         if ($cacheId === $id && is_array($cache)) {
             return $cache;
         }
-        $stmt = Database::pdo()->prepare('SELECT id, email, username, status, editor_mode, created_at FROM users WHERE id = ? LIMIT 1');
+        $stmt = Database::pdo()->prepare('SELECT id, email, username, status, editor_mode, role, created_at FROM users WHERE id = ? LIMIT 1');
         $stmt->execute([$id]);
         $row = $stmt->fetch();
         $cache = $row ?: null;
@@ -84,6 +84,11 @@ final class Auth
         if (!in_array($plan, ['free', 'standard', 'pro'], true)) {
             throw new \InvalidArgumentException('Invalid plan.');
         }
+        // Until billing is enabled, force Free regardless of form POST.
+        $cfg = $GLOBALS['ns_config'] ?? [];
+        if (!Entitlement::isPlanSelectable($plan, is_array($cfg) ? $cfg : [])) {
+            $plan = 'free';
+        }
         if (!in_array($editorMode, ['simple', 'advanced'], true)) {
             throw new \InvalidArgumentException('Invalid editor mode.');
         }
@@ -102,7 +107,6 @@ final class Auth
             $ins->execute([$email, $username, $hash, $editorMode]);
             $userId = (int) $pdo->lastInsertId();
 
-            // Billing not wired yet — selected plan is granted for early access.
             $ent = $pdo->prepare(
                 'INSERT INTO entitlements (user_id, product_key, plan_key, source, meta_json)
                  VALUES (?, ?, ?, ?, ?)'
@@ -169,11 +173,20 @@ final class Auth
     {
         $sid = session_id();
         if ($sid) {
-            $stmt = Database::pdo()->prepare('UPDATE user_sessions SET revoked_at = NOW(3) WHERE session_id = ?');
-            $stmt->execute([$sid]);
+            try {
+                $stmt = Database::pdo()->prepare('UPDATE user_sessions SET revoked_at = NOW(3) WHERE session_id = ?');
+                $stmt->execute([$sid]);
+            } catch (\Throwable $e) {
+                // ignore DB errors on logout
+            }
         }
         Session::destroy();
-        session_start();
+        $config = $GLOBALS['ns_config'] ?? [];
+        if (is_array($config)) {
+            Session::start($config);
+        } elseif (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
         Security::ensureCsrfToken(true);
     }
 
@@ -217,7 +230,7 @@ final class Auth
         $stmt->execute([$email, $ipHash, $ok ? 1 : 0]);
     }
 
-    private static function wantsJson(): bool
+    public static function wantsJson(): bool
     {
         $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
         $uri = $_SERVER['REQUEST_URI'] ?? '';

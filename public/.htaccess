@@ -1,12 +1,54 @@
-# Apache: public front
-Options -Indexes
+# LiteSpeed / Apache — web root must be this public/ folder
+DirectoryIndex index.php index.html
+Options -Indexes +FollowSymLinks
+
+<IfModule mod_authz_core.c>
+  Require all granted
+</IfModule>
+
+# Never cache HTML that embeds CSRF tokens (Cloudflare often caches /login)
+# Keep ads.txt / robots.txt cacheable for Google crawlers.
+<IfModule mod_headers.c>
+  Header set Cache-Control "private, no-store, no-cache, must-revalidate" "expr=%{REQUEST_URI} !~ m#^/(ads\.txt|robots\.txt|sitemap\.xml)#i"
+  Header set Pragma "no-cache" "expr=%{REQUEST_URI} !~ m#^/(ads\.txt|robots\.txt|sitemap\.xml)#i"
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Hide .php in the browser (keep query string)
+  RewriteCond %{THE_REQUEST} \s/+(.+?)\.php[\s?] [NC]
+  RewriteRule ^ /%1 [R=301,L,NE,QSA]
+
   # Hosted FiveM loadscreen: /load?t=TOKEN
   RewriteRule ^load/?$ load.php [L,QSA]
+
+  # Pretty manage index + sitemap
+  RewriteRule ^manage/?$ manage/index.php [L,QSA]
+  RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+  # Extensionless → matching .php file (pages + /api/*)
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME}.php -f
+  RewriteRule ^(.*)$ $1.php [L,QSA]
+
+  # Directory index
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}/index.php -f
+  RewriteRule ^(.*)$ $1/index.php [L]
 
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^ index.php [L]
 </IfModule>
+
+# Block hidden / backup files
+<FilesMatch "(^\.|\.sql$|\.bak$|\.env$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>

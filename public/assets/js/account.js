@@ -12,7 +12,7 @@ window.NS = window.NS || {};
     const mode = e.target.editor_mode.value;
     if (status) status.textContent = 'Saving…';
     try {
-      await NS.api('/api/account/editor-mode.php', {
+      await NS.api('/api/account/editor-mode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
         body: JSON.stringify({ editor_mode: mode }),
@@ -29,11 +29,15 @@ window.NS = window.NS || {};
     btn.addEventListener('click', async () => {
       const plan = btn.dataset.plan;
       if (!plan) return;
+      if (plan !== 'free') {
+        NS.toast('Paid plans are not available yet — billing is not set up.', 'error');
+        return;
+      }
       btn.disabled = true;
       const label = btn.textContent;
       btn.textContent = 'Switching…';
       try {
-        const data = await NS.api('/api/account/plan.php', {
+        const data = await NS.api('/api/account/plan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
           body: JSON.stringify({ plan }),

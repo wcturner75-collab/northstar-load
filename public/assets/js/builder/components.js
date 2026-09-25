@@ -122,7 +122,7 @@ NSBuilder.renderComponentContent = function (comp, doc) {
       wrap.textContent = p.mediaId ? ('Media #' + p.mediaId) : (comp.type === 'logo' ? 'Logo' : 'Image');
       if (p.mediaId) {
         const img = document.createElement('img');
-        img.src = '/api/media/serve.php?id=' + encodeURIComponent(p.mediaId);
+        img.src = '/api/media/serve?id=' + encodeURIComponent(p.mediaId);
         img.alt = '';
         img.style.width = '100%';
         img.style.height = '100%';

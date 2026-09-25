@@ -12,5 +12,6 @@ $limits = \Northstar\Entitlement::limits($userId, 'load', $config);
 \Northstar\View::render('account', [
     'pageTitle' => 'Account',
     'limits' => $limits,
+    'config' => $config,
     'extraJs' => '/assets/js/account.js',
 ]);

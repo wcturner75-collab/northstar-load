@@ -6,7 +6,7 @@ document.querySelectorAll('[data-delete-build]').forEach((btn) => {
     fd.append('id', btn.dataset.deleteBuild);
     fd.append('_csrf', csrf);
     try {
-      const res = await fetch('/api/build/delete.php', {
+      const res = await fetch('/api/build/delete', {
         method: 'POST',
         headers: { 'X-CSRF-Token': csrf },
         body: fd,

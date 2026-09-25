@@ -21,7 +21,7 @@
       <article class="media-item" data-id="<?= (int) $m['id'] ?>">
         <div class="media-thumb kind-<?= \Northstar\Security::e($m['kind']) ?>">
           <?php if ($m['kind'] === 'image'): ?>
-            <img src="/api/media/serve.php?id=<?= (int) $m['id'] ?>" alt="">
+            <img src="/api/media/serve?id=<?= (int) $m['id'] ?>" alt="">
           <?php else: ?>
             <span><?= strtoupper(\Northstar\Security::e($m['kind'])) ?></span>
           <?php endif; ?>

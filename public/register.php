@@ -20,11 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = (string) ($_POST['email'] ?? '');
         $username = (string) ($_POST['username'] ?? '');
         $password = (string) ($_POST['password'] ?? '');
-        $plan = (string) ($_POST['plan'] ?? 'free');
+        // Billing off → Free only (ignore paid plan POSTs).
+        $plan = \Northstar\Entitlement::isPlanSelectable((string) ($_POST['plan'] ?? 'free'), $config)
+            ? (string) ($_POST['plan'] ?? 'free')
+            : 'free';
         $editorMode = (string) ($_POST['editor_mode'] ?? 'simple');
         try {
             \Northstar\Auth::register($email, $username, $password, $plan, $editorMode);
-            \Northstar\Response::redirect('/dashboard.php');
+            \Northstar\Response::redirect('/dashboard');
         } catch (\InvalidArgumentException $e) {
             $error = $e->getMessage();
         } catch (\Throwable $e) {
@@ -42,4 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     'username' => $username,
     'plan' => $plan,
     'editorMode' => $editorMode,
+    'billingEnabled' => \Northstar\Entitlement::billingEnabled($config),
+    'catalog' => \Northstar\Entitlement::catalog($config),
 ]);

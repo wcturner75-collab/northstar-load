@@ -177,18 +177,74 @@ final class Entitlement
         }
     }
 
+    /** @param array<string,mixed>|null $config */
+    public static function billingEnabled(?array $config = null): bool
+    {
+        $config = $config ?? ($GLOBALS['ns_config'] ?? []);
+        return !empty($config['billing']['enabled']);
+    }
+
+    /**
+     * Plans users may select (signup / account switch).
+     *
+     * @param array<string,mixed>|null $config
+     * @return list<string>
+     */
+    public static function selectablePlans(?array $config = null): array
+    {
+        $config = $config ?? ($GLOBALS['ns_config'] ?? []);
+        if (!self::billingEnabled($config)) {
+            return ['free'];
+        }
+        $allowed = $config['billing']['selectable_plans'] ?? ['free'];
+        if (!is_array($allowed) || $allowed === []) {
+            return ['free'];
+        }
+        $out = [];
+        foreach ($allowed as $plan) {
+            $plan = strtolower(trim((string) $plan));
+            if (in_array($plan, ['free', 'standard', 'pro'], true)) {
+                $out[] = $plan;
+            }
+        }
+        return $out !== [] ? array_values(array_unique($out)) : ['free'];
+    }
+
+    public static function isPlanSelectable(string $plan, ?array $config = null): bool
+    {
+        $plan = strtolower(trim($plan));
+        return in_array($plan, self::selectablePlans($config), true);
+    }
+
+    /** @param array<string,mixed>|null $config */
+    public static function assertPlanSelectable(string $plan, ?array $config = null): void
+    {
+        if (self::isPlanSelectable($plan, $config)) {
+            return;
+        }
+        throw new \InvalidArgumentException(
+            'Paid plans are not available yet. Billing is not set up — Free is the only plan you can select.'
+        );
+    }
+
     /**
      * Change (or create) the user's active plan for a product.
-     * Billing is not wired yet — this is an early-access plan switch.
      *
      * @param 'free'|'standard'|'pro' $plan
+     * @param array<string,mixed>|null $config
      */
-    public static function setPlan(int $userId, string $plan, string $productKey = 'load', string $source = 'account'): string
-    {
+    public static function setPlan(
+        int $userId,
+        string $plan,
+        string $productKey = 'load',
+        string $source = 'account',
+        ?array $config = null
+    ): string {
         $plan = strtolower(trim($plan));
         if (!in_array($plan, ['free', 'standard', 'pro'], true)) {
             throw new \InvalidArgumentException('Invalid plan.');
         }
+        self::assertPlanSelectable($plan, $config);
 
         $pdo = Database::pdo();
         $find = $pdo->prepare(
@@ -222,14 +278,23 @@ final class Entitlement
         return $plan;
     }
 
-    /** @return list<array{key:string,label:string,blurb:string,highlights:list<string>}> */
-    public static function catalog(): array
+    /**
+     * @param array<string,mixed>|null $config
+     * @return list<array{key:string,label:string,blurb:string,price:string,price_note:string,highlights:list<string>,selectable:bool}>
+     */
+    public static function catalog(?array $config = null): array
     {
-        return [
+        $pricing = is_array($config['pricing']['load'] ?? null)
+            ? $config['pricing']['load']
+            : (is_array(($GLOBALS['ns_config']['pricing']['load'] ?? null)) ? $GLOBALS['ns_config']['pricing']['load'] : []);
+
+        $cards = [
             [
                 'key' => 'free',
                 'label' => 'Free',
-                'blurb' => 'Ship a complete loading screen.',
+                'blurb' => 'Start building now. Limits keep hosted costs fair.',
+                'price' => (string) ($pricing['free']['label'] ?? '$0'),
+                'price_note' => (string) ($pricing['free']['note'] ?? 'Hosted try-out · fair limits'),
                 'highlights' => [
                     '5 projects · 60 media · 15 builds/day',
                     'YouTube + file music',
@@ -239,7 +304,9 @@ final class Entitlement
             [
                 'key' => 'standard',
                 'label' => 'Standard',
-                'blurb' => 'More room to grow.',
+                'blurb' => 'Optional hosted upgrade (later).',
+                'price' => (string) ($pricing['standard']['label'] ?? '$19/mo'),
+                'price_note' => (string) ($pricing['standard']['note'] ?? 'Optional hosted upgrade later'),
                 'highlights' => [
                     '25 projects · 250 media · 50 builds/day',
                     'Everything in Free',
@@ -249,7 +316,9 @@ final class Entitlement
             [
                 'key' => 'pro',
                 'label' => 'Pro',
-                'blurb' => 'Studio capacity.',
+                'blurb' => 'Optional hosted upgrade (later).',
+                'price' => (string) ($pricing['pro']['label'] ?? '$39/mo'),
+                'price_note' => (string) ($pricing['pro']['note'] ?? 'Optional hosted upgrade later'),
                 'highlights' => [
                     '200 projects · 2000 media · 200 builds/day',
                     'Everything in Standard',
@@ -257,5 +326,10 @@ final class Entitlement
                 ],
             ],
         ];
+        foreach ($cards as &$card) {
+            $card['selectable'] = self::isPlanSelectable($card['key'], $config);
+        }
+        unset($card);
+        return $cards;
     }
 }
