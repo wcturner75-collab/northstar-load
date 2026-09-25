@@ -28,9 +28,11 @@ return [
     'session' => [
         'name' => 'NSLOADSESSID',
         'lifetime' => 7200,
-        'secure' => true,
+        // auto = Secure cookie only when the request is HTTPS (works behind Cloudflare)
+        'secure' => 'auto',
         'httponly' => true,
         'samesite' => 'Lax',
+        'domain' => '', // leave blank; set only if you share cookies across subdomains
     ],
 
     'security' => [

@@ -6,6 +6,12 @@ Options -Indexes +FollowSymLinks
   Require all granted
 </IfModule>
 
+# Never cache HTML that embeds CSRF tokens (Cloudflare often caches /login)
+<IfModule mod_headers.c>
+  Header set Cache-Control "private, no-store, no-cache, must-revalidate"
+  Header set Pragma "no-cache"
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 

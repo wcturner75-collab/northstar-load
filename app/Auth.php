@@ -173,11 +173,20 @@ final class Auth
     {
         $sid = session_id();
         if ($sid) {
-            $stmt = Database::pdo()->prepare('UPDATE user_sessions SET revoked_at = NOW(3) WHERE session_id = ?');
-            $stmt->execute([$sid]);
+            try {
+                $stmt = Database::pdo()->prepare('UPDATE user_sessions SET revoked_at = NOW(3) WHERE session_id = ?');
+                $stmt->execute([$sid]);
+            } catch (\Throwable $e) {
+                // ignore DB errors on logout
+            }
         }
         Session::destroy();
-        session_start();
+        $config = $GLOBALS['ns_config'] ?? [];
+        if (is_array($config)) {
+            Session::start($config);
+        } elseif (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
         Security::ensureCsrfToken(true);
     }
 

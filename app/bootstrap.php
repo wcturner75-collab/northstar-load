@@ -26,9 +26,17 @@ $config['paths'] = [
     'builds' => NORTHSTAR_ROOT . '/storage/builds',
     'build_temp' => NORTHSTAR_ROOT . '/storage/build-temp',
     'logs' => NORTHSTAR_ROOT . '/storage/logs',
+    'sessions' => NORTHSTAR_ROOT . '/storage/sessions',
     'templates' => NORTHSTAR_ROOT . '/templates',
     'fivem_template' => NORTHSTAR_ROOT . '/templates/fivem-loadscreen',
 ];
+
+foreach (['uploads', 'builds', 'build_temp', 'logs', 'sessions'] as $dirKey) {
+    $dir = $config['paths'][$dirKey];
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
+    }
+}
 
 date_default_timezone_set($config['app']['timezone'] ?? 'UTC');
 
