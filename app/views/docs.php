@@ -63,13 +63,4 @@
     <h2>Loading progress</h2>
     <p>The runtime listens for FiveM <code>loadProgress</code>, <code>onLogLine</code>, and related message events. Percentages appear only when the game provides a real fraction. Otherwise an indeterminate status animation is shown.</p>
   </article>
-
-  <article class="doc-block">
-    <h2>Security notes</h2>
-    <ul>
-      <li>Downloads require login and a random build token.</li>
-      <li>Uploads validate extension, MIME, and file signatures.</li>
-      <li>Never expose <code>storage/</code>, <code>config/</code>, or <code>app/</code> as the web root — only <code>public/</code>.</li>
-    </ul>
-  </article>
 </section>
