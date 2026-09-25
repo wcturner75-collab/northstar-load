@@ -65,6 +65,13 @@ return [
         'selectable_plans' => ['free'],
     ],
 
+    'adsense' => [
+        'enabled' => true,
+        'client' => 'ca-pub-2047679408348701',
+        // Optional display unit slot from AdSense → Ads → By ad unit (leave blank for Auto ads only)
+        'slot' => '',
+    ],
+
     'entitlements' => [
         // Philosophy: Free can ship a complete loading screen.
         // Paid plans add capacity + convenience, not a paywall on basics.

@@ -30,8 +30,18 @@ final class Security
         }
 
         header('X-Frame-Options: SAMEORIGIN');
-        // unsafe-inline kept as fallback; primary page logic lives in /assets/js/*.js
-        header("Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'self'");
+        // AdSense + fonts; unsafe-inline kept as fallback for page boot straps
+        header(
+            "Content-Security-Policy: default-src 'self'; "
+            . "img-src 'self' data: blob: https:; "
+            . "media-src 'self' blob:; "
+            . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            . "font-src 'self' https://fonts.gstatic.com data:; "
+            . "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagservices.com https://www.google.com https://partner.googleadservices.com https://tpc.googlesyndication.com; "
+            . "connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com https://tpc.googlesyndication.com; "
+            . "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com https://www.youtube.com https://www.youtube-nocookie.com; "
+            . "frame-ancestors 'self'"
+        );
     }
 
     public static function ensureCsrfToken(bool $force = false): string
