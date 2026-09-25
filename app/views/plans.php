@@ -2,7 +2,11 @@
   <header class="page-head">
     <div>
       <h1>Plans</h1>
-      <p class="muted">Change your Northstar Load plan anytime. Billing isn’t connected yet — switches apply immediately for early access.</p>
+      <?php if (empty($billingEnabled)): ?>
+        <p class="muted">Billing is not connected yet. Free is the only plan you can use right now — paid tiers are listed for what’s coming.</p>
+      <?php else: ?>
+        <p class="muted">Change your Northstar Load plan anytime.</p>
+      <?php endif; ?>
     </div>
   </header>
 
@@ -12,11 +16,12 @@
     <?php foreach ($catalog as $card):
       $key = $card['key'];
       $isCurrent = ($currentPlan ?? 'free') === $key;
+      $selectable = !empty($card['selectable']);
     ?>
-      <article class="choice-card plan-pick <?= $isCurrent ? 'is-current' : '' ?>" data-plan="<?= \Northstar\Security::e($key) ?>">
+      <article class="choice-card plan-pick <?= $isCurrent ? 'is-current' : '' ?> <?= !$selectable ? 'is-locked' : '' ?>" data-plan="<?= \Northstar\Security::e($key) ?>">
         <span class="choice-body">
           <strong><?= \Northstar\Security::e($card['label']) ?></strong>
-          <em><?= \Northstar\Security::e($card['blurb']) ?></em>
+          <em><?= $selectable ? \Northstar\Security::e($card['blurb']) : 'Coming soon — billing not set up' ?></em>
           <ul class="plan-highlights">
             <?php foreach ($card['highlights'] as $h): ?>
               <li><?= \Northstar\Security::e($h) ?></li>
@@ -24,10 +29,12 @@
           </ul>
           <?php if ($isCurrent): ?>
             <button type="button" class="btn btn-ghost" disabled>Current plan</button>
-          <?php else: ?>
+          <?php elseif ($selectable): ?>
             <button type="button" class="btn btn-primary btn-choose-plan" data-plan="<?= \Northstar\Security::e($key) ?>">
               Switch to <?= \Northstar\Security::e($card['label']) ?>
             </button>
+          <?php else: ?>
+            <button type="button" class="btn btn-ghost" disabled>Unavailable</button>
           <?php endif; ?>
         </span>
       </article>

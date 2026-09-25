@@ -1,12 +1,13 @@
 <section class="auth-section shell register-wide">
   <div class="auth-panel auth-panel-wide">
     <h1>Create account</h1>
-    <p class="muted">Free can ship a full loading screen. Paid plans add capacity and polish — not a paywall on the basics.</p>
+    <p class="muted">Free includes a complete loading-screen builder. Paid plans will open when billing is ready.</p>
     <?php if (!empty($error)): ?>
       <div class="alert alert-error"><?= \Northstar\Security::e($error) ?></div>
     <?php endif; ?>
     <form method="post" action="/register" class="stack-form" id="register-form">
       <input type="hidden" name="_csrf" value="<?= \Northstar\Security::e($csrf) ?>">
+      <input type="hidden" name="plan" value="free">
 
       <div class="form-grid-2">
         <label>Email
@@ -44,33 +45,30 @@
       </fieldset>
 
       <fieldset class="choice-set">
-        <legend>Choose a plan</legend>
-        <p class="choice-lead">Billing isn’t connected yet — your selection is applied for early access. Start on Free if you’re unsure.</p>
+        <legend>Plan</legend>
+        <p class="choice-lead">Billing is not set up yet — new accounts start on Free.</p>
         <div class="choice-cards plan-cards">
-          <label class="choice-card recommended">
-            <input type="radio" name="plan" value="free" <?= ($plan ?? 'free') === 'free' ? 'checked' : '' ?>>
-            <span class="choice-body">
-              <strong>Free</strong>
-              <em>Recommended to start</em>
-              <small>Complete loadscreen: branding, YouTube or file music, slideshow, staff, announcements, generate ZIP.</small>
-            </span>
-          </label>
-          <label class="choice-card">
-            <input type="radio" name="plan" value="standard" <?= ($plan ?? '') === 'standard' ? 'checked' : '' ?>>
-            <span class="choice-body">
-              <strong>Standard</strong>
-              <em>More room to grow</em>
-              <small>Higher project/media/build limits + Ken Burns motion.</small>
-            </span>
-          </label>
-          <label class="choice-card">
-            <input type="radio" name="plan" value="pro" <?= ($plan ?? '') === 'pro' ? 'checked' : '' ?>>
-            <span class="choice-body">
-              <strong>Pro</strong>
-              <em>Studio capacity</em>
-              <small>Video backgrounds, highest limits, everything unlocked.</small>
-            </span>
-          </label>
+          <?php foreach (($catalog ?? \Northstar\Entitlement::catalog()) as $card):
+            $key = $card['key'];
+            $selectable = !empty($card['selectable']);
+            $isFree = $key === 'free';
+          ?>
+            <label class="choice-card <?= $isFree ? 'recommended' : '' ?> <?= !$selectable ? 'is-locked' : '' ?>">
+              <input type="radio"
+                     name="plan_ui"
+                     value="<?= \Northstar\Security::e($key) ?>"
+                     <?= $isFree ? 'checked' : '' ?>
+                     <?= $selectable ? '' : 'disabled' ?>
+                     <?= $selectable ? '' : 'tabindex="-1"' ?>>
+              <span class="choice-body">
+                <strong><?= \Northstar\Security::e($card['label']) ?></strong>
+                <em><?= $selectable ? \Northstar\Security::e($card['blurb']) : 'Coming soon' ?></em>
+                <small><?= $selectable
+                  ? 'Complete loadscreen: branding, YouTube or file music, slideshow, staff, announcements, generate ZIP.'
+                  : 'Unavailable until billing is connected.' ?></small>
+              </span>
+            </label>
+          <?php endforeach; ?>
         </div>
       </fieldset>
 

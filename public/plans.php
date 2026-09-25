@@ -12,7 +12,8 @@ $limits = \Northstar\Entitlement::limits($userId, 'load', $config);
 \Northstar\View::render('plans', [
     'pageTitle' => 'Plans',
     'limits' => $limits,
-    'catalog' => \Northstar\Entitlement::catalog(),
+    'catalog' => \Northstar\Entitlement::catalog($config),
     'currentPlan' => $limits['plan'] ?? 'free',
+    'billingEnabled' => \Northstar\Entitlement::billingEnabled($config),
     'extraJs' => '/assets/js/account.js',
 ]);

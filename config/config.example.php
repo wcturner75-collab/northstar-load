@@ -57,6 +57,12 @@ return [
         'load_base_url' => 'https://load.northstarscripts.us',
     ],
 
+    // Paid plan selection — leave disabled until Stripe/PayPal is wired.
+    'billing' => [
+        'enabled' => false,
+        'selectable_plans' => ['free'],
+    ],
+
     'entitlements' => [
         // Philosophy: Free can ship a complete loading screen.
         // Paid plans add capacity + convenience, not a paywall on basics.

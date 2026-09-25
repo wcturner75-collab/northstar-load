@@ -16,7 +16,7 @@ if (!is_array($data)) {
 $plan = (string) ($data['plan'] ?? '');
 
 try {
-    $newPlan = \Northstar\Entitlement::setPlan($userId, $plan, 'load', 'account');
+    $newPlan = \Northstar\Entitlement::setPlan($userId, $plan, 'load', 'account', $config);
     $limits = \Northstar\Entitlement::limits($userId, 'load', $config);
     \Northstar\Response::jsonOk([
         'plan' => $newPlan,

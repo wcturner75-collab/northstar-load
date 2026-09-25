@@ -84,6 +84,11 @@ final class Auth
         if (!in_array($plan, ['free', 'standard', 'pro'], true)) {
             throw new \InvalidArgumentException('Invalid plan.');
         }
+        // Until billing is enabled, force Free regardless of form POST.
+        $cfg = $GLOBALS['ns_config'] ?? [];
+        if (!Entitlement::isPlanSelectable($plan, is_array($cfg) ? $cfg : [])) {
+            $plan = 'free';
+        }
         if (!in_array($editorMode, ['simple', 'advanced'], true)) {
             throw new \InvalidArgumentException('Invalid editor mode.');
         }
@@ -102,7 +107,6 @@ final class Auth
             $ins->execute([$email, $username, $hash, $editorMode]);
             $userId = (int) $pdo->lastInsertId();
 
-            // Billing not wired yet — selected plan is granted for early access.
             $ent = $pdo->prepare(
                 'INSERT INTO entitlements (user_id, product_key, plan_key, source, meta_json)
                  VALUES (?, ?, ?, ?, ?)'

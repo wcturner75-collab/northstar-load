@@ -29,6 +29,10 @@ window.NS = window.NS || {};
     btn.addEventListener('click', async () => {
       const plan = btn.dataset.plan;
       if (!plan) return;
+      if (plan !== 'free') {
+        NS.toast('Paid plans are not available yet — billing is not set up.', 'error');
+        return;
+      }
       btn.disabled = true;
       const label = btn.textContent;
       btn.textContent = 'Switching…';

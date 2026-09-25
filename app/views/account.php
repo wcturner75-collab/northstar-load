@@ -35,25 +35,32 @@
         <dt>Components / project</dt><dd><?= (int) ($limits['max_components'] ?? 0) ?></dd>
         <dt>Builds / day</dt><dd><?= (int) ($limits['max_builds_per_day'] ?? 0) ?></dd>
       </dl>
-      <p style="margin-top:1rem"><a class="btn btn-primary" href="/plans">Change plan</a></p>
+      <p style="margin-top:1rem"><a class="btn btn-ghost" href="/plans">View plans</a></p>
     </div>
   </div>
 
   <section class="plan-matrix" id="change-plan">
-    <h2>Change plan</h2>
-    <p class="muted">Pick a plan below — applies immediately (billing not connected yet).</p>
+    <h2>Plans</h2>
+    <?php
+    $catalog = \Northstar\Entitlement::catalog($config ?? null);
+    $currentPlan = $limits['plan'] ?? 'free';
+    $billingOn = \Northstar\Entitlement::billingEnabled($config ?? null);
+    ?>
+    <?php if (!$billingOn): ?>
+      <p class="muted">Billing is not set up yet — Free is the only selectable plan. Standard and Pro are shown for what’s coming later.</p>
+    <?php else: ?>
+      <p class="muted">Pick a plan below.</p>
+    <?php endif; ?>
     <div class="choice-cards plan-cards plan-switcher">
-      <?php
-      $catalog = \Northstar\Entitlement::catalog();
-      $currentPlan = $limits['plan'] ?? 'free';
-      foreach ($catalog as $card):
+      <?php foreach ($catalog as $card):
         $key = $card['key'];
         $isCurrent = $currentPlan === $key;
+        $selectable = !empty($card['selectable']);
       ?>
-        <article class="choice-card plan-pick <?= $isCurrent ? 'is-current' : '' ?>" data-plan="<?= \Northstar\Security::e($key) ?>">
+        <article class="choice-card plan-pick <?= $isCurrent ? 'is-current' : '' ?> <?= !$selectable ? 'is-locked' : '' ?>" data-plan="<?= \Northstar\Security::e($key) ?>">
           <span class="choice-body">
             <strong><?= \Northstar\Security::e($card['label']) ?></strong>
-            <em><?= \Northstar\Security::e($card['blurb']) ?></em>
+            <em><?= $selectable ? \Northstar\Security::e($card['blurb']) : 'Coming soon — billing not set up' ?></em>
             <ul class="plan-highlights">
               <?php foreach ($card['highlights'] as $h): ?>
                 <li><?= \Northstar\Security::e($h) ?></li>
@@ -61,10 +68,12 @@
             </ul>
             <?php if ($isCurrent): ?>
               <button type="button" class="btn btn-ghost" disabled>Current plan</button>
-            <?php else: ?>
+            <?php elseif ($selectable): ?>
               <button type="button" class="btn btn-primary btn-choose-plan" data-plan="<?= \Northstar\Security::e($key) ?>">
                 Switch to <?= \Northstar\Security::e($card['label']) ?>
               </button>
+            <?php else: ?>
+              <button type="button" class="btn btn-ghost" disabled>Unavailable</button>
             <?php endif; ?>
           </span>
         </article>
@@ -138,6 +147,6 @@
         </tr>
       </tbody>
     </table>
-    <p class="muted">Stripe/PayPal can replace early-access plan grants later.</p>
+    <p class="muted">Paid plans will unlock when billing is connected. For now everyone uses Free.</p>
   </section>
 </section>
