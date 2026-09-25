@@ -1,9 +1,14 @@
 # Northstar Scripts — Discord / forum advert (copy-paste)
 
+Replace `PASTE_YOUR_INVITE` with your real invite before posting.
+Also set it in `assets/site-config.js` for the website buttons.
+
 ```
 # Northstar Scripts
 
 Looking for high-quality FiveM scripts and professional loading screens for your server? Northstar Scripts has you covered.
+
+We just started — and we’re looking for members who want to help grow the studio.
 
 We specialize in tools that help your community stand out, including:
 
@@ -12,16 +17,23 @@ We specialize in tools that help your community stand out, including:
 ➭ Hosted publish links (thin ZIP, live updates)
 ➭ YouTube or file music on your loadscreen
 ➭ Simple guided mode + advanced canvas editor
-➭ Free plan to start building
+
+## We’re recruiting
+
+➭ Staff — moderation, support, community ops
+➭ Creators — scripts, UI, content, and ideas
+➭ Testers — break builds early and shape releases
+➭ Members — hang out, share feedback, grow with us
 
 ## Why Choose Us?
 
+✔️ Fresh studio with room to shape the roadmap
 ✔️ High-quality, practical work for real servers
 ✔️ Clear setup — no hand-edited HTML for Load
-✔️ Built for FiveM roleplay communities
 ✔️ Affordable store pricing + free Load tier
-✔️ Fast path from browse → buy → install / publish
+✔️ Built for FiveM roleplay communities
 
+Discord: https://discord.gg/PASTE_YOUR_INVITE
 Scripts store: https://northstar-scripts.tebex.store/
 Northstar Load: https://load.northstarscripts.us/
 Website: https://northstarscripts.us/
@@ -30,10 +42,11 @@ Website: https://northstarscripts.us/
 Short version:
 
 ```
-Northstar Scripts — FiveM scripts + loading screens
+Northstar Scripts — just launched. FiveM scripts + loading screens.
 
-➭ Scripts store: https://northstar-scripts.tebex.store/
-➭ Northstar Load (visual builder): https://load.northstarscripts.us/
+Looking for staff, creators, testers, and members to help us grow.
 
-Quality packages, operator-friendly tools, free Load plan to start.
+➭ Discord: https://discord.gg/PASTE_YOUR_INVITE
+➭ Store: https://northstar-scripts.tebex.store/
+➭ Load: https://load.northstarscripts.us/
 ```
