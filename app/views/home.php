@@ -1,5 +1,11 @@
 <section class="hero">
-  <div class="hero-media" role="img" aria-label="Northstar Load atmosphere"></div>
+  <div class="hero-media" aria-hidden="true">
+    <div class="hero-sky"></div>
+    <div class="hero-aurora"></div>
+    <div class="hero-star"></div>
+    <div class="hero-ridges"></div>
+    <div class="hero-grid"></div>
+  </div>
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="shell hero-frame">
     <p class="hero-kicker">FiveM loading screens</p>
@@ -19,13 +25,13 @@
   <div class="shell">
     <header class="band-head">
       <h2>Ship in four moves</h2>
-      <p>Canvas to <code>ensure</code> — one tested runtime under your publish link.</p>
+      <p>From the editor to your server — one publish link, one thin resource.</p>
     </header>
     <ol class="process-rail">
       <li><span>01</span><strong>Create</strong><em>Project + layout theme</em></li>
       <li><span>02</span><strong>Design</strong><em>Brand, music, rules</em></li>
-      <li><span>03</span><strong>Generate</strong><em>Thin hosted ZIP</em></li>
-      <li><span>04</span><strong>Ensure</strong><em>Drop into resources/</em></li>
+      <li><span>03</span><strong>Generate</strong><em>Hosted resource ZIP</em></li>
+      <li><span>04</span><strong>Install</strong><em>Add to your server</em></li>
     </ol>
   </div>
 </section>
