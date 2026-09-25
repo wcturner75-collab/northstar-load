@@ -162,6 +162,41 @@ a:hover { color: #7dd3fc; }
 .product p { color: var(--muted); margin: 0 0 0.85rem; }
 .text-link { font-weight: 600; }
 
+.offer-list,
+.why-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.65rem;
+}
+.offer-list li,
+.why-list li {
+  position: relative;
+  padding: 0.75rem 0.9rem 0.75rem 2.4rem;
+  border: 1px solid var(--line);
+  background: rgba(8, 18, 30, 0.75);
+  color: var(--muted);
+}
+.offer-list li::before {
+  content: "➭";
+  position: absolute;
+  left: 0.85rem;
+  top: 0.75rem;
+  color: var(--accent);
+}
+.why-list li::before {
+  content: "✔";
+  position: absolute;
+  left: 0.85rem;
+  top: 0.75rem;
+  color: var(--accent);
+}
+.advert-hero {
+  min-height: 70vh;
+  padding-top: 7rem;
+}
+
 .ad-rail {
   padding: 1.25rem 0 0.5rem;
   text-align: center;
