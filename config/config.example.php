@@ -65,13 +65,14 @@ return [
         'selectable_plans' => ['free'],
     ],
 
-    // Free hosted try-out stays live. The Tebex source license is intentionally expensive
-    // (serious buyers / fewer casual redistributions). Hosted Standard/Pro optional later.
+    // Free hosted try-out stays live. Full source / self-host for companies is private
+    // (DM / email) — not a public Tebex software listing. Hosted Standard/Pro optional later.
     'pricing' => [
-        'tebex_oss' => [
-            'label' => '$399',
-            'note' => 'Planned one-time Tebex · full source license',
-            'url' => 'https://northstar-scripts.tebex.store/',
+        'self_host' => [
+            'label' => 'Private quote',
+            'note' => 'Company self-host · send us a DM',
+            'cta' => 'Interested and want to self-host for your own company? Send us a DM.',
+            'url' => 'https://northstarscripts.us/contact.html',
         ],
         'load' => [
             'free' => ['label' => '$0', 'note' => 'Hosted try-out · fair limits'],

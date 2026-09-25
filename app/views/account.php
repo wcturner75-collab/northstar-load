@@ -47,7 +47,7 @@
     $billingOn = \Northstar\Entitlement::billingEnabled($config ?? null);
     ?>
     <?php if (!$billingOn): ?>
-      <p class="muted">Try Load free on our host. The premium path is a <strong>one-time Tebex source license</strong> (planned ~$399) — full project source for serious teams that will self-host. Optional hosted Standard/Pro may come later.</p>
+      <p class="muted">Try Load free on our host. Want to self-host for your own company? Send us a DM on Discord for a premium private source license. Optional hosted Standard/Pro may come later.</p>
     <?php else: ?>
       <p class="muted">Pick a hosted plan below.</p>
     <?php endif; ?>

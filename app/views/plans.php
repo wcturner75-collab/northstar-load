@@ -3,9 +3,9 @@
     <div>
       <h1>Plans</h1>
         <?php if (empty($billingEnabled)): ?>
-        <p class="muted">Try Load hosted for free. The expensive product path is a <strong>one-time Tebex source license</strong> (planned ~$399) — full project source for serious operators. Optional hosted Standard/Pro may come later.</p>
+        <p class="muted">Try Load hosted for free. Want the full project to self-host for your own company? That’s a premium private license — send us a DM via the studio site / Discord. Optional hosted Standard/Pro may come later.</p>
       <?php else: ?>
-        <p class="muted">Hosted cloud plans. For the full source license, see the Tebex store.</p>
+        <p class="muted">Hosted cloud plans. Company self-host licenses are handled privately (DM / email).</p>
       <?php endif; ?>
     </div>
   </header>
