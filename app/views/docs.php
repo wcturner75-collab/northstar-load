@@ -30,23 +30,23 @@
 
   <article class="doc-block">
     <h2>Plans &amp; pricing</h2>
-    <p><strong>Free ($0)</strong> ships a complete loading screen. <strong>Standard ($19/mo planned)</strong> and <strong>Pro ($39/mo planned)</strong> fund hosted media + bandwidth and add capacity (Ken Burns, video backgrounds, higher limits). Billing is not live yet — everyone is on Free for now.</p>
-    <p>We’re considering open-sourcing the builder. Self-host could stay free; our cloud hosted loadscreen service would remain a paid product because storage and delivery cost money.</p>
+    <p><strong>Free hosted ($0)</strong> lets you try the builder with fair limits. The expensive product we’re planning is a <strong>one-time Tebex open-source package (~$149)</strong> — full source so your team can self-host and own the stack. Optional hosted Standard/Pro upgrades may come later for people who want us to run the cloud.</p>
   </article>
 
   <article class="doc-block">
     <h2>Music</h2>
-    <p>Upload MP3/OGG in <strong>Media</strong>, or (Standard/Pro) paste a YouTube link. YouTube audio plays through a <em>hidden</em> embed in the loading screen — no visible player chrome.</p>
+    <p>Upload MP3/OGG in <strong>Media</strong>, or paste a YouTube link when your plan allows. YouTube audio plays through a <em>hidden</em> embed in the loading screen — no visible player chrome.</p>
   </article>
 
   <article class="doc-block">
-    <h2>Plan limits</h2>
+    <h2>Plan limits (hosted)</h2>
     <ul>
       <li><strong>Free</strong> — core editor, YouTube + file music, slideshow, staff, announcements, limited components.</li>
-      <li><strong>Standard · $19/mo</strong> — higher limits + Ken Burns.</li>
-      <li><strong>Pro · $39/mo</strong> — video backgrounds, highest limits.</li>
+      <li><strong>Standard · $19/mo</strong> (optional later) — higher limits + Ken Burns.</li>
+      <li><strong>Pro · $39/mo</strong> (optional later) — video backgrounds, highest limits.</li>
+      <li><strong>Tebex open-source · ~$149 one-time</strong> (planned) — full source package on the scripts store.</li>
     </ul>
-    <p>Limits are enforced on save and generate, not only in the UI.</p>
+    <p>Hosted limits are enforced on save and generate, not only in the UI.</p>
   </article>
 
   <article class="doc-block">

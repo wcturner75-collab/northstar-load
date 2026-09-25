@@ -2,10 +2,10 @@
   <header class="page-head">
     <div>
       <h1>Plans</h1>
-      <?php if (empty($billingEnabled)): ?>
-        <p class="muted">Free is live now. Paid hosted tiers are priced for real media + bandwidth cost — billing unlocks later. If Load goes open source, self-host stays free; cloud hosting stays premium.</p>
+        <?php if (empty($billingEnabled)): ?>
+        <p class="muted">Try Load hosted for free. The expensive product path is a <strong>one-time Tebex open-source package</strong> (planned) — full source for teams that want to own and self-host it. Optional hosted Standard/Pro may come later.</p>
       <?php else: ?>
-        <p class="muted">Hosted Northstar Load plans. Self-host / open-source builds don’t include our cloud media delivery.</p>
+        <p class="muted">Hosted cloud plans. For the full open-source package, see the Tebex store.</p>
       <?php endif; ?>
     </div>
   </header>

@@ -65,13 +65,18 @@ return [
         'selectable_plans' => ['free'],
     ],
 
-    // Display prices for hosted Load (billing still off). Hosted media/bandwidth is costly —
-    // if the builder goes open source, self-host can be free while cloud stays premium.
+    // Free hosted try-out stays live. Premium Tebex open-source package is the expensive
+    // one-time product. Hosted Standard/Pro remain optional cloud upgrades later.
     'pricing' => [
+        'tebex_oss' => [
+            'label' => '$149',
+            'note' => 'Planned one-time on Tebex · full open-source package',
+            'url' => 'https://northstar-scripts.tebex.store/',
+        ],
         'load' => [
-            'free' => ['label' => '$0', 'note' => 'Forever · community tier'],
-            'standard' => ['label' => '$19/mo', 'note' => 'Planned · hosted media & builds'],
-            'pro' => ['label' => '$39/mo', 'note' => 'Planned · studio capacity + video BG'],
+            'free' => ['label' => '$0', 'note' => 'Hosted try-out · fair limits'],
+            'standard' => ['label' => '$19/mo', 'note' => 'Optional hosted upgrade later'],
+            'pro' => ['label' => '$39/mo', 'note' => 'Optional hosted upgrade later'],
         ],
     ],
 

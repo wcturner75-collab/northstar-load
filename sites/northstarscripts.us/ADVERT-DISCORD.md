@@ -25,20 +25,20 @@ We specialize in tools that help your community stand out, including:
 ➭ Testers — break builds early and shape releases
 ➭ Members — hang out, share feedback, grow with us
 
-## Northstar Load pricing
+## Northstar Load — Tebex open source
 
-We’re considering open-sourcing the builder. Self-host could stay free — hosted cloud stays premium because media + bandwidth cost money.
+Try the hosted builder free. We’re planning to sell Load as an open-source package on Tebex — priced expensive on purpose, because you get the full source to own and self-host.
 
-➭ Free · $0 — live now (fair limits)
-➭ Standard · $19/mo — planned hosted headroom
-➭ Pro · $39/mo — planned studio capacity + video BG
+➭ Hosted Free · $0 — try it live now
+➭ Tebex open source · ~$149 one-time — planned full source package
+➭ Optional hosted Standard/Pro later if you want us to run the cloud
 
 ## Why Choose Us?
 
 ✔️ Fresh studio with room to shape the roadmap
 ✔️ High-quality, practical work for real servers
 ✔️ Clear setup — no hand-edited HTML for Load
-✔️ Honest hosted pricing (not a race to $0 cloud)
+✔️ Premium source package (not a cheap dump)
 ✔️ Built for FiveM roleplay communities
 
 Discord: https://discord.gg/PASTE_YOUR_INVITE
@@ -54,10 +54,10 @@ Northstar Scripts — just launched. FiveM scripts + loading screens.
 
 Looking for staff, creators, testers, and members to help us grow.
 
-Load pricing (hosted is costly — OSS self-host may come later):
-➭ Free $0 · Standard $19/mo · Pro $39/mo (paid tiers planned)
+Northstar Load:
+➭ Free hosted try-out: https://load.northstarscripts.us/
+➭ Planned Tebex open-source package (~$149 one-time) — full source, priced high on purpose
 
 ➭ Discord: https://discord.gg/PASTE_YOUR_INVITE
 ➭ Store: https://northstar-scripts.tebex.store/
-➭ Load: https://load.northstarscripts.us/
 ```

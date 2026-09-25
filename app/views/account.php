@@ -47,7 +47,7 @@
     $billingOn = \Northstar\Entitlement::billingEnabled($config ?? null);
     ?>
     <?php if (!$billingOn): ?>
-      <p class="muted">Free is live. Hosted Standard/Pro show planned premium prices — cloud media and bandwidth are costly. If we open-source the builder, self-host can stay free while hosted cloud stays paid.</p>
+      <p class="muted">Try Load free on our host. The premium path is a <strong>one-time Tebex open-source package</strong> (planned ~$149) — full source, yours to self-host. Optional hosted Standard/Pro may come later.</p>
     <?php else: ?>
       <p class="muted">Pick a hosted plan below.</p>
     <?php endif; ?>
@@ -153,6 +153,6 @@
         </tr>
       </tbody>
     </table>
-    <p class="muted">Paid hosted plans unlock when billing is connected. Free stays available; open-source self-host is on the roadmap for later.</p>
+    <p class="muted">Free hosted try-out is live. Premium open-source package will list on <a href="https://northstar-scripts.tebex.store/" target="_blank" rel="noopener">Tebex</a> when ready.</p>
   </section>
 </section>
