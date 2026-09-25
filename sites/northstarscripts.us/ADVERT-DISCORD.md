@@ -30,7 +30,7 @@ We specialize in tools that help your community stand out, including:
 Try the hosted builder free. We’re planning to sell Load as an open-source package on Tebex — priced expensive on purpose, because you get the full source to own and self-host.
 
 ➭ Hosted Free · $0 — try it live now
-➭ Tebex open source · ~$149 one-time — planned full source package
+➭ Tebex open source · ~$399 one-time — planned full source package
 ➭ Optional hosted Standard/Pro later if you want us to run the cloud
 
 ## Why Choose Us?
@@ -56,7 +56,7 @@ Looking for staff, creators, testers, and members to help us grow.
 
 Northstar Load:
 ➭ Free hosted try-out: https://load.northstarscripts.us/
-➭ Planned Tebex open-source package (~$149 one-time) — full source, priced high on purpose
+➭ Planned Tebex open-source package (~$399 one-time) — full source, priced high on purpose
 
 ➭ Discord: https://discord.gg/PASTE_YOUR_INVITE
 ➭ Store: https://northstar-scripts.tebex.store/

@@ -47,7 +47,7 @@
     $billingOn = \Northstar\Entitlement::billingEnabled($config ?? null);
     ?>
     <?php if (!$billingOn): ?>
-      <p class="muted">Try Load free on our host. The premium path is a <strong>one-time Tebex open-source package</strong> (planned ~$149) — full source, yours to self-host. Optional hosted Standard/Pro may come later.</p>
+      <p class="muted">Try Load free on our host. The premium path is a <strong>one-time Tebex open-source package</strong> (planned ~$399) — full source, yours to self-host. Optional hosted Standard/Pro may come later.</p>
     <?php else: ?>
       <p class="muted">Pick a hosted plan below.</p>
     <?php endif; ?>

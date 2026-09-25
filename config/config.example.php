@@ -65,12 +65,12 @@ return [
         'selectable_plans' => ['free'],
     ],
 
-    // Free hosted try-out stays live. Premium Tebex open-source package is the expensive
-    // one-time product. Hosted Standard/Pro remain optional cloud upgrades later.
+    // Free hosted try-out stays live. The Tebex source license is intentionally expensive
+    // (serious buyers / fewer casual redistributions). Hosted Standard/Pro optional later.
     'pricing' => [
         'tebex_oss' => [
-            'label' => '$149',
-            'note' => 'Planned one-time on Tebex · full open-source package',
+            'label' => '$399',
+            'note' => 'Planned one-time Tebex · full source license',
             'url' => 'https://northstar-scripts.tebex.store/',
         ],
         'load' => [
