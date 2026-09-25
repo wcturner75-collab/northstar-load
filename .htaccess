@@ -1,0 +1,7 @@
+# If Document Root is the project folder (not public/), send traffic into public/.
+# Preferred on DirectAdmin: set the subdomain Document Root Override to .../public
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^$ public/ [L]
+  RewriteRule (.*) public/$1 [L]
+</IfModule>

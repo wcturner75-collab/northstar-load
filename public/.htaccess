@@ -1,12 +1,32 @@
-# Apache: public front
-Options -Indexes
+# LiteSpeed / Apache — web root must be this public/ folder
+DirectoryIndex index.php index.html
+Options -Indexes +FollowSymLinks
+
+<IfModule mod_authz_core.c>
+  Require all granted
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
   # Hosted FiveM loadscreen: /load?t=TOKEN
   RewriteRule ^load/?$ load.php [L,QSA]
 
+  # Pretty manage paths
+  RewriteRule ^manage/?$ manage/index.php [L,QSA]
+  RewriteRule ^system-status/?$ system-status.php [L,QSA]
+
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^ index.php [L]
 </IfModule>
+
+# Block hidden / backup files
+<FilesMatch "(^\.|\.sql$|\.bak$|\.env$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>
