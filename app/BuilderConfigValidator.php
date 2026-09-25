@@ -449,7 +449,7 @@ final class BuilderConfigValidator
     }
 
     /** @return array<string,mixed> */
-    public static function defaultConfig(string $serverName = 'My Server', string $theme = 'cinematic'): array
+    public static function defaultConfig(string $serverName = 'My Server', string $theme = 'northstar'): array
     {
         return [
             'version' => 1,
@@ -469,22 +469,22 @@ final class BuilderConfigValidator
             'theme' => [
                 'preset' => $theme,
                 'layout' => $theme === 'dual_panel' || $theme === 'info_rules' || $theme === 'rulebook' ? 'dual_panel' : 'freeform',
-                'accent' => '#C4A35A',
+                'accent' => '#38BDF8',
                 'fonts' => ['display' => 'Syne', 'body' => 'DM Sans'],
                 'colors' => [
-                    'text' => '#F5F5F5',
-                    'muted' => '#A8A8A8',
-                    'panel' => 'rgba(8,10,14,0.55)',
+                    'text' => '#E8F1F8',
+                    'muted' => '#7F9BB0',
+                    'panel' => 'rgba(10,22,38,0.62)',
                 ],
             ],
             'background' => [
                 'type' => 'color',
-                'color' => '#0B0C10',
+                'color' => '#050B14',
                 'mediaIds' => [],
                 'fit' => 'cover',
                 'intervalMs' => 8000,
                 'kenBurns' => false,
-                'overlay' => ['enabled' => true, 'color' => '#000000', 'opacity' => 0.35],
+                'overlay' => ['enabled' => true, 'color' => '#000000', 'opacity' => 0.4],
             ],
             'music' => [
                 'enabled' => false,
