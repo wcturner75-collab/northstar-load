@@ -136,10 +136,16 @@ a:hover { color: #7dd3fc; }
   letter-spacing: 0.06em;
 }
 .sub { color: var(--muted); margin: 0 0 1.75rem; }
+.product-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
 .product {
   border: 1px solid var(--line);
   background: rgba(8, 18, 30, 0.8);
   padding: 1.4rem 1.35rem;
+  height: 100%;
 }
 .tag {
   margin: 0 0 0.4rem;
