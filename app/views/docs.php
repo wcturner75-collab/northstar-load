@@ -29,8 +29,9 @@
   </article>
 
   <article class="doc-block">
-    <h2>Plans (not pay-to-win)</h2>
-    <p><strong>Free</strong> can ship a complete loading screen (branding, YouTube or file music, slideshow, staff, announcements, ZIP generate). Standard/Pro mainly add capacity and studio extras like Ken Burns and video backgrounds.</p>
+    <h2>Plans &amp; pricing</h2>
+    <p><strong>Free ($0)</strong> ships a complete loading screen. <strong>Standard ($19/mo planned)</strong> and <strong>Pro ($39/mo planned)</strong> fund hosted media + bandwidth and add capacity (Ken Burns, video backgrounds, higher limits). Billing is not live yet — everyone is on Free for now.</p>
+    <p>We’re considering open-sourcing the builder. Self-host could stay free; our cloud hosted loadscreen service would remain a paid product because storage and delivery cost money.</p>
   </article>
 
   <article class="doc-block">
@@ -39,11 +40,11 @@
   </article>
 
   <article class="doc-block">
-    <h2>Plans</h2>
+    <h2>Plan limits</h2>
     <ul>
-      <li><strong>Free</strong> — core editor, file music, image/color backgrounds, limited components.</li>
-      <li><strong>Standard</strong> — YouTube music, slideshows, staff &amp; announcements.</li>
-      <li><strong>Pro</strong> — video backgrounds, Ken Burns, higher limits.</li>
+      <li><strong>Free</strong> — core editor, YouTube + file music, slideshow, staff, announcements, limited components.</li>
+      <li><strong>Standard · $19/mo</strong> — higher limits + Ken Burns.</li>
+      <li><strong>Pro · $39/mo</strong> — video backgrounds, highest limits.</li>
     </ul>
     <p>Limits are enforced on save and generate, not only in the UI.</p>
   </article>

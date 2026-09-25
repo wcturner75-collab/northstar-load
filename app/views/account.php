@@ -153,6 +153,6 @@
         </tr>
       </tbody>
     </table>
-    <p class="muted">Paid plans will unlock when billing is connected. For now everyone uses Free.</p>
+    <p class="muted">Paid hosted plans unlock when billing is connected. Free stays available; open-source self-host is on the roadmap for later.</p>
   </section>
 </section>
