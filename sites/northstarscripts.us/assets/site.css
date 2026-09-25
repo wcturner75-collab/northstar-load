@@ -1,0 +1,200 @@
+:root {
+  --bg: #040910;
+  --elev: #0a1420;
+  --line: rgba(56, 189, 248, 0.18);
+  --text: #eaf3fa;
+  --muted: #7d96ab;
+  --accent: #38bdf8;
+  --metal: #d0dbe6;
+  --display: "Syne", sans-serif;
+  --body: "DM Sans", sans-serif;
+  --shell: 1080px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  line-height: 1.55;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7dd3fc; }
+
+.shell {
+  width: min(100% - 2.5rem, var(--shell));
+  margin-inline: auto;
+}
+.shell.narrow { max-width: 720px; }
+
+.top {
+  position: absolute;
+  inset-inline: 0;
+  z-index: 5;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 72px;
+}
+.logo {
+  font-family: var(--display);
+  letter-spacing: 0.14em;
+  font-size: 0.82rem;
+  color: var(--metal);
+}
+.logo span { color: var(--accent); }
+.bar nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+.bar nav a { color: var(--text); font-size: 0.9rem; }
+.bar nav a:hover { color: var(--accent); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: var(--elev);
+  color: var(--text);
+  padding: 0.55rem 1rem;
+  font: inherit;
+}
+.btn.primary {
+  background: linear-gradient(180deg, #4fc3f7, #0ea5e9);
+  border-color: transparent;
+  color: #031018;
+  font-weight: 700;
+}
+.btn.ghost { background: transparent; color: var(--accent); }
+
+.hero {
+  position: relative;
+  min-height: 88vh;
+  display: grid;
+  align-items: end;
+  padding: 8rem 0 4rem;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 55% at 70% 20%, rgba(14, 165, 233, 0.22), transparent 55%),
+    radial-gradient(ellipse 45% 35% at 15% 40%, rgba(56, 189, 248, 0.1), transparent 50%),
+    linear-gradient(180deg, #071525 0%, #040910 60%, #02060c 100%);
+}
+.hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 40%;
+  background: linear-gradient(180deg, transparent, #02060c);
+}
+.hero-copy { position: relative; z-index: 1; }
+.kicker {
+  margin: 0 0 0.75rem;
+  color: var(--accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+.hero h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 8vw, 5.2rem);
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  color: var(--metal);
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+  display: block;
+}
+.lede {
+  max-width: 34rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+  margin: 1.1rem 0 1.5rem;
+}
+.cta { display: flex; flex-wrap: wrap; gap: 0.65rem; }
+
+.band { padding: 4.5rem 0; }
+.band.alt { background: rgba(10, 20, 32, 0.55); border-block: 1px solid var(--line); }
+.band h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--display);
+  letter-spacing: 0.06em;
+}
+.sub { color: var(--muted); margin: 0 0 1.75rem; }
+.product {
+  border: 1px solid var(--line);
+  background: rgba(8, 18, 30, 0.8);
+  padding: 1.4rem 1.35rem;
+}
+.tag {
+  margin: 0 0 0.4rem;
+  color: var(--accent);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.product h3 {
+  margin: 0 0 0.55rem;
+  font-family: var(--display);
+  letter-spacing: 0.04em;
+}
+.product p { color: var(--muted); margin: 0 0 0.85rem; }
+.text-link { font-weight: 600; }
+
+.ad-rail {
+  padding: 1.25rem 0 0.5rem;
+  text-align: center;
+}
+.page {
+  padding: 7rem 0 4rem;
+}
+.page h1 {
+  font-family: var(--display);
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem;
+}
+.page p, .page li { color: var(--muted); }
+.page ul { padding-left: 1.2rem; }
+
+.foot {
+  border-top: 1px solid var(--line);
+  padding: 1.35rem 0;
+  margin-top: 2rem;
+  background: #03070d;
+}
+.foot-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.foot strong {
+  font-family: var(--display);
+  letter-spacing: 0.12em;
+  color: var(--metal);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .hero { min-height: auto; padding-top: 6.5rem; }
+  .bar { flex-direction: column; align-items: flex-start; padding-block: 0.85rem; }
+}

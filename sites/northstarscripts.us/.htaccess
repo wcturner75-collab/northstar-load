@@ -1,0 +1,12 @@
+DirectoryIndex index.html
+Options -Indexes
+
+<IfModule mod_headers.c>
+  <FilesMatch "^(ads\.txt|robots\.txt|sitemap\.xml)$">
+    Header set Cache-Control "public, max-age=3600"
+    Header set Content-Type "text/plain; charset=utf-8"
+  </FilesMatch>
+  <Files "sitemap.xml">
+    Header set Content-Type "application/xml; charset=utf-8"
+  </Files>
+</IfModule>

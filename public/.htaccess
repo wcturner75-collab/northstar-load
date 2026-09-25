@@ -7,9 +7,10 @@ Options -Indexes +FollowSymLinks
 </IfModule>
 
 # Never cache HTML that embeds CSRF tokens (Cloudflare often caches /login)
+# Keep ads.txt / robots.txt cacheable for Google crawlers.
 <IfModule mod_headers.c>
-  Header set Cache-Control "private, no-store, no-cache, must-revalidate"
-  Header set Pragma "no-cache"
+  Header set Cache-Control "private, no-store, no-cache, must-revalidate" "expr=%{REQUEST_URI} !~ m#^/(ads\.txt|robots\.txt|sitemap\.xml)#i"
+  Header set Pragma "no-cache" "expr=%{REQUEST_URI} !~ m#^/(ads\.txt|robots\.txt|sitemap\.xml)#i"
 </IfModule>
 
 <IfModule mod_rewrite.c>
@@ -22,8 +23,9 @@ Options -Indexes +FollowSymLinks
   # Hosted FiveM loadscreen: /load?t=TOKEN
   RewriteRule ^load/?$ load.php [L,QSA]
 
-  # Pretty manage index
+  # Pretty manage index + sitemap
   RewriteRule ^manage/?$ manage/index.php [L,QSA]
+  RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
   # Extensionless → matching .php file (pages + /api/*)
   RewriteCond %{REQUEST_FILENAME} !-d

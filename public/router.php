@@ -24,6 +24,11 @@ if ($path !== '/' && !str_ends_with($path, '.php')) {
     }
 }
 
+if ($path === '/sitemap.xml' || $path === '/sitemap') {
+    require __DIR__ . '/sitemap.php';
+    return true;
+}
+
 // Pretty hosted load URL: /load?t=TOKEN
 if ($path === '/load') {
     require __DIR__ . '/load.php';
