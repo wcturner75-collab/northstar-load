@@ -65,6 +65,16 @@ return [
         'selectable_plans' => ['free'],
     ],
 
+    // Display prices for hosted Load (billing still off). Hosted media/bandwidth is costly —
+    // if the builder goes open source, self-host can be free while cloud stays premium.
+    'pricing' => [
+        'load' => [
+            'free' => ['label' => '$0', 'note' => 'Forever · community tier'],
+            'standard' => ['label' => '$19/mo', 'note' => 'Planned · hosted media & builds'],
+            'pro' => ['label' => '$39/mo', 'note' => 'Planned · studio capacity + video BG'],
+        ],
+    ],
+
     'adsense' => [
         'enabled' => true,
         'client' => 'ca-pub-2047679408348701',

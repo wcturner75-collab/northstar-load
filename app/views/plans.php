@@ -3,9 +3,9 @@
     <div>
       <h1>Plans</h1>
       <?php if (empty($billingEnabled)): ?>
-        <p class="muted">Billing is not connected yet. Free is the only plan you can use right now — paid tiers are listed for what’s coming.</p>
+        <p class="muted">Free is live now. Paid hosted tiers are priced for real media + bandwidth cost — billing unlocks later. If Load goes open source, self-host stays free; cloud hosting stays premium.</p>
       <?php else: ?>
-        <p class="muted">Change your Northstar Load plan anytime.</p>
+        <p class="muted">Hosted Northstar Load plans. Self-host / open-source builds don’t include our cloud media delivery.</p>
       <?php endif; ?>
     </div>
   </header>
@@ -21,6 +21,12 @@
       <article class="choice-card plan-pick <?= $isCurrent ? 'is-current' : '' ?> <?= !$selectable ? 'is-locked' : '' ?>" data-plan="<?= \Northstar\Security::e($key) ?>">
         <span class="choice-body">
           <strong><?= \Northstar\Security::e($card['label']) ?></strong>
+          <?php if (!empty($card['price'])): ?>
+            <span class="plan-price"><?= \Northstar\Security::e($card['price']) ?></span>
+            <?php if (!empty($card['price_note'])): ?>
+              <span class="plan-price-note"><?= \Northstar\Security::e($card['price_note']) ?></span>
+            <?php endif; ?>
+          <?php endif; ?>
           <em><?= $selectable ? \Northstar\Security::e($card['blurb']) : 'Coming soon — billing not set up' ?></em>
           <ul class="plan-highlights">
             <?php foreach ($card['highlights'] as $h): ?>

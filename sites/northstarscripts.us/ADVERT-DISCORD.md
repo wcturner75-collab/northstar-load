@@ -25,12 +25,20 @@ We specialize in tools that help your community stand out, including:
 ➭ Testers — break builds early and shape releases
 ➭ Members — hang out, share feedback, grow with us
 
+## Northstar Load pricing
+
+We’re considering open-sourcing the builder. Self-host could stay free — hosted cloud stays premium because media + bandwidth cost money.
+
+➭ Free · $0 — live now (fair limits)
+➭ Standard · $19/mo — planned hosted headroom
+➭ Pro · $39/mo — planned studio capacity + video BG
+
 ## Why Choose Us?
 
 ✔️ Fresh studio with room to shape the roadmap
 ✔️ High-quality, practical work for real servers
 ✔️ Clear setup — no hand-edited HTML for Load
-✔️ Affordable store pricing + free Load tier
+✔️ Honest hosted pricing (not a race to $0 cloud)
 ✔️ Built for FiveM roleplay communities
 
 Discord: https://discord.gg/PASTE_YOUR_INVITE
@@ -45,6 +53,9 @@ Short version:
 Northstar Scripts — just launched. FiveM scripts + loading screens.
 
 Looking for staff, creators, testers, and members to help us grow.
+
+Load pricing (hosted is costly — OSS self-host may come later):
+➭ Free $0 · Standard $19/mo · Pro $39/mo (paid tiers planned)
 
 ➭ Discord: https://discord.gg/PASTE_YOUR_INVITE
 ➭ Store: https://northstar-scripts.tebex.store/

@@ -280,15 +280,21 @@ final class Entitlement
 
     /**
      * @param array<string,mixed>|null $config
-     * @return list<array{key:string,label:string,blurb:string,highlights:list<string>,selectable:bool}>
+     * @return list<array{key:string,label:string,blurb:string,price:string,price_note:string,highlights:list<string>,selectable:bool}>
      */
     public static function catalog(?array $config = null): array
     {
+        $pricing = is_array($config['pricing']['load'] ?? null)
+            ? $config['pricing']['load']
+            : (is_array(($GLOBALS['ns_config']['pricing']['load'] ?? null)) ? $GLOBALS['ns_config']['pricing']['load'] : []);
+
         $cards = [
             [
                 'key' => 'free',
                 'label' => 'Free',
-                'blurb' => 'Ship a complete loading screen.',
+                'blurb' => 'Start building now. Limits keep hosted costs fair.',
+                'price' => (string) ($pricing['free']['label'] ?? '$0'),
+                'price_note' => (string) ($pricing['free']['note'] ?? 'Forever · community tier'),
                 'highlights' => [
                     '5 projects · 60 media · 15 builds/day',
                     'YouTube + file music',
@@ -298,7 +304,9 @@ final class Entitlement
             [
                 'key' => 'standard',
                 'label' => 'Standard',
-                'blurb' => 'More room to grow.',
+                'blurb' => 'Hosted headroom for active servers.',
+                'price' => (string) ($pricing['standard']['label'] ?? '$19/mo'),
+                'price_note' => (string) ($pricing['standard']['note'] ?? 'Planned · covers media + hosting'),
                 'highlights' => [
                     '25 projects · 250 media · 50 builds/day',
                     'Everything in Free',
@@ -308,7 +316,9 @@ final class Entitlement
             [
                 'key' => 'pro',
                 'label' => 'Pro',
-                'blurb' => 'Studio capacity.',
+                'blurb' => 'Studio capacity for serious operators.',
+                'price' => (string) ($pricing['pro']['label'] ?? '$39/mo'),
+                'price_note' => (string) ($pricing['pro']['note'] ?? 'Planned · priority hosted load'),
                 'highlights' => [
                     '200 projects · 2000 media · 200 builds/day',
                     'Everything in Standard',

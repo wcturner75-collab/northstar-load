@@ -47,9 +47,9 @@
     $billingOn = \Northstar\Entitlement::billingEnabled($config ?? null);
     ?>
     <?php if (!$billingOn): ?>
-      <p class="muted">Billing is not set up yet — Free is the only selectable plan. Standard and Pro are shown for what’s coming later.</p>
+      <p class="muted">Free is live. Hosted Standard/Pro show planned premium prices — cloud media and bandwidth are costly. If we open-source the builder, self-host can stay free while hosted cloud stays paid.</p>
     <?php else: ?>
-      <p class="muted">Pick a plan below.</p>
+      <p class="muted">Pick a hosted plan below.</p>
     <?php endif; ?>
     <div class="choice-cards plan-cards plan-switcher">
       <?php foreach ($catalog as $card):
@@ -60,6 +60,12 @@
         <article class="choice-card plan-pick <?= $isCurrent ? 'is-current' : '' ?> <?= !$selectable ? 'is-locked' : '' ?>" data-plan="<?= \Northstar\Security::e($key) ?>">
           <span class="choice-body">
             <strong><?= \Northstar\Security::e($card['label']) ?></strong>
+            <?php if (!empty($card['price'])): ?>
+              <span class="plan-price"><?= \Northstar\Security::e($card['price']) ?></span>
+              <?php if (!empty($card['price_note'])): ?>
+                <span class="plan-price-note"><?= \Northstar\Security::e($card['price_note']) ?></span>
+              <?php endif; ?>
+            <?php endif; ?>
             <em><?= $selectable ? \Northstar\Security::e($card['blurb']) : 'Coming soon — billing not set up' ?></em>
             <ul class="plan-highlights">
               <?php foreach ($card['highlights'] as $h): ?>
@@ -83,7 +89,7 @@
 
   <section class="plan-matrix">
     <h2>What each plan is for</h2>
-    <p class="muted">We don’t lock the core experience behind a paywall. Paid plans buy headroom and studio extras.</p>
+    <p class="muted">Free ships a complete loadscreen. Paid plans fund hosted media delivery and unlock studio capacity — not a paywall on the basics.</p>
     <table>
       <thead>
         <tr>
