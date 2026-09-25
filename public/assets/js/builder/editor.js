@@ -331,10 +331,15 @@
       doc.background.color = v;
       preview();
     });
-    F.text(bg, 'Media IDs', (doc.background.mediaIds || []).join(','), (v) => {
-      doc.background.mediaIds = v.split(',').map((s) => parseInt(s.trim(), 10)).filter(Boolean);
+    F.media(bg, 'Background media', doc.background.mediaIds || [], (ids) => {
+      doc.background.mediaIds = ids || [];
       preview();
-    }, { placeholder: 'e.g. 12, 15' });
+    }, {
+      kind: doc.background.type === 'video' ? 'video' : 'image',
+      multiple: true,
+      title: 'Background media',
+      hint: 'Select images or video from your library.',
+    });
     if (canFeature('ken_burns')) {
       F.bool(bg, 'Ken Burns', !!doc.background.kenBurns, (v) => {
         doc.background.kenBurns = v;
@@ -376,11 +381,16 @@
         }, { placeholder: 'https://www.youtube.com/watch?v=…' });
       }
     } else {
-      F.number(music, 'Audio media ID', doc.music.mediaId || '', (v) => {
-        doc.music.mediaId = v ? Math.round(v) : null;
+      F.media(music, 'Audio file', doc.music.mediaId || null, (id) => {
+        doc.music.mediaId = id || null;
         doc.music.source = 'file';
         preview();
-      }, { min: 1, step: 1 });
+      }, {
+        kind: 'audio',
+        multiple: false,
+        title: 'Choose audio',
+        hint: 'Select an uploaded audio file.',
+      });
     }
     if (!canFeature('youtube_music')) {
       F.hint(music, 'YouTube music embed: not on your plan');

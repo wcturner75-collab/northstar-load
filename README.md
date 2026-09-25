@@ -73,6 +73,13 @@ Expire old ZIPs (projects remain):
 php scripts/expire_builds.php
 ```
 
+## Management & health
+
+- Staff console: `/manage/` (roles `manager` / `admin` on `users.role`)
+- First admin: `UPDATE users SET role = 'admin' WHERE email = 'you@example.com';`
+- Broken DB / missing tables → redirect to `/system-status.php`
+- Builder media fields use a popup picker (no typed Media IDs)
+
 ## Security notes
 
 - Passwords: `password_hash` / `password_verify`

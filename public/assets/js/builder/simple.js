@@ -145,13 +145,18 @@ NSBuilder.Simple = (function () {
       doc.background.color = v;
       preview();
     });
-    F().text(look, 'Background media IDs', (doc.background.mediaIds || []).join(', '), (v) => {
-      doc.background.mediaIds = v.split(',').map((s) => parseInt(s.trim(), 10)).filter(Boolean);
+    F().media(look, 'Background media', doc.background.mediaIds || [], (ids) => {
+      doc.background.mediaIds = ids || [];
       if (doc.background.mediaIds.length && doc.background.type === 'color') {
         doc.background.type = 'image';
       }
       preview();
-    }, { placeholder: 'e.g. 12, 15' });
+    }, {
+      kind: (doc.background.type === 'video') ? 'video' : 'image',
+      multiple: true,
+      title: 'Background media',
+      hint: 'Pick images (or video for video backgrounds).',
+    });
 
     if (NSBuilder.isDualPanelLayout && NSBuilder.isDualPanelLayout(doc)) {
       F().text(look, 'Map', doc.server.map || '', (v) => {
@@ -173,7 +178,7 @@ NSBuilder.Simple = (function () {
       preview();
     });
 
-    const sourceOpts = [{ value: 'file', label: 'Uploaded file (Media ID)' }];
+    const sourceOpts = [{ value: 'file', label: 'Uploaded audio file' }];
     if (features.youtube_music) {
       sourceOpts.push({ value: 'youtube', label: 'YouTube (hidden embed)' });
     } else {
@@ -197,12 +202,17 @@ NSBuilder.Simple = (function () {
         preview();
       }, { placeholder: 'https://www.youtube.com/watch?v=…' });
     } else {
-      F().number(music, 'Audio media ID', doc.music.mediaId || '', (v) => {
-        doc.music.mediaId = v ? Math.round(v) : null;
+      F().media(music, 'Audio file', doc.music.mediaId || null, (id) => {
+        doc.music.mediaId = id || null;
         doc.music.source = 'file';
         if (doc.music.mediaId) doc.music.enabled = true;
         preview();
-      }, { min: 1, step: 1, placeholder: 'From Media library' });
+      }, {
+        kind: 'audio',
+        multiple: false,
+        title: 'Choose audio',
+        hint: 'Select an uploaded MP3/OGG from your media library.',
+      });
     }
     F().number(music, 'Volume', doc.music.volume ?? 0.15, (v) => {
       doc.music.volume = Math.max(0, Math.min(1, v));

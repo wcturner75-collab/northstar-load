@@ -7,7 +7,11 @@ define('NORTHSTAR_ROOT', dirname(__DIR__));
 $configFile = NORTHSTAR_ROOT . '/config/config.php';
 if (!is_file($configFile)) {
     http_response_code(500);
-    echo 'Configuration missing. Copy config/config.example.php to config/config.php.';
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!DOCTYPE html><html><head><title>Configuration missing</title></head><body style="font-family:sans-serif;background:#040910;color:#eaf3fa;padding:2rem">';
+    echo '<h1>Configuration missing</h1>';
+    echo '<p>Copy <code>config/config.example.php</code> to <code>config/config.php</code> and set database credentials.</p>';
+    echo '</body></html>';
     exit;
 }
 
@@ -40,8 +44,24 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
-\Northstar\Database::init($config);
-\Northstar\Session::start($config);
+$GLOBALS['ns_db_ready'] = false;
+try {
+    \Northstar\Database::init($config);
+    $GLOBALS['ns_db_ready'] = true;
+} catch (\Throwable $e) {
+    $GLOBALS['ns_db_ready'] = false;
+    // Soft-fail: health page / redirect instead of hard crash
+    if (!\Northstar\DbHealth::isExemptPath()) {
+        header('Location: /system-status.php?reason=connection');
+        exit;
+    }
+}
+
+if ($GLOBALS['ns_db_ready']) {
+    \Northstar\Session::start($config);
+    \Northstar\DbHealth::guard($config);
+}
+
 \Northstar\Security::sendHeaders();
 
 return $config;

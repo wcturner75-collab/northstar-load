@@ -20,8 +20,24 @@ if ($path === '/load' || $path === '/load/') {
     return true;
 }
 
+if ($path === '/system-status' || $path === '/system-status/') {
+    require __DIR__ . '/system-status.php';
+    return true;
+}
+
+if ($path === '/manage' || $path === '/manage/') {
+    require __DIR__ . '/manage/index.php';
+    return true;
+}
+
 if (str_ends_with($path, '.php') && is_file($file)) {
     require $file;
+    return true;
+}
+
+// Directory index for /manage/users etc. when pretty paths used
+if (is_dir($file) && is_file(rtrim($file, '/') . '/index.php')) {
+    require rtrim($file, '/') . '/index.php';
     return true;
 }
 

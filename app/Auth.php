@@ -48,7 +48,7 @@ final class Auth
         if ($cacheId === $id && is_array($cache)) {
             return $cache;
         }
-        $stmt = Database::pdo()->prepare('SELECT id, email, username, status, editor_mode, created_at FROM users WHERE id = ? LIMIT 1');
+        $stmt = Database::pdo()->prepare('SELECT id, email, username, status, editor_mode, role, created_at FROM users WHERE id = ? LIMIT 1');
         $stmt->execute([$id]);
         $row = $stmt->fetch();
         $cache = $row ?: null;
@@ -217,7 +217,7 @@ final class Auth
         $stmt->execute([$email, $ipHash, $ok ? 1 : 0]);
     }
 
-    private static function wantsJson(): bool
+    public static function wantsJson(): bool
     {
         $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
         $uri = $_SERVER['REQUEST_URI'] ?? '';

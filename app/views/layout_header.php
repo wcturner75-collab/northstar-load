@@ -42,6 +42,9 @@ $bodyClass = $bodyClass ?? '';
         <a href="/plans.php">Plans</a>
         <a href="/docs.php">Docs</a>
         <a href="/account.php">Account</a>
+        <?php if (\Northstar\Manage::isStaff($user)): ?>
+          <a href="/manage/">Manage</a>
+        <?php endif; ?>
         <a class="btn btn-ghost" href="/logout.php">Logout</a>
       <?php else: ?>
         <a href="/docs.php">Docs</a>
