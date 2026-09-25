@@ -8,7 +8,7 @@ document.querySelectorAll('[data-act]').forEach((btn) => {
       const body = { user_id: Number(userId), action: btn.dataset.act };
       if (btn.dataset.act === 'status') body.status = btn.dataset.status;
       if (btn.dataset.act === 'role') body.role = btn.dataset.role;
-      await NS.api('/api/manage/user.php', {
+      await NS.api('/api/manage/user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

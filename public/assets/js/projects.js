@@ -1,12 +1,12 @@
 document.getElementById('btn-new-project')?.addEventListener('click', () => {
-  location.href = '/projects.php?new=1';
+  location.href = '/projects?new=1';
 });
 
 document.getElementById('create-project-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const fd = new FormData(e.target);
   try {
-    const res = await fetch('/api/projects/create.php', {
+    const res = await fetch('/api/projects/create', {
       method: 'POST',
       headers: { 'X-CSRF-Token': fd.get('_csrf'), 'Accept': 'application/json' },
       body: fd,
@@ -16,7 +16,7 @@ document.getElementById('create-project-form')?.addEventListener('submit', async
       NS.toast(json.error?.message || 'Create failed', 'error');
       return;
     }
-    location.href = '/builder.php?id=' + json.data.project.id;
+    location.href = '/builder?id=' + json.data.project.id;
   } catch (err) {
     NS.toast(err.message || 'Create failed', 'error');
   }
@@ -30,7 +30,7 @@ document.querySelectorAll('[data-delete-project]').forEach((btn) => {
     fd.append('id', btn.dataset.deleteProject);
     fd.append('_csrf', csrf);
     try {
-      const res = await fetch('/api/projects/delete.php', {
+      const res = await fetch('/api/projects/delete', {
         method: 'POST',
         headers: { 'X-CSRF-Token': csrf },
         body: fd,

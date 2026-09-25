@@ -8,7 +8,7 @@
   </header>
 
   <?php if (!empty($showCreate) || !empty($_GET['new'])): ?>
-  <form class="create-panel stack-form" method="post" action="/api/projects/create.php" id="create-project-form">
+  <form class="create-panel stack-form" method="post" action="/api/projects/create" id="create-project-form">
     <input type="hidden" name="_csrf" value="<?= \Northstar\Security::e($csrf) ?>">
     <h2>Create project</h2>
     <label>Project name
@@ -45,7 +45,7 @@
             <td><?= \Northstar\Security::e($p['theme_key']) ?></td>
             <td><?= \Northstar\Security::e($p['updated_at']) ?></td>
             <td class="row-actions">
-              <a class="btn btn-small" href="/builder.php?id=<?= (int) $p['id'] ?>">Edit</a>
+              <a class="btn btn-small" href="/builder?id=<?= (int) $p['id'] ?>">Edit</a>
               <button class="btn btn-small btn-danger" data-delete-project="<?= (int) $p['id'] ?>" type="button">Delete</button>
             </td>
           </tr>

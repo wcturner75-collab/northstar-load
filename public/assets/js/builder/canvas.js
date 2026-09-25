@@ -122,7 +122,7 @@ NSBuilder.Canvas = (function () {
     } else if (b.type === 'color' || !b.mediaIds || !b.mediaIds.length) {
       bg.style.background = b.color || '#0B0C10';
     } else if (b.mediaIds && b.mediaIds[0]) {
-      bg.style.backgroundImage = 'url(/api/media/serve.php?id=' + encodeURIComponent(b.mediaIds[0]) + ')';
+      bg.style.backgroundImage = 'url(/api/media/serve?id=' + encodeURIComponent(b.mediaIds[0]) + ')';
     }
     root.appendChild(bg);
 

@@ -35,7 +35,7 @@
         <dt>Components / project</dt><dd><?= (int) ($limits['max_components'] ?? 0) ?></dd>
         <dt>Builds / day</dt><dd><?= (int) ($limits['max_builds_per_day'] ?? 0) ?></dd>
       </dl>
-      <p style="margin-top:1rem"><a class="btn btn-primary" href="/plans.php">Change plan</a></p>
+      <p style="margin-top:1rem"><a class="btn btn-primary" href="/plans">Change plan</a></p>
     </div>
   </div>
 

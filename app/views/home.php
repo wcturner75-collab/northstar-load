@@ -15,8 +15,8 @@
     </h1>
     <p class="hero-copy">Design visually. Preview live. Publish a hosted resource — no hand-edited HTML.</p>
     <div class="hero-cta">
-      <a class="btn btn-primary btn-lg" href="/register.php">Start building</a>
-      <a class="btn btn-ghost btn-lg" href="/login.php">Sign in</a>
+      <a class="btn btn-primary btn-lg" href="/register">Start building</a>
+      <a class="btn btn-ghost btn-lg" href="/login">Sign in</a>
     </div>
   </div>
 </section>

@@ -26,7 +26,7 @@ $mode = (($editorMode ?? 'simple') === 'advanced') ? 'advanced' : 'simple';
 
 <div class="builder-app">
   <header class="builder-top">
-    <a class="brand compact" href="/projects.php">
+    <a class="brand compact" href="/projects">
       <span class="brand-mark">N</span>
       <span>LOAD</span>
     </a>

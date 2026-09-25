@@ -23,9 +23,9 @@
           <td><?= \Northstar\Security::e($b['status']) ?></td>
           <td class="row-actions">
             <?php if ($b['status'] === 'ready'): ?>
-              <a class="btn btn-small" href="/download.php?build=<?= \Northstar\Security::e($b['build_token']) ?>">Download</a>
+              <a class="btn btn-small" href="/download?build=<?= \Northstar\Security::e($b['build_token']) ?>">Download</a>
             <?php endif; ?>
-            <a class="btn btn-small" href="/builder.php?id=<?= (int) $b['project_id'] ?>">Regenerate</a>
+            <a class="btn btn-small" href="/builder?id=<?= (int) $b['project_id'] ?>">Regenerate</a>
             <button class="btn btn-small btn-danger" type="button" data-delete-build="<?= (int) $b['id'] ?>">Delete</button>
           </td>
         </tr>

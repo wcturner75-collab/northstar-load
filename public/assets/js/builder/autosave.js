@@ -23,7 +23,7 @@ NSBuilder.Autosave = (function () {
     const doc = pending;
     pending = null;
     try {
-      await NS.api('/api/projects/save.php', {
+      await NS.api('/api/projects/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: projectId, config: doc }),

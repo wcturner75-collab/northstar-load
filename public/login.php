@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = (string) ($_POST['password'] ?? '');
         try {
             if (\Northstar\Auth::attemptLogin($email, $password, $config)) {
-                \Northstar\Response::redirect('/dashboard.php');
+                \Northstar\Response::redirect('/dashboard');
             }
             $error = 'Invalid email or password.';
         } catch (\Throwable $e) {

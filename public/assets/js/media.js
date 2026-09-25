@@ -4,7 +4,7 @@ document.getElementById('media-upload-form')?.addEventListener('submit', async (
   const fd = new FormData(e.target);
   status.textContent = 'Uploading…';
   try {
-    await NS.api('/api/media/upload.php', { method: 'POST', body: fd });
+    await NS.api('/api/media/upload', { method: 'POST', body: fd });
     status.textContent = 'Uploaded.';
     location.reload();
   } catch (err) {
@@ -19,7 +19,7 @@ document.querySelectorAll('[data-delete-media]').forEach((btn) => {
     fd.append('id', btn.dataset.deleteMedia);
     fd.append('_csrf', NS.csrf());
     try {
-      await NS.api('/api/media/delete.php', { method: 'POST', body: fd });
+      await NS.api('/api/media/delete', { method: 'POST', body: fd });
       location.reload();
     } catch (err) {
       NS.toast(err.message, 'error');

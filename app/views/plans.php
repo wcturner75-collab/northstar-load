@@ -34,5 +34,5 @@
     <?php endforeach; ?>
   </div>
 
-  <p class="muted" style="margin-top:1.25rem">Need the comparison table? See <a href="/account.php">Account</a>.</p>
+  <p class="muted" style="margin-top:1.25rem">Need the comparison table? See <a href="/account">Account</a>.</p>
 </section>

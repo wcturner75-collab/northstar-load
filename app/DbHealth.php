@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Northstar;
 
 /**
- * Schema / connection health. Broken DB → /system-status.php (not a white screen).
+ * Schema / connection health. Broken DB → /system-status (not a white screen).
  */
 final class DbHealth
 {
@@ -28,8 +28,8 @@ final class DbHealth
         $path = $path ?? (string) (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');
         $path = rtrim($path, '/') ?: '/';
         $exempt = [
-            '/system-status.php',
             '/system-status',
+            '/system-status.php',
             '/assets',
             '/hosted',
         ];
@@ -127,7 +127,7 @@ final class DbHealth
         $qs = http_build_query([
             'reason' => !$status['connected'] ? 'connection' : 'schema',
         ]);
-        header('Location: /system-status.php?' . $qs);
+        header('Location: /system-status?' . $qs);
         exit;
     }
 }

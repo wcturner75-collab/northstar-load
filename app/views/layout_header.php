@@ -26,7 +26,7 @@ $bodyClass = $bodyClass ?? '';
 <body class="<?= \Northstar\Security::e($bodyClass) ?>">
 <header class="site-header">
   <div class="shell header-inner">
-    <a class="brand" href="<?= $user ? '/dashboard.php' : '/' ?>">
+    <a class="brand" href="<?= $user ? '/dashboard' : '/' ?>">
       <span class="brand-mark" aria-hidden="true">N</span>
       <span class="brand-text">
         <strong>NORTHSTAR</strong>
@@ -35,21 +35,21 @@ $bodyClass = $bodyClass ?? '';
     </a>
     <nav class="nav">
       <?php if ($user): ?>
-        <a href="/dashboard.php">Dashboard</a>
-        <a href="/projects.php">Projects</a>
-        <a href="/media.php">Media</a>
-        <a href="/downloads.php">Downloads</a>
-        <a href="/plans.php">Plans</a>
-        <a href="/docs.php">Docs</a>
-        <a href="/account.php">Account</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/projects">Projects</a>
+        <a href="/media">Media</a>
+        <a href="/downloads">Downloads</a>
+        <a href="/plans">Plans</a>
+        <a href="/docs">Docs</a>
+        <a href="/account">Account</a>
         <?php if (\Northstar\Manage::isStaff($user)): ?>
           <a href="/manage/">Manage</a>
         <?php endif; ?>
-        <a class="btn btn-ghost" href="/logout.php">Logout</a>
+        <a class="btn btn-ghost" href="/logout">Logout</a>
       <?php else: ?>
-        <a href="/docs.php">Docs</a>
-        <a href="/login.php">Sign in</a>
-        <a class="btn btn-primary" href="/register.php">Start building</a>
+        <a href="/docs">Docs</a>
+        <a href="/login">Sign in</a>
+        <a class="btn btn-primary" href="/register">Start building</a>
       <?php endif; ?>
     </nav>
   </div>

@@ -72,7 +72,7 @@ Website → Auth/Session → Builder (JSON state)
             → thin ZIP (fxmanifest → hosted URL + client.lua)
        → download.php?build=TOKEN (auth + ownership)
 Players → https://load.northstarscripts.us/load?t=TOKEN
-       → /api/load/config.php + /api/load/media.php
+       → /api/load/config + /api/load/media
 ```
 
 Set `hosting.load_base_url` in `config/config.php` (production: `https://load.northstarscripts.us`).
@@ -89,7 +89,7 @@ php scripts/expire_builds.php
 
 - Staff console: `/manage/` (roles `manager` / `admin` on `users.role`)
 - First admin: `UPDATE users SET role = 'admin' WHERE email = 'you@example.com';`
-- Broken DB / missing tables → redirect to `/system-status.php`
+- Broken DB / missing tables → redirect to `/system-status`
 - Builder media fields use a popup picker (no typed Media IDs)
 
 ## Security notes

@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $editorMode = (string) ($_POST['editor_mode'] ?? 'simple');
         try {
             \Northstar\Auth::register($email, $username, $password, $plan, $editorMode);
-            \Northstar\Response::redirect('/dashboard.php');
+            \Northstar\Response::redirect('/dashboard');
         } catch (\InvalidArgumentException $e) {
             $error = $e->getMessage();
         } catch (\Throwable $e) {

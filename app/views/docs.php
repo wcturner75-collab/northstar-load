@@ -15,7 +15,7 @@
       <li>Upload logos, backgrounds, and music in <strong>Media</strong>.</li>
       <li>Click <strong>Generate Resource</strong>, download the thin ZIP.</li>
       <li>Extract into your FiveM <code>resources</code> folder and add <code>ensure your_resource_name</code> to <code>server.cfg</code>.</li>
-      <li>Players open your screen from <code>https://load.northstarscripts.us/load.php?t=…</code> (already set in the ZIP’s <code>fxmanifest.lua</code>).</li>
+      <li>Players open your screen from <code>https://load.northstarscripts.us/load?t=…</code> (already set in the ZIP’s <code>fxmanifest.lua</code>).</li>
     </ol>
   </article>
 
@@ -51,11 +51,11 @@
   <article class="doc-block">
     <h2>Hosted loading screens</h2>
     <p>Generated resources do <strong>not</strong> ship HTML/CSS/media locally. The ZIP is a thin FiveM resource whose <code>loadscreen</code> points at your Northstar URL:</p>
-    <p><code>https://load.northstarscripts.us/load.php?t=YOUR_TOKEN</code></p>
+    <p><code>https://load.northstarscripts.us/load?t=YOUR_TOKEN</code></p>
     <p>Edit anytime in the builder — players see updates without regenerating the ZIP (same publish link). Media is served only for assets referenced by that project.</p>
 
     <h2>How generation works</h2>
-    <p>Northstar assigns a stable publish token, validates your project JSON against plan limits, then packages <code>fxmanifest.lua</code> + <code>client.lua</code> into a ZIP. The live runtime is hosted under <code>/hosted/</code> and config is loaded from <code>/api/load/config.php</code>.</p>
+    <p>Northstar assigns a stable publish token, validates your project JSON against plan limits, then packages <code>fxmanifest.lua</code> + <code>client.lua</code> into a ZIP. The live runtime is hosted under <code>/hosted/</code> and config is loaded from <code>/api/load/config</code>.</p>
   </article>
 
   <article class="doc-block">

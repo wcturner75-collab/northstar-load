@@ -5,7 +5,7 @@
       <h1>Dashboard</h1>
       <p class="muted">Signed in as <?= \Northstar\Security::e($user['username'] ?? '') ?> · Plan <?= \Northstar\Security::e(strtoupper($plan ?? 'free')) ?></p>
     </div>
-    <a class="btn btn-primary" href="/projects.php?new=1">New project</a>
+    <a class="btn btn-primary" href="/projects?new=1">New project</a>
   </header>
 
   <div class="stat-row">
@@ -23,7 +23,7 @@
         <ul class="list-plain">
           <?php foreach ($projects as $p): ?>
             <li>
-              <a href="/builder.php?id=<?= (int) $p['id'] ?>">
+              <a href="/builder?id=<?= (int) $p['id'] ?>">
                 <strong><?= \Northstar\Security::e($p['name']) ?></strong>
                 <span class="mono"><?= \Northstar\Security::e($p['resource_name']) ?></span>
               </a>
@@ -43,7 +43,7 @@
               <strong><?= \Northstar\Security::e($b['project_name']) ?></strong>
               <span class="muted"><?= \Northstar\Security::e($b['created_at']) ?></span>
               <?php if (($b['status'] ?? '') === 'ready'): ?>
-                <a href="/download.php?build=<?= \Northstar\Security::e($b['build_token']) ?>">Download</a>
+                <a href="/download?build=<?= \Northstar\Security::e($b['build_token']) ?>">Download</a>
               <?php endif; ?>
             </li>
           <?php endforeach; ?>

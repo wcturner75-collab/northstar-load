@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Public hosted loading screen page.
- * Preferred: /load.php?t=TOKEN
+ * Preferred: /load?t=TOKEN
  * Also: /load?t=TOKEN  (rewrite) · /load?=TOKEN · /load?TOKEN
  */
 
@@ -27,7 +27,7 @@ if (!$project) {
     exit;
 }
 
-$configPath = '/api/load/config.php?t=' . rawurlencode($token);
+$configPath = '/api/load/config?t=' . rawurlencode($token);
 $serverName = htmlspecialchars(
     (string) (($project['config']['server']['name'] ?? null) ?: $project['name'] ?: 'Loading'),
     ENT_QUOTES | ENT_SUBSTITUTE,

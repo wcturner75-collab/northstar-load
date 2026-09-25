@@ -84,7 +84,7 @@ final class ResourceGenerator
                 'buildToken' => $buildToken,
                 'resourceName' => $resourceName,
                 'fileSize' => $size,
-                'downloadUrl' => '/download.php?build=' . $buildToken,
+                'downloadUrl' => '/download?build=' . $buildToken,
                 'loadUrl' => $loadUrl,
                 'publishToken' => $publishToken,
                 'hosted' => true,

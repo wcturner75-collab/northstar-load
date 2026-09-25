@@ -21,7 +21,7 @@ NSBuilder.MediaPicker = (function () {
       '  </header>',
       '  <p class="muted" id="media-picker-hint"></p>',
       '  <div class="media-picker-toolbar">',
-      '    <a class="btn btn-ghost btn-small" href="/media.php" target="_blank" rel="noopener">Open library</a>',
+      '    <a class="btn btn-ghost btn-small" href="/media" target="_blank" rel="noopener">Open library</a>',
       '    <button type="button" class="btn btn-ghost btn-small" id="media-picker-refresh">Refresh</button>',
       '  </div>',
       '  <div class="media-picker-grid" id="media-picker-grid"></div>',
@@ -85,7 +85,7 @@ NSBuilder.MediaPicker = (function () {
     grid.innerHTML = '<p class="muted">Loading…</p>';
     try {
       const q = opts.kind ? ('?kind=' + encodeURIComponent(opts.kind)) : '';
-      const data = await NS.api('/api/media/list.php' + q);
+      const data = await NS.api('/api/media/list' + q);
       renderGrid(data.media || []);
     } catch (err) {
       grid.innerHTML = '<p class="muted">' + (err.message || 'Could not load media') + '</p>';
@@ -128,7 +128,7 @@ NSBuilder.MediaPicker = (function () {
       thumb.className = 'media-picker-thumb';
       if (item.kind === 'image') {
         const img = document.createElement('img');
-        img.src = '/api/media/serve.php?id=' + encodeURIComponent(id);
+        img.src = '/api/media/serve?id=' + encodeURIComponent(id);
         img.alt = '';
         thumb.appendChild(img);
       } else {

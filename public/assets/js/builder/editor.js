@@ -171,7 +171,7 @@
     document.getElementById('mode-simple')?.classList.toggle('active', editorMode === 'simple');
     document.getElementById('mode-advanced')?.classList.toggle('active', editorMode === 'advanced');
     NSBuilder.Canvas.fit();
-    NS.api('/api/account/editor-mode.php', {
+    NS.api('/api/account/editor-mode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ editor_mode: editorMode }),
@@ -518,12 +518,12 @@
     document.getElementById('generate-result').classList.add('hidden');
     try {
       await NSBuilder.Autosave.flush();
-      await NS.api('/api/projects/save.php', {
+      await NS.api('/api/projects/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: projectId, config: doc }),
       });
-      const data = await NS.api('/api/build/generate.php', {
+      const data = await NS.api('/api/build/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ project_id: projectId }),

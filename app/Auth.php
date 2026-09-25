@@ -25,14 +25,14 @@ final class Auth
             if (self::wantsJson()) {
                 Response::jsonError('Authentication required.', 401, 'auth');
             }
-            Response::redirect('/login.php');
+            Response::redirect('/login');
         }
     }
 
     public static function guestOnly(): void
     {
         if (self::check()) {
-            Response::redirect('/dashboard.php');
+            Response::redirect('/dashboard');
         }
     }
 

@@ -111,7 +111,7 @@ $title = $status['ok'] ? 'System healthy' : 'System needs attention';
           <p>Apply files in <code>database/migrations/</code> — especially <code>004_user_role.sql</code> for management.</p>
         <?php endif; ?>
         <p style="margin-top:1.5rem">
-          <a class="btn btn-primary" href="/system-status.php">Recheck</a>
+          <a class="btn btn-primary" href="/system-status">Recheck</a>
         </p>
       <?php endif; ?>
     </div>

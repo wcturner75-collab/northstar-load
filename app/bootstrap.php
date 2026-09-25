@@ -52,7 +52,7 @@ try {
     $GLOBALS['ns_db_ready'] = false;
     // Soft-fail: health page / redirect instead of hard crash
     if (!\Northstar\DbHealth::isExemptPath()) {
-        header('Location: /system-status.php?reason=connection');
+        header('Location: /system-status?reason=connection');
         exit;
     }
 }

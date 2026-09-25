@@ -5,7 +5,7 @@
     <?php if (!empty($error)): ?>
       <div class="alert alert-error"><?= \Northstar\Security::e($error) ?></div>
     <?php endif; ?>
-    <form method="post" action="/register.php" class="stack-form" id="register-form">
+    <form method="post" action="/register" class="stack-form" id="register-form">
       <input type="hidden" name="_csrf" value="<?= \Northstar\Security::e($csrf) ?>">
 
       <div class="form-grid-2">
@@ -76,6 +76,6 @@
 
       <button class="btn btn-primary" type="submit">Create account</button>
     </form>
-    <p class="muted">Already registered? <a href="/login.php">Login</a></p>
+    <p class="muted">Already registered? <a href="/login">Login</a></p>
   </div>
 </section>

@@ -6,8 +6,8 @@
       <p class="muted">Your role: <?= \Northstar\Security::e(strtoupper($role ?? 'manager')) ?></p>
     </div>
     <div class="row-actions">
-      <a class="btn btn-ghost" href="/manage/users.php">Users</a>
-      <a class="btn btn-ghost" href="/system-status.php">System status</a>
+      <a class="btn btn-ghost" href="/manage/users">Users</a>
+      <a class="btn btn-ghost" href="/system-status">System status</a>
     </div>
   </header>
 
@@ -26,8 +26,8 @@
     <h2>Quick links</h2>
     <p class="muted">Review accounts, disable abuse, and check schema health when something breaks.</p>
     <div class="row-actions" style="margin-top:0.75rem">
-      <a class="btn btn-primary" href="/manage/users.php">Manage users</a>
-      <a class="btn btn-ghost" href="/system-status.php">Database health</a>
+      <a class="btn btn-primary" href="/manage/users">Manage users</a>
+      <a class="btn btn-ghost" href="/system-status">Database health</a>
     </div>
   </section>
 
