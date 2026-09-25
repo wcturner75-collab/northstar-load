@@ -348,7 +348,7 @@ final class BuilderConfigValidator
         }
         return [
             'madeBy' => $madeBy,
-            'copyright' => self::str($watermark['copyright'] ?? 'NorthStar Scripts', 80) ?: 'NorthStar Scripts',
+            'copyright' => self::str($watermark['copyright'] ?? 'Northstar Load', 80) ?: 'Northstar Load',
         ];
     }
 
@@ -524,7 +524,7 @@ final class BuilderConfigValidator
             ],
             'watermark' => [
                 'madeBy' => $serverName,
-                'copyright' => 'NorthStar Scripts',
+                'copyright' => 'Northstar Load',
             ],
             'components' => [
                 [

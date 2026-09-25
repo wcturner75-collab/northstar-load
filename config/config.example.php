@@ -9,7 +9,7 @@ declare(strict_types=1);
 return [
     'app' => [
         'name' => 'Northstar Load',
-        'brand' => 'Northstar Scripts',
+        'brand' => 'Northstar Load',
         'url' => 'http://localhost:8080',
         'env' => 'production', // local|production
         'debug' => false,

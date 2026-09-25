@@ -4,7 +4,7 @@
 /** @var string $csrf */
 /** @var string $pageTitle */
 /** @var string $bodyClass */
-$brand = $config['app']['brand'] ?? 'Northstar Scripts';
+$brand = $config['app']['brand'] ?? 'Northstar Load';
 $appName = $config['app']['name'] ?? 'Northstar Load';
 $pageTitle = $pageTitle ?? $appName;
 $bodyClass = $bodyClass ?? '';
@@ -30,7 +30,7 @@ $bodyClass = $bodyClass ?? '';
       <span class="brand-mark" aria-hidden="true">N</span>
       <span class="brand-text">
         <strong>NORTHSTAR</strong>
-        <em>SCRIPTS</em>
+        <em>LOAD</em>
       </span>
     </a>
     <nav class="nav">
@@ -45,8 +45,8 @@ $bodyClass = $bodyClass ?? '';
         <a class="btn btn-ghost" href="/logout.php">Logout</a>
       <?php else: ?>
         <a href="/docs.php">Docs</a>
-        <a href="/login.php">Login</a>
-        <a class="btn btn-primary" href="/register.php">Create Account</a>
+        <a href="/login.php">Sign in</a>
+        <a class="btn btn-primary" href="/register.php">Start building</a>
       <?php endif; ?>
     </nav>
   </div>

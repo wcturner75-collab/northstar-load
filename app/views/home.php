@@ -1,42 +1,51 @@
 <section class="hero">
-  <div class="hero-bg" role="img" aria-label="Northstar Scripts brand artwork"></div>
-  <div class="shell hero-content">
-    <p class="eyebrow">Scripts</p>
-    <h1 class="hero-brand">NORTHSTAR<span>LOAD</span></h1>
-    <p class="hero-lead">Design FiveM loading screens visually. Preview live. Ship a hosted resource — no hand-edited HTML.</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary btn-lg" href="/register.php">Start Building</a>
-      <a class="btn btn-ghost btn-lg" href="/docs.php">Read the Docs</a>
+  <div class="hero-media" role="img" aria-label="Northstar Load atmosphere"></div>
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="shell hero-frame">
+    <p class="hero-kicker">FiveM loading screens</p>
+    <h1 class="hero-title">
+      <span class="hero-title-brand">NORTHSTAR</span>
+      <span class="hero-title-product">LOAD</span>
+    </h1>
+    <p class="hero-copy">Design visually. Preview live. Publish a hosted resource — no hand-edited HTML.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary btn-lg" href="/register.php">Start building</a>
+      <a class="btn btn-ghost btn-lg" href="/login.php">Sign in</a>
     </div>
   </div>
 </section>
 
-<section class="section shell">
-  <header class="section-head">
-    <h2>From canvas to server.cfg</h2>
-    <p>One tested FiveM runtime. Your design becomes configuration, not a fragile custom fork.</p>
-  </header>
-  <ol class="flow-steps">
-    <li><strong>Create</strong> a project and pick a layout theme</li>
-    <li><strong>Design</strong> branding, media, rules, and socials in the editor</li>
-    <li><strong>Generate</strong> a thin hosted resource ZIP</li>
-    <li><strong>Ensure</strong> the resource on your FiveM server</li>
-  </ol>
+<section class="band band-process">
+  <div class="shell">
+    <header class="band-head">
+      <h2>Ship in four moves</h2>
+      <p>Canvas to <code>ensure</code> — one tested runtime under your publish link.</p>
+    </header>
+    <ol class="process-rail">
+      <li><span>01</span><strong>Create</strong><em>Project + layout theme</em></li>
+      <li><span>02</span><strong>Design</strong><em>Brand, music, rules</em></li>
+      <li><span>03</span><strong>Generate</strong><em>Thin hosted ZIP</em></li>
+      <li><span>04</span><strong>Ensure</strong><em>Drop into resources/</em></li>
+    </ol>
+  </div>
 </section>
 
-<section class="section section-alt">
-  <div class="shell feature-grid">
-    <article>
-      <h3>Visual editor</h3>
-      <p>Simple guided mode or Advanced canvas — drag, snap, inspect, undo, and autosave.</p>
-    </article>
-    <article>
-      <h3>Honest loading</h3>
-      <p>The runtime listens for real FiveM load events — never a fake percentage timer.</p>
-    </article>
-    <article>
-      <h3>Hosted &amp; secure</h3>
-      <p>Screens live on Northstar. Ownership checks, CSRF, hashed passwords, and tokenized media keep customers isolated.</p>
-    </article>
+<section class="band band-split">
+  <div class="shell split-row">
+    <div class="split-copy">
+      <h2>Built for operators</h2>
+      <p>Simple guided mode when you want speed. Advanced canvas when you want control. Autosave either way.</p>
+    </div>
+    <div class="split-aside" aria-hidden="true">
+      <div class="split-chip">Simple</div>
+      <div class="split-chip split-chip-accent">Advanced</div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-honest">
+  <div class="shell honest-row">
+    <h2>Honest progress</h2>
+    <p>Runtime listens to real FiveM load events. Unknown progress shows motion — never a fake percent timer.</p>
   </div>
 </section>

@@ -60,7 +60,7 @@
 
   function copyrightLabel(cfg) {
     const wm = cfg.watermark || {};
-    return (wm.copyright && String(wm.copyright).trim()) || 'NorthStar Scripts';
+    return (wm.copyright && String(wm.copyright).trim()) || 'Northstar Load';
   }
 
   function renderWatermarks(cfg) {

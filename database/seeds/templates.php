@@ -62,7 +62,7 @@ $dual['content']['player'] = [
 ];
 $dual['watermark'] = [
     'madeBy' => 'My Server',
-    'copyright' => 'NorthStar Scripts',
+    'copyright' => 'Northstar Load',
 ];
 
 $glass = \Northstar\BuilderConfigValidator::defaultConfig('My Server', 'glass');

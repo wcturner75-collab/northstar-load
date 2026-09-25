@@ -264,7 +264,7 @@ NSBuilder.applyLayoutTheme = function (doc, themeId, opts) {
   const madeBy = doc.server.creator || doc.watermark.madeBy || doc.server.name || 'Server';
   doc.watermark.madeBy = madeBy;
   if (!doc.server.creator) doc.server.creator = madeBy;
-  doc.watermark.copyright = 'NorthStar Scripts';
+  doc.watermark.copyright = 'Northstar Load';
 
   if (reposition && theme.layout) {
     (doc.components || []).forEach((comp) => {
@@ -346,7 +346,7 @@ NSBuilder.renderDualPanel = function (doc, opts) {
     || server.creator
     || server.name
     || 'Server';
-  const copy = (doc.watermark && doc.watermark.copyright) || 'NorthStar Scripts';
+  const copy = (doc.watermark && doc.watermark.copyright) || 'Northstar Load';
   const line1 = document.createElement('div');
   line1.textContent = 'Made By: ' + madeBy;
   const line2 = document.createElement('div');

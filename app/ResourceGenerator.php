@@ -106,7 +106,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 name '{$name}'
-author 'Northstar Scripts'
+author 'Northstar Load'
 description 'Hosted loading screen — Northstar Load'
 version '{$ver}'
 
@@ -144,7 +144,7 @@ LUA;
             . "1. Drop this folder into your server resources/\r\n"
             . "2. Add: ensure {$resourceName}\r\n"
             . "3. Restart the server (or start the resource)\r\n\r\n"
-            . "The loading screen is hosted by Northstar Scripts.\r\n"
+            . "The loading screen is hosted by Northstar Load.\r\n"
             . "Edit it anytime in the web builder — players see updates\r\n"
             . "without regenerating this ZIP (same publish link).\r\n\r\n"
             . "Do not change the loadscreen URL in fxmanifest.lua.\r\n";

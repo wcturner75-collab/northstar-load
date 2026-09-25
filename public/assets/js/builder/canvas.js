@@ -84,7 +84,7 @@ NSBuilder.Canvas = (function () {
       || (server.creator && String(server.creator).trim())
       || server.name
       || 'Server';
-    const copyName = (watermark.copyright && String(watermark.copyright).trim()) || 'NorthStar Scripts';
+    const copyName = (watermark.copyright && String(watermark.copyright).trim()) || 'Northstar Load';
     const made = document.createElement('div');
     made.className = 'canvas-wm-made';
     made.textContent = 'Made By: ' + madeBy;

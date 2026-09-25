@@ -1,6 +1,6 @@
 # Northstar Load
 
-Visual FiveM loading-screen builder for **Northstar Scripts**.
+Visual FiveM loading-screen builder for **Northstar Load**.
 
 Stack: PHP 8.2+, MySQL 8 / MariaDB, PDO, sessions, vanilla JS, ZipArchive.
 
