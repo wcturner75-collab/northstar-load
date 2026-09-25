@@ -185,6 +185,12 @@ a:hover { color: #7dd3fc; }
   top: 0.75rem;
   color: var(--accent);
 }
+.recruit-list li strong {
+  color: var(--text);
+  font-family: var(--display);
+  letter-spacing: 0.03em;
+  margin-right: 0.25rem;
+}
 .why-list li::before {
   content: "✔";
   position: absolute;
