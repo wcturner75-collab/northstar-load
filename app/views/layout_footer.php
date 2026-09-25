@@ -38,5 +38,6 @@ foreach ($scripts as $src):
 ?>
 <script src="<?= \Northstar\Security::e($src) ?>"></script>
 <?php endforeach; ?>
+<?php require NORTHSTAR_ROOT . '/app/views/partials/tawk.php'; ?>
 </body>
 </html>

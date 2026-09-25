@@ -30,16 +30,16 @@ final class Security
         }
 
         header('X-Frame-Options: SAMEORIGIN');
-        // AdSense + fonts; unsafe-inline kept as fallback for page boot straps
+        // AdSense + Tawk.to + fonts; unsafe-inline kept as fallback for page boot straps
         header(
             "Content-Security-Policy: default-src 'self'; "
-            . "img-src 'self' data: blob: https:; "
+            . "img-src 'self' data: blob: https: https://*.tawk.to; "
             . "media-src 'self' blob:; "
-            . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-            . "font-src 'self' https://fonts.gstatic.com data:; "
-            . "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagservices.com https://www.google.com https://partner.googleadservices.com https://tpc.googlesyndication.com; "
-            . "connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com https://tpc.googlesyndication.com; "
-            . "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com https://www.youtube.com https://www.youtube-nocookie.com; "
+            . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to; "
+            . "font-src 'self' https://fonts.gstatic.com data: https://*.tawk.to; "
+            . "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagservices.com https://www.google.com https://partner.googleadservices.com https://tpc.googlesyndication.com https://embed.tawk.to https://cdn.jsdelivr.net; "
+            . "connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com https://tpc.googlesyndication.com https://*.tawk.to wss://*.tawk.to; "
+            . "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com https://www.youtube.com https://www.youtube-nocookie.com https://*.tawk.to; "
             . "frame-ancestors 'self'"
         );
     }

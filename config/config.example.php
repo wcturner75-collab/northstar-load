@@ -88,6 +88,15 @@ return [
         'slot' => '',
     ],
 
+    // Live chat (Tawk.to) — shown on Load site pages + builder, not on player loadscreens
+    'tawk' => [
+        'enabled' => true,
+        'property_id' => '677746b949e2fd8dfe01db4e',
+        'widget_id' => '1igkuogtd',
+        // Or set embed_src directly:
+        // 'embed_src' => 'https://embed.tawk.to/677746b949e2fd8dfe01db4e/1igkuogtd',
+    ],
+
     'entitlements' => [
         // Philosophy: Free can ship a complete loading screen.
         // Paid plans add capacity + convenience, not a paywall on basics.

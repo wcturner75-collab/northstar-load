@@ -139,5 +139,6 @@ $mode = (($editorMode ?? 'simple') === 'advanced') ? 'advanced' : 'simple';
 <script src="/assets/js/builder/autosave.js"></script>
 <script src="/assets/js/builder/simple.js"></script>
 <script src="/assets/js/builder/editor.js"></script>
+<?php require NORTHSTAR_ROOT . '/app/views/partials/tawk.php'; ?>
 </body>
 </html>
