@@ -3,9 +3,9 @@
     <div>
       <h1>Plans</h1>
         <?php if (empty($billingEnabled)): ?>
-        <p class="muted">Try Load hosted for free. The expensive product path is a <strong>one-time Tebex open-source package</strong> (planned) — full source for teams that want to own and self-host it. Optional hosted Standard/Pro may come later.</p>
+        <p class="muted">Try Load hosted for free. The expensive product path is a <strong>one-time Tebex source license</strong> (planned ~$399) — full project source for serious operators. Optional hosted Standard/Pro may come later.</p>
       <?php else: ?>
-        <p class="muted">Hosted cloud plans. For the full open-source package, see the Tebex store.</p>
+        <p class="muted">Hosted cloud plans. For the full source license, see the Tebex store.</p>
       <?php endif; ?>
     </div>
   </header>

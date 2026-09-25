@@ -30,7 +30,7 @@
 
   <article class="doc-block">
     <h2>Plans &amp; pricing</h2>
-    <p><strong>Free hosted ($0)</strong> lets you try the builder with fair limits. The expensive product we’re planning is a <strong>one-time Tebex open-source package (~$399)</strong> — full source so your team can self-host and own the stack. Optional hosted Standard/Pro upgrades may come later for people who want us to run the cloud.</p>
+    <p><strong>Free hosted ($0)</strong> lets you try the builder with fair limits. The expensive product we’re planning is a <strong>one-time Tebex source license (~$399)</strong> — full project source for serious teams that will self-host and maintain it. Priced as a premium license on purpose. Optional hosted Standard/Pro upgrades may come later if you want us to run the cloud.</p>
   </article>
 
   <article class="doc-block">
@@ -44,7 +44,7 @@
       <li><strong>Free</strong> — core editor, YouTube + file music, slideshow, staff, announcements, limited components.</li>
       <li><strong>Standard · $19/mo</strong> (optional later) — higher limits + Ken Burns.</li>
       <li><strong>Pro · $39/mo</strong> (optional later) — video backgrounds, highest limits.</li>
-      <li><strong>Tebex open-source · ~$399 one-time</strong> (planned) — full source package on the scripts store.</li>
+      <li><strong>Tebex source license · ~$399 one-time</strong> (planned) — full project source on the scripts store.</li>
     </ul>
     <p>Hosted limits are enforced on save and generate, not only in the UI.</p>
   </article>

@@ -47,7 +47,7 @@
     $billingOn = \Northstar\Entitlement::billingEnabled($config ?? null);
     ?>
     <?php if (!$billingOn): ?>
-      <p class="muted">Try Load free on our host. The premium path is a <strong>one-time Tebex open-source package</strong> (planned ~$399) — full source, yours to self-host. Optional hosted Standard/Pro may come later.</p>
+      <p class="muted">Try Load free on our host. The premium path is a <strong>one-time Tebex source license</strong> (planned ~$399) — full project source for serious teams that will self-host. Optional hosted Standard/Pro may come later.</p>
     <?php else: ?>
       <p class="muted">Pick a hosted plan below.</p>
     <?php endif; ?>
@@ -153,6 +153,6 @@
         </tr>
       </tbody>
     </table>
-    <p class="muted">Free hosted try-out is live. Premium open-source package will list on <a href="https://northstar-scripts.tebex.store/" target="_blank" rel="noopener">Tebex</a> when ready.</p>
+    <p class="muted">Free hosted try-out is live. Premium Tebex source license (~$399 one-time) will list on <a href="https://northstar-scripts.tebex.store/" target="_blank" rel="noopener">Tebex</a> when ready.</p>
   </section>
 </section>
