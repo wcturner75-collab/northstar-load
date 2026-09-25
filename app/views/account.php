@@ -153,6 +153,6 @@
         </tr>
       </tbody>
     </table>
-    <p class="muted">Free hosted try-out is live. Premium Tebex source license (~$399 one-time) will list on <a href="https://northstar-scripts.tebex.store/" target="_blank" rel="noopener">Tebex</a> when ready.</p>
+    <p class="muted">Free hosted try-out is live. Company self-host licenses: DM us on Discord via <a href="https://northstarscripts.us/contact.html">northstarscripts.us/contact</a>.</p>
   </section>
 </section>

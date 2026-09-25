@@ -70,7 +70,7 @@ return [
     'pricing' => [
         'self_host' => [
             'label' => 'Private quote',
-            'note' => 'Company self-host · send us a DM',
+            'note' => 'Company self-host · DM or email',
             'cta' => 'Interested and want to self-host for your own company? Send us a DM.',
             'url' => 'https://northstarscripts.us/contact.html',
         ],

@@ -30,7 +30,7 @@ We specialize in tools that help your community stand out, including:
 Try the hosted builder free: https://load.northstarscripts.us/
 
 Interested and want to self-host for your own company?
-Send us a DM — premium private source licenses are by request only.
+Send us a DM on Discord or email hello@northstarscripts.us — premium private source licenses are by request only.
 
 ## Why Choose Us?
 
@@ -54,7 +54,7 @@ Northstar Scripts — just launched. FiveM scripts + loading screens.
 Looking for staff, creators, testers, and members to help us grow.
 
 ➭ Free hosted Load: https://load.northstarscripts.us/
-➭ Want to self-host for your company? Send us a DM
+➭ Want to self-host for your company? Send us a DM or email hello@northstarscripts.us
 ➭ Discord: https://discord.gg/PASTE_YOUR_INVITE
 ➭ Store: https://northstar-scripts.tebex.store/
 ```
